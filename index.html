@@ -94,6 +94,11 @@ button:active{transform:scale(.96)}
 .insight-dots{display:flex;gap:5px;margin-bottom:12px;justify-content:center}
 .idot{width:6px;height:6px;border-radius:50%;background:var(--border3);transition:background .3s}
 .idot.on{background:var(--blue)}
+.bottom-sheet{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-radius:20px 20px 0 0;padding:24px;z-index:300;transform:translateY(100%);transition:transform .3s ease;box-shadow:0 -8px 32px rgba(0,0,0,.2);max-height:80vh;overflow-y:auto;visibility:hidden;}
+.bottom-sheet.open{transform:translateY(0);visibility:visible;}
+.bs-handle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 20px;}
+.bs-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:299;display:none;}
+.bs-overlay.open{display:block;}
 </style>
 </head>
 <body>
@@ -544,7 +549,9 @@ function toggleGPS(){
       document.getElementById("mgps-lbl-km").textContent=T("trajet");
       document.getElementById("mgps-lbl-cout").textContent=T("coutTrajet");
       document.getElementById("mgps-btn-stop").textContent=T("gpsStop");
-      if(mgps)mgps.style.display="flex";
+      if(mgps){mgps.style.display="";mgps.classList.add("open");}
+	  document.getElementById("mgps-btn-share").style.display="none";
+document.getElementById("mgps-overlay").classList.add("open");
 	  document.getElementById("mgps-cout").textContent="0.00 "+userCurrency;
       gpsWatchId=navigator.geolocation.watchPosition(function(p){
         gpsDistance+=calcDist(gpsStartCoords,{lat:p.coords.latitude,lng:p.coords.longitude});
@@ -580,7 +587,21 @@ function stopGPS(){
   var distEl=document.getElementById("gps-dist");
   if(distEl)distEl.style.display="none";
   var mgps=document.getElementById("mgps");
-  if(mgps)mgps.style.display="none";
+  if(mgps)mgps.classList.remove("open");
+var ov=document.getElementById("mgps-overlay");
+if(ov)ov.classList.remove("open");
+document.getElementById("mgps-km").textContent="0 km";
+document.getElementById("mgps-cout").textContent="0.00 "+userCurrency;
+document.getElementById("mgps-btn-share").style.display="none";
+var km=Math.round(gpsDistance/100)/10;
+if(km>0){
+  var shareBtn=document.getElementById("mgps-btn-share");
+  if(shareBtn)shareBtn.style.display="block";
+  shareBtn.dataset.km=km;
+  var s=getStats();
+  var cout=s&&s.avgPpk?(km*s.avgPpk).toFixed(2):"--";
+  shareBtn.dataset.cout=cout;
+}
 }
 function calcDist(a,b){
   var R=6371000;
@@ -831,6 +852,8 @@ jour:"j",mois:"mois",an:"an",ans:"ans",
   gpsStart:"Démarrer trajet",gpsStop:"Terminer trajet",gpsIndispo:"GPS non disponible",
   coutTrajet:"Coût du trajet",enregistrement:"Enregistrement en cours",
 ct:"Contrôle technique",ctDate:"Date de mise en circulation",ctProchain:"Prochain CT",ctPopupTitre:"Rappel CT",ctPopupSub:"Votre contrôle technique approche !",ctFait:"CT effectué !",ctRappeler:"Me le rappeler",ctNonSoumis:"Non soumis",ctLastDate:"Date dernier CT",
+  prixStation:"Prix station",comingSoon:"Bientôt disponible",
+  partager:"Partager",partagerTitre:"Résumé du trajet",copie:"Copié !",
   droits:"Tous droits réservés",
   sp95:"SP95",sp98:"SP98",e10:"E10",e85:"E85",b7:"B7",gpl:"GPL"
 },
@@ -876,6 +899,8 @@ en:{
   gpsStart:"Start trip",gpsStop:"End trip",gpsIndispo:"GPS not available",
   coutTrajet:"Trip cost",enregistrement:"Recording in progress",
     ct:"MOT / Technical control",ctDate:"Registration date",ctProchain:"Next MOT",ctPopupTitre:" MOT reminder",ctPopupSub:"Your MOT is coming up!",ctFait:" MOT done!",ctRappeler:" Remind me later",ctNonSoumis:"Not required",ctLastDate:"Last MOT date",
+  prixStation:"Station price",comingSoon:"Coming soon",
+  partager:"Share",partagerTitre:"Trip summary",copie:"Copied!",
   droits:"All rights reserved",
   sp95:"Petrol 95",sp98:"Petrol 98",e10:"E10 petrol",e85:"E85 ethanol",b7:"B7 diesel",gpl:"LPG"
 },
@@ -921,6 +946,8 @@ jour:"d",mois:"meses",an:"año",ans:"años",
   gpsStart:"Iniciar trayecto",gpsStop:"Finalizar trayecto",gpsIndispo:"GPS no disponible",
   coutTrajet:"Coste del trayecto",enregistrement:"Grabación en curso",
   ct:"Revisione",ctDate:"Data di immatricolazione",ctProchain:"Prossima revisione",ctPopupTitre:" Promemoria revisione",ctPopupSub:"La revisione si avvicina!",ctFait:" Revisione effettuata!",ctRappeler:" Ricordamelo",ctNonSoumis:"No requerido",ctLastDate:"Fecha última ITV",
+  prixStation:"Precio estación",comingSoon:"Próximamente",
+  partager:"Compartir",partagerTitre:"Resumen del trayecto",copie:"¡Copiado!",
   droits:"Todos los derechos reservados",
   sp95:"Gasolina 95",sp98:"Gasolina 98",e10:"Gasolina E10",e85:"Etanol E85",b7:"Diésel B7",gpl:"GLP"
 },
@@ -966,6 +993,8 @@ jour:"g",mois:"mesi",an:"anno",ans:"anni",
   gpsStart:"Avvia percorso",gpsStop:"Termina percorso",gpsIndispo:"GPS non disponibile",
   coutTrajet:"Costo del percorso",enregistrement:"Registrazione in corso",
     ct:"Revisione",ctDate:"Data di immatricolazione",ctProchain:"Prossima revisione",ctPopupTitre:" Promemoria revisione",ctPopupSub:"La revisione si avvicina!",ctFait:" Revisione effettuata!",ctRappeler:" Ricordamelo",ctNonSoumis:"Non richiesto",ctLastDate:"Data ultima revisione",
+  prixStation:"Prezzo stazione",comingSoon:"Prossimamente",
+  partager:"Condividi",partagerTitre:"Riepilogo percorso",copie:"Copiato!",
   droits:"Tutti i diritti riservati",
   sp95:"Benzina 95",sp98:"Benzina 98",e10:"Benzina E10",e85:"E85 etanolo",b7:"Diesel B7",gpl:"GPL"
 },
@@ -1011,6 +1040,8 @@ jour:"T",mois:"Monate",an:"Jahr",ans:"Jahre",
   gpsStart:"Fahrt starten",gpsStop:"Fahrt beenden",gpsIndispo:"GPS nicht verfügbar",
   coutTrajet:"Fahrtkosten",enregistrement:"Aufzeichnung läuft",
     ct:"Hauptuntersuchung",ctDate:"Erstzulassungsdatum",ctProchain:"Nächste HU",ctPopupTitre:"️ HU-Erinnerung",ctPopupSub:"Ihre Hauptuntersuchung naht!",ctFait:" HU erledigt!",ctRappeler:" Später erinnern",ctNonSoumis:"Nicht erforderlich",ctLastDate:"Datum letzte HU",
+  prixStation:"Tankstellenpreis",comingSoon:"Demnächst",
+  partager:"Teilen",partagerTitre:"Fahrtbericht",copie:"Kopiert!",
   droits:"Alle Rechte vorbehalten",
   sp95:"Super 95",sp98:"Super Plus 98",e10:"E10",e85:"E85",b7:"Diesel B7",gpl:"LPG"
 },
@@ -1056,6 +1087,8 @@ jour:"d",mois:"meses",an:"ano",ans:"anos",
   gpsStart:"Iniciar percurso",gpsStop:"Terminar percurso",gpsIndispo:"GPS não disponível",
   coutTrajet:"Custo do percurso",enregistrement:"Gravação em curso",
   ct:"Inspeção técnica",ctDate:"Data de matrícula",ctProchain:"Próxima inspeção",ctPopupTitre:" Lembrete inspeção",ctPopupSub:"A sua inspeção está a chegar!",ctFait:" Inspeção feita!",ctRappeler:" Lembrar depois",ctNonSoumis:"Não obrigatório",ctLastDate:"Data última inspeção",
+  prixStation:"Preço posto",comingSoon:"Em breve",
+  partager:"Partilhar",partagerTitre:"Resumo da viagem",copie:"Copiado!",
   droits:"Todos os direitos reservados",
   sp95:"Gasolina 95",sp98:"Gasolina 98",e10:"Gasolina E10",e85:"Etanol E85",b7:"Diesel B7",gpl:"GPL"
  },
@@ -1237,7 +1270,9 @@ nl: {
   e85: "E85",
   b7: "B7",
   gpl: "GPL",
+  prixStation:"Stationprijs",comingSoon:"Binnenkort",
   ct:"APK keuring",ctDate:"Datum eerste toelating",ctProchain:"Volgende APK",ctPopupTitre:" APK herinnering",ctPopupSub:"Uw APK nadert!",ctFait:" APK gedaan!",ctRappeler:" Herinner me",ctNonSoumis:"Niet vereist",ctLastDate:"Datum laatste APK",
+  partager:"Delen",partagerTitre:"Rit samenvatting",copie:"Gekopieerd!",
 },
 jp: {
   accueil: "ホーム",
@@ -1417,7 +1452,9 @@ jp: {
   e85: "E85",
   b7: "B7",
   gpl: "GPL",
+  prixStation:"スタンド価格",comingSoon:"近日公開",
   ct:"車検",ctDate:"初度登録日",ctProchain:"次回車検",ctPopupTitre:" 車検リマインダー",ctPopupSub:"車検が近づいています！",ctFait:" 車検完了！",ctRappeler:" 後で通知",ctNonSoumis:"不要",ctLastDate:"最終車検日",
+  partager:"共有",partagerTitre:"旅行の概要",copie:"コピーしました！",
 },
 ko: {
   accueil: "홈",
@@ -1597,7 +1634,9 @@ ko: {
   e85: "E85",
   b7: "B7",
   gpl: "GPL",
+  prixStation:"주유소 가격",comingSoon:"곧 출시",
   ct:"자동차 검사",ctDate:"최초 등록일",ctProchain:"다음 검사",ctPopupTitre:" 검사 알림",ctPopupSub:"자동차 검사가 다가옵니다!",ctFait:" 검사 완료!",ctRappeler:" 나중에 알림",ctNonSoumis:"불필요",ctLastDate:"마지막 검사일",
+  partager:"공유",partagerTitre:"여행 요약",copie:"복사됨!",
 },
 tr: {
   accueil: "Ana Sayfa",
@@ -1777,7 +1816,9 @@ tr: {
   e85: "E85",
   b7: "B7",
   gpl: "GPL",
+  prixStation:"İstasyon fiyatı",comingSoon:"Yakında",
   ct:"Araç muayenesi",ctDate:"İlk tescil tarihi",ctProchain:"Sonraki muayene",ctPopupTitre:" Muayene hatırlatıcı",ctPopupSub:"Araç muayeneniz yaklaşıyor!",ctFait:" Muayene yapıldı!",ctRappeler:" Sonra hatırlat",ctNonSoumis:"Gerekli değil",ctLastDate:"Son muayene tarihi",
+  partager:"Paylaş",partagerTitre:"Seyahat özeti",copie:"Kopyalandı!",
 }
 };
 function T(k){return(LANG[userLang]&&LANG[userLang][k])||LANG.fr[k]||k;}
@@ -2108,12 +2149,12 @@ h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-botto
 h+='<div class="card-sm" style="text-align:center"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">'+T("consoMoy")+'</div><div style="font-size:26px;font-weight:900;letter-spacing:-1.5px;line-height:1;color:var(--text)">'+(s.avgConso||"--")+'</div><div style="font-size:11px;color:var(--text3);margin-top:5px">'+uC+' km</div></div>';
 
 h+='<div class="card-sm" style="text-align:center"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">'+T("prixMoy")+'</div><div style="font-size:26px;font-weight:900;letter-spacing:-1.5px;line-height:1;color:var(--text)">'+(s.avgPpk||"--")+'</div><div style="font-size:11px;color:var(--text3);margin-top:5px">'+userCurrency+' / km</div></div>';
-h+='<div class="card-sm" style="text-align:center"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">'+T("trajetMoy")+'</div><div style="font-size:26px;font-weight:900;letter-spacing:-1.5px;line-height:1;color:var(--text)">'+(s.avgKm||"--")+'</div><div style="font-size:11px;color:var(--text3);margin-top:5px">km</div></div>';
+h+='<div class="card-sm" style="text-align:center"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">'+T("autonomie")+'</div><div style="font-size:26px;font-weight:900;letter-spacing:-1.5px;line-height:1;color:var(--text)">'+(s.autonomie||"--")+'<span style="font-size:12px;font-weight:600;margin-left:3px">km</span></div><div style="font-size:11px;color:var(--text3);margin-top:4px">~'+(s.avgKm||"--")+' km ('+T("trajetMoy")+')</div></div>';
 
 var f=getFiltered();var allDates=f.map(function(e){return e.date;}).sort();var duree="--";
 if(allDates.length>=2){var d1=new Date(allDates[0]),d2=new Date(allDates[allDates.length-1]);var days=Math.round((d2-d1)/(1000*60*60*24));if(days<30)duree=days+" "+T("jour");else if(days<365)duree=Math.round(days/30)+" "+T("mois");else{var ans=(days/365).toFixed(1);duree=ans+" "+(parseFloat(ans)>=2?T("ans"):T("an"));}}
 if(s.autonomie){
-h+='<div class="card-sm" style="text-align:center"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">'+T("autonomie")+'</div><div style="font-size:26px;font-weight:900;letter-spacing:-1.5px;line-height:1;color:var(--text)">'+s.autonomie+'</div><div style="font-size:11px;color:var(--text3);margin-top:5px">km</div></div>';
+h+='<div class="card-sm" style="text-align:center;opacity:.5"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">⛽ '+T("prixStation")+'</div><div style="font-size:20px;font-weight:900;color:var(--text3)">--</div><div style="font-size:10px;color:var(--text3);margin-top:5px">'+T("comingSoon")+'</div></div>';
 }
 h+='</div>';
   if(s.last){
@@ -2648,6 +2689,20 @@ updateNavLang();
 function openAbout(){
   document.getElementById('mabout').style.display='flex';
 }
+function partagerTrajet(){
+  var btn=document.getElementById("mgps-btn-share");
+  var km=btn.dataset.km||"--";
+  var cout=btn.dataset.cout||"--";
+  var now=new Date().toLocaleDateString();
+  var txt=T("partagerTitre")+"\n"+T("kmTrajet")+": "+km+" km\n"+T("coutTrajet")+": "+cout+" "+userCurrency+"\n"+now+"\n\nKarBu — karbu.net";
+  if(navigator.share){
+    navigator.share({title:"KarBu",text:txt});
+  } else {
+    navigator.clipboard.writeText(txt).then(function(){
+      showToast(T("copie"));
+    });
+  }
+}
 </script>
 <div id="mhelp" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.4);align-items:center;justify-content:center;padding:24px">
   <div class="card" style="width:100%;max-width:340px;padding:24px;max-height:80vh;overflow-y:auto">
@@ -2692,19 +2747,22 @@ function openAbout(){
     </div>
   </div>
 </div>
-<div id="mgps" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;align-items:center;justify-content:center">
-  <div style="background:var(--card);border-radius:24px;padding:32px;width:85%;max-width:320px;text-align:center">
+<div class="bs-overlay" id="mgps-overlay" onclick="stopGPS()"></div>
+<div class="bottom-sheet" id="mgps" style="display:none">
+  <div class="bs-handle"></div>
+  <div style="text-align:center">
     <div style="font-size:13px;color:var(--text3);font-weight:700;letter-spacing:.5px;margin-bottom:20px" id="mgps-title"></div>
     <div style="margin-bottom:16px">
       <div style="font-size:12px;color:var(--text3);margin-bottom:4px" id="mgps-lbl-km"></div>
       <div style="font-size:42px;font-weight:900;color:var(--text);letter-spacing:-2px" id="mgps-km">0 km</div>
     </div>
     <div style="margin-bottom:24px">
-    <div style="font-size:12px;color:var(--text3);margin-bottom:4px" id="mgps-lbl-cout"></div>
-      <div style="font-size:42px;font-weight:900;color:#2563eb;letter-spacing:-2px" id="mgps-cout">0.00 €</div>  
+      <div style="font-size:12px;color:var(--text3);margin-bottom:4px" id="mgps-lbl-cout"></div>
+      <div style="font-size:42px;font-weight:900;color:#2563eb;letter-spacing:-2px" id="mgps-cout">0.00</div>
     </div>
     <button onclick="stopGPS()" style="width:100%;background:#ef0000;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:700;color:#fff;cursor:pointer" id="mgps-btn-stop"></button>
   </div>
+</div>
 </div>
 <div id="mct" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:center;justify-content:center;padding:20px">
   <div style="background:var(--card);border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center">
