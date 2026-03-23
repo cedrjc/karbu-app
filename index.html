@@ -155,11 +155,7 @@ button:active{transform:scale(.96)}
   <span id="reserve-unit" style="font-size:12px;color:var(--text3)">L</span>
   <button type="button" onclick="adjustReserve(1)" style="width:28px;height:28px;border-radius:50%;border:1px solid var(--border2);background:var(--card);font-size:16px;cursor:pointer">➕</button>
 </div>
-<div class="lbl" style="margin-top:12px" id="mveh-couleur">Couleur</div>
-    <div style="display:flex;align-items:center;gap:12px;margin-top:4px">
-      <input type="color" id="nv-color" value="#4f8ef7" style="width:52px;height:42px;padding:3px;border-radius:10px;border:none;cursor:pointer"/>
-      <div id="nv-prev" style="flex:1;height:42px;border-radius:12px;background:#4f8ef7"></div>
-    </div>
+
     <div style="display:flex;gap:10px;margin-top:20px">
       <button class="btn-p" style="flex:1" onclick="addVehicle()" id="mveh-btn-add">Ajouter</button>
       <button class="btn-s" onclick="closeVehModal()" id="mveh-btn-cancel">'+T("annuler")+'</button>
@@ -374,24 +370,7 @@ var vselHtml='<div style="position:relative;margin-bottom:16px"><button class="c
     var fuelVehs=selV&&selV.type==="fuel"?[selV]:[];
     var html='';
     if(fuelVehs.length){
-      fuelVehs.forEach(function(v){
-  
-  html+='<div style="font-size:10px;color:var(--text3);font-weight:500;margin-bottom:6px">('+T("carburant")+')</div>';
-  html+='<div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px">';
-  FUEL_TYPES.forEach(function(ft){
-    html+='<button class="chip'+(v.fuel===ft.id?" sel":"")+'" onclick="setVehFuel(\''+v.id+'\',\''+ft.id+'\')">'+ft.label+'</button>';
-  });
-  html+='</div>';
-  html+='<div style="font-size:10px;color:var(--text3);font-weight:500;margin-bottom:6px">('+T("reservoir")+')</div>';
-  html+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">';
-  html+='<input type="number" placeholder="60" value="'+(v.cap||"")+'" style="max-width:80px" onchange="setVehCap(\''+v.id+'\',this.value)"/>';
-html+='<span style="font-size:12px;color:var(--text3)">L</span>';
- html+='<span style="font-size:12px;color:var(--text3);font-weight:600">'+T("reserve")+'</span>'; 
-  html+='<button class="chip" onclick="setVehReserve(\''+v.id+'\',-1)">➖</button>';
-  html+='<span style="font-size:15px;font-weight:800">'+(v.reserve!==undefined?v.reserve:10)+'</span>';
-  html+='<span id="reserve-unit" style="font-size:12px;color:var(--text3)">L</span>';
-  html+='<button class="chip" onclick="setVehReserve(\''+v.id+'\',1)">➕</button>';
-  html+='</div>';
+      fuelVehs.forEach(function(v){ 
 html+='<div style="font-size:10px;color:var(--text3);font-weight:500;margin-bottom:6px">('+T("stationDef")+')</div>';
 html+='<div style="display:flex;gap:8px;margin-bottom:16px">';
 html+='<button class="chip'+((v.defSta||"major")==="major"?" sel":"")+'" onclick="setVehDefSta(\''+v.id+'\',\'major\')">'+T("major")+'</button>';
@@ -407,6 +386,16 @@ html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bo
 html+='<div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">'+T("vidIntervalKm")+'</div><div style="display:flex;align-items:center;gap:6px"><button class="chip" onclick="setVidIntervalKm(\''+v.id+'\',-1000)">➖</button><span style="font-weight:800">'+(v.vidIntervalKm||10000)+'</span><span style="font-size:11px;color:var(--text3)">km</span><button class="chip" onclick="setVidIntervalKm(\''+v.id+'\',1000)">➕</button></div></div>';
 html+='<div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">'+T("vidIntervalMois")+'</div><div style="display:flex;align-items:center;gap:6px"><button class="chip" onclick="setVidIntervalMois(\''+v.id+'\',-1)">➖</button><span style="font-weight:800">'+(v.vidIntervalMois||12)+'</span><span style="font-size:11px;color:var(--text3)">'+T("mois")+'</span><button class="chip" onclick="setVidIntervalMois(\''+v.id+'\',1)">➕</button></div></div>';
 html+='</div>';
+html+='<div style="font-size:10px;color:var(--text3);font-weight:500;margin-bottom:6px">('+T("ct")+')</div>';
+html+='<div style="display:flex;gap:8px;margin-bottom:8px">';
+html+='<button class="chip'+((v.ctInterval||2)===1?" sel":"")+'" onclick="setCtInterval(\''+v.id+'\',1)">1 '+T("an")+'</button>';
+html+='<button class="chip'+((v.ctInterval||2)===2?" sel":"")+'" onclick="setCtInterval(\''+v.id+'\',2)">2 '+T("ans")+'</button>';
+html+='</div>';
+html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">';
+html+='<div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">'+T("ctDate")+'</div><input type="date" value="'+(v.ctDate||"")+'" style="width:100%" onchange="setCtDate(\''+v.id+'\',this.value)"/></div>';
+html+='<div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">'+T("ctLastDate")+'</div><input type="date" value="'+(v.ctLastDate||"")+'" style="width:100%" onchange="setCtLastDate(\''+v.id+'\',this.value)"/></div>';
+html+='</div>';
+html+='<div style="font-size:13px;color:var(--text3);margin-bottom:16px">'+T("ctProchain")+' : <strong>'+getCtProchain(v)+'</strong></div>';
 html+='<button onclick="deleteVeh(\''+v.id+'\')" style="width:100%;margin-top:4px;margin-bottom:16px;background:var(--red-bg);border:1.5px solid var(--red-bg);border-radius:14px;padding:6px;font-size:12px;font-weight:700;color:var(--red)">'+T("supprimerVeh")+'</button>';
 });
 }
@@ -415,17 +404,8 @@ if(true){
 if(elecVehs.length){
   elecVehs.forEach(function(v){
     
-    html+='<div style="font-size:10px;color:var(--text3);font-weight:500;margin-bottom:6px">('+T("batterie")+')</div>';
-html+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">';
-html+='<input type="number" placeholder="75" value="'+(v.cap||"")+'" style="max-width:80px" onchange="setVehCap(\''+v.id+'\',this.value)"/>';
-html+='<span style="font-size:12px;color:var(--text3)">kWh</span>';
-html+='<span style="font-size:12px;color:var(--text3);font-weight:600">'+T("tampon")+'</span>';
-html+='<button class="chip" onclick="setVehReserve(\''+v.id+'\',-1)">➖</button>';
-html+='<span style="font-size:15px;font-weight:800">'+(v.reserve!==undefined?v.reserve:10)+'</span>';
-html+='<span style="font-size:12px;color:var(--text3)">kWh</span>';
-html+='<button class="chip" onclick="setVehReserve(\''+v.id+'\',1)">➕</button>';
-html+='</div>';
-html+='<div style="font-size:10px;color:var(--text3);font-weight:500;margin-bottom:6px">('+T("stationDef")+')</div>';
+    
+html+='<div style="font-size:10px;color:var(--text3);font-weight:500;margin-bottom:6px">('+T("borneDef")+')</div>';
     html+='<div style="display:flex;gap:8px;margin-bottom:16px">';
     html+='<button class="chip'+(defaultBorne==="maison"?" sel":"")+'" onclick="setDefBorne(\'maison\')">'+T("maison")+'</button>';
     html+='<button class="chip'+(defaultBorne==="autre"?" sel":"")+'" onclick="setDefBorne(\'autre\')">'+T("autre")+'</button>';
@@ -440,6 +420,16 @@ html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bo
 html+='<div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">'+T("vidIntervalKm")+'</div><div style="display:flex;align-items:center;gap:6px"><button class="chip" onclick="setVidIntervalKm(\''+v.id+'\',-1000)">➖</button><span style="font-weight:800">'+(v.vidIntervalKm||10000)+'</span><span style="font-size:11px;color:var(--text3)">km</span><button class="chip" onclick="setVidIntervalKm(\''+v.id+'\',1000)">➕</button></div></div>';
 html+='<div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">'+T("vidIntervalMois")+'</div><div style="display:flex;align-items:center;gap:6px"><button class="chip" onclick="setVidIntervalMois(\''+v.id+'\',-1)">➖</button><span style="font-weight:800">'+(v.vidIntervalMois||12)+'</span><span style="font-size:11px;color:var(--text3)">'+T("mois")+'</span><button class="chip" onclick="setVidIntervalMois(\''+v.id+'\',1)">➕</button></div></div>';
 html+='</div>';
+html+='<div style="font-size:10px;color:var(--text3);font-weight:500;margin-bottom:6px">('+T("ct")+')</div>';
+html+='<div style="display:flex;gap:8px;margin-bottom:8px">';
+html+='<button class="chip'+((v.ctInterval||2)===1?" sel":"")+'" onclick="setCtInterval(\''+v.id+'\',1)">1 '+T("an")+'</button>';
+html+='<button class="chip'+((v.ctInterval||2)===2?" sel":"")+'" onclick="setCtInterval(\''+v.id+'\',2)">2 '+T("ans")+'</button>';
+html+='</div>';
+html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">';
+html+='<div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">'+T("ctDate")+'</div><input type="date" value="'+(v.ctDate||"")+'" style="width:100%" onchange="setCtDate(\''+v.id+'\',this.value)"/></div>';
+html+='<div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">'+T("ctLastDate")+'</div><input type="date" value="'+(v.ctLastDate||"")+'" style="width:100%" onchange="setCtLastDate(\''+v.id+'\',this.value)"/></div>';
+html+='</div>';
+html+='<div style="font-size:13px;color:var(--text3);margin-bottom:16px">'+T("ctProchain")+' : <strong>'+getCtProchain(v)+'</strong></div>';
 html+='<button onclick="deleteVeh(\''+v.id+'\')" style="width:100%;margin-top:4px;margin-bottom:16px;background:var(--red-bg);border:1.5px solid var(--red-bg);border-radius:14px;padding:6px;font-size:12px;font-weight:700;color:var(--red)">'+T("supprimerVeh")+'</button>';
 });
 }
@@ -537,8 +527,8 @@ function setVidIntervalKm(id,delta){
 function setVidIntervalMois(id,delta){
   var v=vehicles.find(function(x){return x.id===id;});
   if(v){v.vidIntervalMois=Math.max(1,(v.vidIntervalMois||12)+delta);saveAll();openConfig();}
-} 
-  var gpsWatchId=null;
+}
+var gpsWatchId=null;
 var gpsStartCoords=null;
 var gpsDistance=0;
 
@@ -549,14 +539,13 @@ function toggleGPS(){
     navigator.geolocation.getCurrentPosition(function(pos){
       gpsStartCoords={lat:pos.coords.latitude,lng:pos.coords.longitude};
       gpsDistance=0;
-      var mgps=document.getElementById("mgps");
+   var mgps=document.getElementById("mgps");
       document.getElementById("mgps-title").textContent=T("enregistrement");
       document.getElementById("mgps-lbl-km").textContent=T("trajet");
       document.getElementById("mgps-lbl-cout").textContent=T("coutTrajet");
       document.getElementById("mgps-btn-stop").textContent=T("gpsStop");
-      document.getElementById("mgps-cout").textContent="0.00 "+userCurrency;
       if(mgps)mgps.style.display="flex";
-      ico.textContent="⏹️";
+	  document.getElementById("mgps-cout").textContent="0.00 "+userCurrency;
       gpsWatchId=navigator.geolocation.watchPosition(function(p){
         gpsDistance+=calcDist(gpsStartCoords,{lat:p.coords.latitude,lng:p.coords.longitude});
         gpsStartCoords={lat:p.coords.latitude,lng:p.coords.longitude};
@@ -568,20 +557,18 @@ function toggleGPS(){
         }
         var distEl=document.getElementById("gps-dist");
         if(distEl&&km>0){distEl.style.display="inline";distEl.textContent=km+"km";}
-      },function(err){
-        console.warn("GPS watch error",err);
-      },{enableHighAccuracy:true,maximumAge:0,timeout:10000});
-    },function(err){
-      console.warn("getCurrentPosition error",err);
-    },{enableHighAccuracy:true,maximumAge:0,timeout:10000});
+      },{enableHighAccuracy:true,maximumAge:0,timeout:5000});
+      ico.textContent="⏹️";
+    });
   } else {
-    navigator.geolocation.clearWatch(gpsWatchId);
+   navigator.geolocation.clearWatch(gpsWatchId);
     gpsWatchId=null;
-    ico.textContent="📍";
+   ico.textContent="📍";
     var distEl=document.getElementById("gps-dist");
     if(distEl)distEl.style.display="none";
     var mgps=document.getElementById("mgps");
-    if(mgps)mgps.style.display="none";
+    if(mgps)mgps.style.display="none"; 
+    var km=Math.round(gpsDistance/100)/10;
   }
 }
 function stopGPS(){
@@ -590,7 +577,6 @@ function stopGPS(){
     gpsWatchId=null;
   }
   var ico=document.getElementById("gps-ico");
-  if(ico)ico.textContent="📍";
   var distEl=document.getElementById("gps-dist");
   if(distEl)distEl.style.display="none";
   var mgps=document.getElementById("mgps");
@@ -665,6 +651,75 @@ function setVehDefBorne(vid,val){
   }
   saveAll();
   openConfig();
+}
+function setCtDate(id,val){
+  var v=vehicles.find(function(x){return x.id===id;});
+  if(v){v.ctDate=val||null;saveAll();openConfig();}
+}
+function setCtLastDate(id,val){
+  var v=vehicles.find(function(x){return x.id===id;});
+  if(v){v.ctLastDate=val||null;saveAll();openConfig();}
+}
+function setCtInterval(id,val){
+  var v=vehicles.find(function(x){return x.id===id;});
+  if(v){v.ctInterval=val;saveAll();openConfig();}
+}
+function parseYMD(s){
+  if(!s) return null;
+  var p=s.split('-');if(p.length!==3)return null;
+  return new Date(parseInt(p[0],10),parseInt(p[1],10)-1,parseInt(p[2],10));
+}
+
+function getCtProchain(v){
+  if(!v.ctLastDate)return"--";
+  var interval=v.ctInterval||2;
+  var base=parseYMD(v.ctLastDate);
+  if(!base)return"--";
+  var prochain=new Date(base);
+  prochain.setFullYear(prochain.getFullYear()+interval);
+  return prochain.toLocaleDateString();
+}
+
+function checkCT(){
+  var now=new Date();
+  for(var i=0;i<vehicles.length;i++){
+    var v=vehicles[i];
+    if(!v.ctDate)continue;
+    if(ls("KarBu_ct_skip_"+v.id))continue;
+    var mise=parseYMD(v.ctDate);
+    if(!mise)continue;
+    var ageAns=(now-mise)/(1000*60*60*24*365.25);
+    if(ageAns<4)continue;
+    var interval=ageAns>=10?1:2;
+    var prochain=new Date(mise);
+    while(prochain<=now){
+      prochain.setFullYear(prochain.getFullYear()+interval);
+      if(prochain.getFullYear()>now.getFullYear()+100)break;
+    }
+    var diffMonths=(prochain-now)/(1000*60*60*24*30);
+    if(diffMonths<=1){showCtPopup(v);break;}
+  }
+}
+
+function showCtPopup(v){
+  document.getElementById("mct-title").textContent=T("ctPopupTitre");
+  document.getElementById("mct-sub").textContent=v.name+" — "+T("ctPopupSub");
+  document.getElementById("mct-btn-fait").textContent=T("ctFait");
+  document.getElementById("mct-btn-rappel").textContent=T("ctRappeler");
+  document.getElementById("mct").dataset.vid=v.id;
+  document.getElementById("mct").style.display="flex";
+}
+
+function ctFait(){
+  var vid=document.getElementById("mct").dataset.vid;
+  ss("KarBu_ct_skip_"+vid,null);
+  document.getElementById("mct").style.display="none";
+}
+
+function ctRappeler(){
+  var vid=document.getElementById("mct").dataset.vid;
+  ss("KarBu_ct_skip_"+vid,"1");
+  document.getElementById("mct").style.display="none";
 }
 function clearData(){
   if(!confirm("Supprimer TOUTES les données ? Cette action est irréversible."))return;
@@ -753,7 +808,7 @@ fr:{
   pays:"Pays",t6:"Jusqu'à 7 pays au total.",t7:"Ajoutez un pays depuis la page Ajouter selon vos voyages.",
   t8:"Exportez vos données en CSV depuis la configuration.",t9:"Importez une sauvegarde existante à tout moment.",
   v2:"v2.0 en préparation ! Mode multi-utilisateurs : partagez un/des véhicule(s) avec votre famille, chacun enregistre ses pleins depuis son propre appareil, tout se synchronise en temps réel.",
-stationDef:"station par défaut",
+stationDef:"station par défaut",borneDef:"Borne par défaut",
 toutes:"Toutes",tous:"Tous",pays:"Pays",major:"Major",autre:"Autre",maison:"Maison",maison:"Maison",plein:"plein",pleins:"pleins",  
   premium:"Premium",normal:"Normal",trajet:"Trajet",touchPoint:"Touchez un point pour le detail. Pincez pour zoomer.",consoTitle:"Consommation",prixTitle:"Prix",prixPays:"Prix moyen par pays",meilleure:"Meilleure",pire:"Pire",meilleur:"Meilleur",tableau:"Tableau",consoMoy:"Conso. moyenne",trajetMoy:"Trajet moyen",prixMoy:"Prix moyen",autonomie:"Autonomie estimée",dernierPlein:"Dernier plein",prixL:"Prix/L",vsMoy:"VS moyenne",prixAvant:"Prix vs avant",conseil:"Conseil",record:"Record personnel",conseilEco:"Conseil eco",txtConsoHaut:"au-dessus de la moyenne - Vérifiez la pression des pneus !",txtConsoBas:"en dessous de la moyenne - Continuez !",txtRecord:"Record à battre !",txtEco:"Anticipez les freinages, roulez souple - Ça change tout à la conso !",txtConsoDebut:"Votre conso est",txtLe:"le",txtMeilleureConso:"Meilleure conso",
   aucuneDonnee:"Aucune donnée",ajouterPlein:"Ajoutez votre premier plein !",
@@ -775,6 +830,7 @@ jour:"j",mois:"mois",an:"an",ans:"ans",
   vidPopupTitre:"⚠️ Rappel vidange",vidPopupSub:"Il est temps de faire la vidange !",vidFait:"✅ C'est fait !",vidRappeler:"🔔 Me le rappeler",
   gpsStart:"Démarrer trajet",gpsStop:"Terminer trajet",gpsIndispo:"GPS non disponible",
   coutTrajet:"Coût du trajet",enregistrement:"Enregistrement en cours",
+ct:"Contrôle technique",ctDate:"Date de mise en circulation",ctProchain:"Prochain CT",ctPopupTitre:"Rappel CT",ctPopupSub:"Votre contrôle technique approche !",ctFait:"CT effectué !",ctRappeler:"Me le rappeler",ctNonSoumis:"Non soumis",ctLastDate:"Date dernier CT",
   droits:"Tous droits réservés",
   sp95:"SP95",sp98:"SP98",e10:"E10",e85:"E85",b7:"B7",gpl:"GPL"
 },
@@ -797,7 +853,7 @@ en:{
   pays:"Countries",t6:"Up to 7 countries in total.",t7:"Add a country from the Add page according to your travels.",
   t8:"Export your data as CSV from the settings.",t9:"Import an existing backup at any time.",
   v2:"v2.0 in preparation! Multi-user mode: share one or more vehicles with your family, each person records refuels from their own device and everything syncs in real time.",prixTitle:"Price",prixPays:"Average price by country",meilleure:"Best",pire:"Worst",meilleur:"Best",tableau:"Table",consoMoy:"Avg. consumption",trajetMoy:"Avg. trip",prixMoy:"Avg. price",autonomie:"Estimated range",dernierPlein:"Last refuel",prixL:"Price/L",vsMoy:"VS average",prixAvant:"Price vs prev.",conseil:"Tip",record:"Personal record",conseilEco:"Eco tip",txtConsoHaut:"above average - Check your tyre pressure!",txtConsoBas:"below average - Keep it up!",txtRecord:"Record to beat!",txtEco:"Anticipate braking, drive smoothly - It makes all the difference!",txtConsoDebut:"Your consumption is",txtLe:"on",txtMeilleureConso:"Best consumption",
-  stationDef:"default station",
+  stationDef:"default station",borneDef:"Default charger",
   toutes:"All",tous:"All",pays:"Country",major:"Major",autre:"Other",maison:"Home",maison:"Home",plein:"fill",pleins:"fills",
   premium:"Premium",normal:"Regular",trajet:"Trip",touchPoint:"Touch a point for details. Pinch to zoom.",consoTitle:"Consumption",
   aucuneDonnee:"No data",ajouterPlein:"Add your first refuel!",
@@ -819,6 +875,7 @@ en:{
   vidPopupTitre:"⚠️ Oil change reminder",vidPopupSub:"Time for an oil change!",vidFait:"✅ Done!",vidRappeler:"🔔 Remind me later",
   gpsStart:"Start trip",gpsStop:"End trip",gpsIndispo:"GPS not available",
   coutTrajet:"Trip cost",enregistrement:"Recording in progress",
+    ct:"MOT / Technical control",ctDate:"Registration date",ctProchain:"Next MOT",ctPopupTitre:" MOT reminder",ctPopupSub:"Your MOT is coming up!",ctFait:" MOT done!",ctRappeler:" Remind me later",ctNonSoumis:"Not required",ctLastDate:"Last MOT date",
   droits:"All rights reserved",
   sp95:"Petrol 95",sp98:"Petrol 98",e10:"E10 petrol",e85:"E85 ethanol",b7:"B7 diesel",gpl:"LPG"
 },
@@ -841,7 +898,7 @@ es:{
   pays:"Países",t6:"Hasta 7 países en total.",t7:"Agregue un país desde la página Agregar según sus viajes.",
   t8:"Exporte sus datos en CSV desde la configuración.",t9:"Importe una copia de seguridad existente en cualquier momento.",
   v2:"¡v2.0 en preparación! Modo multiusuario: comparta uno o más vehículos con su familia, cada persona registra sus repostajes desde su propio dispositivo y todo se sincroniza en tiempo real.",prixTitle:"Precio",prixPays:"Precio medio por país",meilleure:"Mejor",pire:"Peor",meilleur:"Mejor",tableau:"Tabla",consoMoy:"Conso. media",trajetMoy:"Trayecto medio",prixMoy:"Precio medio",autonomie:"Autonomía estimada",dernierPlein:"Último repostaje",prixL:"Precio/L",vsMoy:"VS media",prixAvant:"Precio vs ant.",conseil:"Consejo",record:"Récord personal",conseilEco:"Consejo eco",txtConsoHaut:"por encima de la media - ¡Compruebe la presión de los neumáticos!",txtConsoBas:"por debajo de la media - ¡Continúe así!",txtRecord:"¡Récord a batir!",txtEco:"Anticipe los frenos, conduzca suave - ¡Cambia todo en el consumo!",txtConsoDebut:"Su consumo es",txtLe:"el",txtMeilleureConso:"Mejor consumo",
-  stationDef:"estación por defecto",
+  stationDef:"estación por defecto",borneDef:"Cargador predeterminado",
   toutes:"Todas",tous:"Todos",pays:"País",major:"Major",autre:"Otro",maison:"Casa",maison:"Casa",plein:"repostaje",pleins:"repostajes",
   premium:"Premium",normal:"Normal",trajet:"Trayecto",touchPoint:"Toca un punto para el detalle. Pellizca para hacer zoom.",consoTitle:"Consumo",
   aucuneDonnee:"Sin datos",ajouterPlein:"¡Agrega tu primer repostaje!",
@@ -863,6 +920,7 @@ jour:"d",mois:"meses",an:"año",ans:"años",
   vidPopupTitre:"⚠️ Recordatorio cambio aceite",vidPopupSub:"¡Es hora de cambiar el aceite!",vidFait:"✅ ¡Hecho!",vidRappeler:"🔔 Recuérdamelo",
   gpsStart:"Iniciar trayecto",gpsStop:"Finalizar trayecto",gpsIndispo:"GPS no disponible",
   coutTrajet:"Coste del trayecto",enregistrement:"Grabación en curso",
+  ct:"Revisione",ctDate:"Data di immatricolazione",ctProchain:"Prossima revisione",ctPopupTitre:" Promemoria revisione",ctPopupSub:"La revisione si avvicina!",ctFait:" Revisione effettuata!",ctRappeler:" Ricordamelo",ctNonSoumis:"No requerido",ctLastDate:"Fecha última ITV",
   droits:"Todos los derechos reservados",
   sp95:"Gasolina 95",sp98:"Gasolina 98",e10:"Gasolina E10",e85:"Etanol E85",b7:"Diésel B7",gpl:"GLP"
 },
@@ -885,7 +943,7 @@ it:{
   pays:"Paesi",t6:"Fino a 7 paesi in totale.",t7:"Aggiungi un paese dalla pagina Aggiungi in base ai tuoi viaggi.",
   t8:"Esporta i tuoi dati in CSV dalle impostazioni.",t9:"Importa un backup esistente in qualsiasi momento.",
   v2:"v2.0 in preparazione! Modalità multi-utente: condividi uno o più veicoli con la tua famiglia, ognuno registra i rifornimenti dal proprio dispositivo e tutto si sincronizza in tempo reale.",prixTitle:"Prezzo",prixPays:"Prezzo medio per paese",meilleure:"Migliore",pire:"Peggiore",meilleur:"Migliore",tableau:"Tabella",consoMoy:"Cons. media",trajetMoy:"Percorso medio",prixMoy:"Prezzo medio",autonomie:"Autonomia stimata",dernierPlein:"Ultimo rifornimento",prixL:"Prezzo/L",vsMoy:"VS media",prixAvant:"Prezzo vs prec.",conseil:"Consiglio",record:"Record personale",conseilEco:"Consiglio eco",txtConsoHaut:"sopra la media - Controlla la pressione dei pneumatici!",txtConsoBas:"sotto la media - Continua così!",txtRecord:"Record da battere!",txtEco:"Anticipa le frenate, guida piano - Cambia tutto nel consumo!",txtConsoDebut:"Il tuo consumo è",txtLe:"il",txtMeilleureConso:"Miglior consumo",
-  stationDef:"stazione predefinita",
+  stationDef:"stazione predefinita",borneDef:"Caricatore predefinito",
   toutes:"Tutte",tous:"Tutti",pays:"Paese",major:"Major",autre:"Altro",maison:"Casa",maison:"Casa",plein:"rifornimento",pleins:"rifornimenti",
   premium:"Premium",normal:"Normale",trajet:"Percorso",touchPoint:"Tocca un punto per i dettagli. Pizzica per ingrandire.",consoTitle:"Consumo",
   aucuneDonnee:"Nessun dato",ajouterPlein:"Aggiungi il tuo primo rifornimento!",
@@ -907,6 +965,7 @@ jour:"g",mois:"mesi",an:"anno",ans:"anni",
   vidPopupTitre:"⚠️ Promemoria cambio olio",vidPopupSub:"È ora di fare il cambio olio!",vidFait:"✅ Fatto!",vidRappeler:"🔔 Ricordamelo",
   gpsStart:"Avvia percorso",gpsStop:"Termina percorso",gpsIndispo:"GPS non disponibile",
   coutTrajet:"Costo del percorso",enregistrement:"Registrazione in corso",
+    ct:"Revisione",ctDate:"Data di immatricolazione",ctProchain:"Prossima revisione",ctPopupTitre:" Promemoria revisione",ctPopupSub:"La revisione si avvicina!",ctFait:" Revisione effettuata!",ctRappeler:" Ricordamelo",ctNonSoumis:"Non richiesto",ctLastDate:"Data ultima revisione",
   droits:"Tutti i diritti riservati",
   sp95:"Benzina 95",sp98:"Benzina 98",e10:"Benzina E10",e85:"E85 etanolo",b7:"Diesel B7",gpl:"GPL"
 },
@@ -929,7 +988,7 @@ de:{
   pays:"Länder",t6:"Bis zu 7 Länder insgesamt.",t7:"Fügen Sie je nach Ihren Reisen ein Land über die Seite Hinzufügen hinzu.",
   t8:"Exportieren Sie Ihre Daten als CSV aus den Einstellungen.",t9:"Importieren Sie jederzeit eine vorhandene Sicherung.",
   v2:"Version 2.0 in Vorbereitung! Mehrbenutzermodus: Teilen Sie ein oder mehrere Fahrzeuge mit Ihrer Familie, jeder erfasst seine Tankvorgänge auf seinem eigenen Gerät und alles synchronisiert sich in Echtzeit.",prixTitle:"Preis",prixPays:"Durchschnittspreis pro Land",meilleure:"Beste",pire:"Schlechteste",meilleur:"Bester",tableau:"Tabelle",consoMoy:"Ø Verbrauch",trajetMoy:"Ø Strecke",prixMoy:"Ø Preis",autonomie:"Geschätzte Reichweite",dernierPlein:"Letzte Tankung",prixL:"Preis/L",vsMoy:"VS Durchschnitt",prixAvant:"Preis vs vorher",conseil:"Tipp",record:"Persönlicher Rekord",conseilEco:"Eco-Tipp",txtConsoHaut:"über dem Durchschnitt - Reifendruck prüfen!",txtConsoBas:"unter dem Durchschnitt - Weiter so!",txtRecord:"Rekord zu schlagen!",txtEco:"Bremsen antizipieren, sanft fahren - Das ändert alles am Verbrauch!",txtConsoDebut:"Ihr Verbrauch ist",txtLe:"am",txtMeilleureConso:"Bester Verbrauch",
-  stationDef:"Standardtankstelle",
+  stationDef:"Standardtankstelle",borneDef:"Standard-Ladestation",
   toutes:"Alle",tous:"Alle",pays:"Land",major:"Major",autre:"Andere",maison:"Zuhause",maison:"Zuhause",plein:"Tankung",pleins:"Tankungen",
   premium:"Premium",normal:"Normal",trajet:"Strecke",touchPoint:"Punkt antippen für Details. Zum Zoomen zusammenkneifen.",consoTitle:"Verbrauch",
   aucuneDonnee:"Keine Daten",ajouterPlein:"Fügen Sie Ihre erste Tankung hinzu!",
@@ -951,6 +1010,7 @@ jour:"T",mois:"Monate",an:"Jahr",ans:"Jahre",
   vidPopupTitre:"⚠️ Ölwechsel-Erinnerung",vidPopupSub:"Zeit für einen Ölwechsel!",vidFait:"✅ Erledigt!",vidRappeler:"🔔 Später erinnern",
   gpsStart:"Fahrt starten",gpsStop:"Fahrt beenden",gpsIndispo:"GPS nicht verfügbar",
   coutTrajet:"Fahrtkosten",enregistrement:"Aufzeichnung läuft",
+    ct:"Hauptuntersuchung",ctDate:"Erstzulassungsdatum",ctProchain:"Nächste HU",ctPopupTitre:"️ HU-Erinnerung",ctPopupSub:"Ihre Hauptuntersuchung naht!",ctFait:" HU erledigt!",ctRappeler:" Später erinnern",ctNonSoumis:"Nicht erforderlich",ctLastDate:"Datum letzte HU",
   droits:"Alle Rechte vorbehalten",
   sp95:"Super 95",sp98:"Super Plus 98",e10:"E10",e85:"E85",b7:"Diesel B7",gpl:"LPG"
 },
@@ -973,7 +1033,7 @@ pt:{
   pays:"Países",t6:"Até 7 países no total.",t7:"Adicione um país na página Adicionar de acordo com suas viagens.",
   t8:"Exporte seus dados em CSV nas configurações.",t9:"Importe um backup existente a qualquer momento.",
   v2:"v2.0 em preparação! Modo multiusuário: compartilhe um ou mais veículos com sua família, cada pessoa registra seus abastecimentos em seu próprio dispositivo e tudo sincroniza em tempo real.",prixTitle:"Preço",prixPays:"Preço médio por país",meilleure:"Melhor",pire:"Pior",meilleur:"Melhor",tableau:"Tabela",consoMoy:"Cons. média",trajetMoy:"Percurso médio",prixMoy:"Preço médio",autonomie:"Autonomia estimada",dernierPlein:"Último abast.",prixL:"Preço/L",vsMoy:"VS média",prixAvant:"Preço vs ant.",conseil:"Dica",record:"Recorde pessoal",conseilEco:"Dica eco",txtConsoHaut:"acima da média - Verifique a pressão dos pneus!",txtConsoBas:"abaixo da média - Continue assim!",txtRecord:"Recorde a bater!",txtEco:"Antecipe as travagens, conduza suave - Muda tudo no consumo!",txtConsoDebut:"O seu consumo é",txtLe:"em",txtMeilleureConso:"Melhor consumo",
-  stationDef:"posto padrão",
+  stationDef:"posto padrão",borneDef:"Carregador padrão",
   toutes:"Todas",tous:"Todos",pays:"País",major:"Major",autre:"Outro",maison:"Casa",maison:"Casa",plein:"abastecimento",pleins:"abastecimentos",
   premium:"Premium",normal:"Normal",trajet:"Percurso",touchPoint:"Toque num ponto para detalhes. Belisque para zoom.",consoTitle:"Consumo",
   aucuneDonnee:"Sem dados",ajouterPlein:"Adicione seu primeiro abastecimento!",
@@ -995,9 +1055,10 @@ jour:"d",mois:"meses",an:"ano",ans:"anos",
   vidPopupTitre:"⚠️ Lembrete troca de óleo",vidPopupSub:"Está na hora de trocar o óleo!",vidFait:"✅ Feito!",vidRappeler:"🔔 Lembrar depois",
   gpsStart:"Iniciar percurso",gpsStop:"Terminar percurso",gpsIndispo:"GPS não disponível",
   coutTrajet:"Custo do percurso",enregistrement:"Gravação em curso",
+  ct:"Inspeção técnica",ctDate:"Data de matrícula",ctProchain:"Próxima inspeção",ctPopupTitre:" Lembrete inspeção",ctPopupSub:"A sua inspeção está a chegar!",ctFait:" Inspeção feita!",ctRappeler:" Lembrar depois",ctNonSoumis:"Não obrigatório",ctLastDate:"Data última inspeção",
   droits:"Todos os direitos reservados",
   sp95:"Gasolina 95",sp98:"Gasolina 98",e10:"Gasolina E10",e85:"Etanol E85",b7:"Diesel B7",gpl:"GPL"
-},
+ },
 nl: {
   accueil: "Home",
   graphiques: "Grafieken",
@@ -1052,7 +1113,7 @@ nl: {
   t8: "Exporteer uw gegevens in CSV vanuit de configuratie.",
   t9: "Importeer een bestaande back-up op elk moment.",
   v2: "v2.0 in voorbereiding! Multi-user modus: deel één of meerdere voertuigen met uw gezin, iedereen registreert zijn eigen tankbeurten vanaf zijn eigen apparaat, alles synchroniseert in realtime.",
-  stationDef: "standaard station",
+  stationDef: "standaard station",borneDef:"Standaard laadstation",
   toutes: "Alle",
   tous: "Alle",
   pays: "Landen",
@@ -1175,7 +1236,8 @@ nl: {
   e10: "E10",
   e85: "E85",
   b7: "B7",
-  gpl: "GPL"
+  gpl: "GPL",
+  ct:"APK keuring",ctDate:"Datum eerste toelating",ctProchain:"Volgende APK",ctPopupTitre:" APK herinnering",ctPopupSub:"Uw APK nadert!",ctFait:" APK gedaan!",ctRappeler:" Herinner me",ctNonSoumis:"Niet vereist",ctLastDate:"Datum laatste APK",
 },
 jp: {
   accueil: "ホーム",
@@ -1231,7 +1293,7 @@ jp: {
   t8: "設定からCSV形式でデータをエクスポートします。",
   t9: "いつでも既存のバックアップをインポートできます。",
   v2: "v2.0準備中！マルチユーザーモード：家族と車両を共有します。誰もが自分のデバイスから給油を記録し、すべてがリアルタイムで同期されます。",
-  stationDef: "デフォルトのステーション",
+  stationDef: "デフォルトのステーション",borneDef:"デフォルト充電器",
   toutes: "すべて",
   tous: "すべて",
   pays: "国",
@@ -1354,7 +1416,8 @@ jp: {
   e10: "E10",
   e85: "E85",
   b7: "B7",
-  gpl: "GPL"
+  gpl: "GPL",
+  ct:"車検",ctDate:"初度登録日",ctProchain:"次回車検",ctPopupTitre:" 車検リマインダー",ctPopupSub:"車検が近づいています！",ctFait:" 車検完了！",ctRappeler:" 後で通知",ctNonSoumis:"不要",ctLastDate:"最終車検日",
 },
 ko: {
   accueil: "홈",
@@ -1410,7 +1473,7 @@ ko: {
   t8: "설정에서 CSV 형식으로 데이터를 내보내세요.",
   t9: "언제든지 기존 백업을 가져올 수 있습니다.",
   v2: "v2.0 준비 중! 다중 사용자 모드: 가족과 차량을 공유하세요. 각자 자신의 장치에서 주유를 기록하면 모든 것이 실시간으로 동기화됩니다.",
-  stationDef: "기본 스테이션",
+  stationDef: "기본 스테이션",borneDef:"기본 충전기",
   toutes: "모두",
   tous: "모두",
   pays: "국가",
@@ -1533,7 +1596,8 @@ ko: {
   e10: "E10",
   e85: "E85",
   b7: "B7",
-  gpl: "GPL"
+  gpl: "GPL",
+  ct:"자동차 검사",ctDate:"최초 등록일",ctProchain:"다음 검사",ctPopupTitre:" 검사 알림",ctPopupSub:"자동차 검사가 다가옵니다!",ctFait:" 검사 완료!",ctRappeler:" 나중에 알림",ctNonSoumis:"불필요",ctLastDate:"마지막 검사일",
 },
 tr: {
   accueil: "Ana Sayfa",
@@ -1589,7 +1653,7 @@ tr: {
   t8: "Verilerinizi ayarlardan CSV formatında dışa aktarın.",
   t9: "Herhangi bir zamanda mevcut bir yedeklemeyi içe aktarın.",
   v2: "v2.0 hazırlanıyor! Çoklu kullanıcı modu: Ailenizle birden fazla aracı paylaşın, her biri kendi cihazından dolum kaydeder, her şey gerçek zamanlı olarak senkronize edilir.",
-  stationDef: "varsayılan istasyon",
+  stationDef: "varsayılan istasyon",borneDef:"Varsayılan şarj istasyonu",
   toutes: "Tümü",
   tous: "Hepsi",
   pays: "Ülkeler",
@@ -1712,7 +1776,8 @@ tr: {
   e10: "E10",
   e85: "E85",
   b7: "B7",
-  gpl: "GPL"
+  gpl: "GPL",
+  ct:"Araç muayenesi",ctDate:"İlk tescil tarihi",ctProchain:"Sonraki muayene",ctPopupTitre:" Muayene hatırlatıcı",ctPopupSub:"Araç muayeneniz yaklaşıyor!",ctFait:" Muayene yapıldı!",ctRappeler:" Sonra hatırlat",ctNonSoumis:"Gerekli değil",ctLastDate:"Son muayene tarihi",
 }
 };
 function T(k){return(LANG[userLang]&&LANG[userLang][k])||LANG.fr[k]||k;}
@@ -1860,7 +1925,7 @@ function addVehicle(){
   var name=document.getElementById("nv-name").value.trim();if(!name)return;
   var cap=parseFloat(document.getElementById("nv-cap").value)||null;
 var reserve=parseInt(document.getElementById("nv-reserve-val").textContent)||10;
-var v={id:"v"+Date.now(),name:name,color:document.getElementById("nv-color").value,type:newVehType,fuel:newVehType==="fuel"?newFuelType:null,cap:cap,reserve:reserve,vidKm:null,vidDate:null,vidIntervalKm:10000,vidIntervalMois:12};
+var v={id:"v"+Date.now(),name:name,color:"#4f8ef7",type:newVehType,fuel:newVehType==="fuel"?newFuelType:null,cap:cap,reserve:reserve,vidKm:null,vidDate:null,vidIntervalKm:10000,vidIntervalMois:12,ctDate:null};
   vehicles.push(v);activeVid=v.id;
   document.getElementById("nv-name").value="";
   closeVehModal();saveAll();
@@ -1869,7 +1934,6 @@ var v={id:"v"+Date.now(),name:name,color:document.getElementById("nv-color").val
   }
   showToast("Vehicule ajoute");render();
 }
-document.getElementById("nv-color").addEventListener("input",function(){document.getElementById("nv-prev").style.background=this.value;});
 function saveCountry(){
   var val=document.getElementById("mc-input").value.trim();
   if(!val)return;
@@ -2579,8 +2643,7 @@ if(!vehicles.length){
   setView("ajouter");
 } else {
   render();
-  setTimeout(function(){checkVidange();},1000);
-}
+setTimeout(function(){checkVidange();checkCT();},1000);}
 updateNavLang();
 function openAbout(){
   document.getElementById('mabout').style.display='flex';
@@ -2641,6 +2704,17 @@ function openAbout(){
       <div style="font-size:42px;font-weight:900;color:#2563eb;letter-spacing:-2px" id="mgps-cout">0.00 €</div>  
     </div>
     <button onclick="stopGPS()" style="width:100%;background:#ef0000;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:700;color:#fff;cursor:pointer" id="mgps-btn-stop"></button>
+  </div>
+</div>
+<div id="mct" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--card);border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center">
+    <div style="font-size:40px;margin-bottom:12px">🔧</div>
+    <div style="font-size:16px;font-weight:800;margin-bottom:8px" id="mct-title"></div>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:20px" id="mct-sub"></div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button onclick="ctFait()" style="background:var(--green);border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:700;color:#fff;cursor:pointer" id="mct-btn-fait"></button>
+      <button onclick="ctRappeler()" style="background:var(--card);border:1.5px solid var(--border2);border-radius:14px;padding:14px;font-size:14px;font-weight:700;color:var(--text);cursor:pointer" id="mct-btn-rappel"></button>
+    </div>
   </div>
 </div>
 </body>
