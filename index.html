@@ -2546,33 +2546,38 @@ function renderHistorique(){
   var isElec=veh&&veh.type==="elec";
   var uF=isElec?"kWh":"L";var uC=isElec?"kWh/100":"L/100";
   if(!sorted.length)return'<div class="empty"><div class="eico">'+(isElec?"E":"F")+'</div><div class="etit">'+T("aucunPlein")+'</div><div class="esub">'+T("ajouterPremier")+'</div></div>';
-  return sorted.map(function(e){
+  return sorted.map(function(e,idx){
   var sf=!isElec&&e.ftype?" - "+(e.ftype==="premium"?T("premium"):T("normal")):"";
-  return'<div class="card" style="padding:12px 14px">'+
-    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'+
+  var prev=sorted[idx+1];
+  var fleche="";
+  if(e.conso&&prev&&prev.conso){
+    fleche=e.conso<prev.conso?' <span style="color:#34d399;font-size:18px;font-weight:900">↓</span>':' <span style="color:#ef4444;font-size:18px;font-weight:900">↑</span>';
+  }
+  return'<div class="card" style="padding:10px 14px">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">'+
       '<div>'+
         '<span style="font-size:14px;font-weight:800">'+fmtDate(e.date)+'</span>'+
         '<span style="font-size:12px;color:var(--text3);margin-left:8px">'+(e.tkm?e.tkm.toLocaleString():"--")+' kms</span>'+
       '</div>'+
       '<div style="display:flex;gap:6px">'+
-        '<button onclick="editEntry('+e.id+')" style="background:var(--card2);border:1.5px solid var(--border3);border-radius:8px;padding:5px 8px;color:var(--text3);font-size:14px">✏️</button>'+
-        '<button onclick="deleteEntry('+e.id+')" style="background:var(--red-bg);border:1.5px solid var(--red-bg);border-radius:8px;padding:5px 8px;color:var(--red);font-size:14px">🗑️</button>'+
+        '<button onclick="editEntry('+e.id+')" style="background:var(--card2);border:1.5px solid var(--border3);border-radius:8px;padding:5px 8px;color:var(--text3);font-size:13px">✏️</button>'+
+        '<button onclick="deleteEntry('+e.id+')" style="background:var(--red-bg);border:1.5px solid var(--red-bg);border-radius:8px;padding:5px 8px;color:var(--red);font-size:13px">🗑️</button>'+
       '</div>'+
     '</div>'+
-    '<div style="font-size:11px;color:var(--text3);margin-bottom:8px">'+e.sta+sf+' • <span style="color:'+(getSlotColor(e.ctr)||"var(--text3)")+';font-weight:600">'+e.ctr+'</span></div>'+
-    '<div style="display:flex;gap:10px;align-items:center">'+
-      '<div style="background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:10px;padding:8px 12px;text-align:center;min-width:70px">'+
-        '<div style="font-size:22px;font-weight:900;color:var(--text);letter-spacing:-1px">'+(e.conso||"--")+'</div>'+
+    '<div style="font-size:11px;color:var(--text3);margin-bottom:6px;margin-top:-8px">'+e.sta+sf+' • <span style="color:'+(getSlotColor(e.ctr)||"var(--text3)")+';font-weight:600">'+e.ctr+'</span></div>'+
+    '<div style="display:flex;gap:20px;align-items:center">'+
+      '<div style="background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:10px;padding:8px 12px;text-align:center;min-width:72px">'+
+        '<div style="font-size:22px;font-weight:900;color:var(--text);letter-spacing:-1px">'+(e.conso||"--")+fleche+'</div>'+
         '<div style="font-size:9px;color:var(--blue);font-weight:700">'+uC+'</div>'+
       '</div>'+
-      '<div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:4px">'+
-        '<div style="font-size:12px;color:var(--text3)">'+userCurrency+'/'+(isElec?"kWh":"L")+' <strong style="color:var(--text)">'+e.ppl+'</strong></div>'+
-        '<div style="font-size:12px;color:var(--text3)">'+userCurrency+'/km <strong style="color:var(--text)">'+(e.ppk||"--")+'</strong></div>'+
-        '<div style="font-size:12px;color:var(--text3)">'+uF+' <strong style="color:var(--text)">'+e.lit+'</strong></div>'+
-        '<div style="font-size:12px;color:var(--text3)">'+T("trajet")+' <strong style="color:var(--text)">'+e.rkm+' kms</strong></div>'+
+      '<div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:3px 8px">'+
+        '<div style="font-size:12px;color:var(--text3)"><strong style="color:var(--text)">'+e.lit+'</strong> '+uF+'</div>'+
+        '<div style="font-size:12px;color:var(--text3)"><strong style="color:var(--text)">'+e.rkm+'</strong> kms</div>'+
+        '<div style="font-size:12px;color:var(--text3)"><strong style="color:var(--text)">'+e.ppl+'</strong> '+userCurrency+'/'+(isElec?"kWh":"L")+'</div>'+
+        '<div style="font-size:12px;color:var(--text3)"><strong style="color:var(--text)">'+(e.ppk||"--")+'</strong> '+userCurrency+'/km</div>'+
       '</div>'+
     '</div>'+
-    (e.note?'<div class="note-box" style="margin-top:8px">'+e.note+'</div>':'')+
+    (e.note?'<div class="note-box" style="margin-top:6px">'+e.note+'</div>':'')+
   '</div>';
 }).join("");
 }
