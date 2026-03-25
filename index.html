@@ -576,6 +576,8 @@ function toggleGPS(){
       if(mgps){mgps.style.display="";mgps.classList.add("open");}
 	  document.getElementById("mgps-btn-share").style.display="none";
 document.getElementById("mgps-overlay").classList.add("open");
+document.getElementById("mgps-btn-share").textContent="📤 "+T("partager");
+document.getElementById("mgps-btn-close").textContent="✕ "+T("fermer");
 	  document.getElementById("mgps-cout").textContent="0.00 "+userCurrency;
       gpsWatchId=navigator.geolocation.watchPosition(function(p){
         gpsDistance+=calcDist(gpsStartCoords,{lat:p.coords.latitude,lng:p.coords.longitude});
@@ -593,7 +595,7 @@ document.getElementById("mgps-overlay").classList.add("open");
     });
   } else {
     stopGPS();
-  }
+  } 
 }
 function stopGPS(){
   if(gpsWatchId){
@@ -884,6 +886,7 @@ ct:"Contrôle technique",ctDate:"Date de mise en circulation",ctProchain:"Procha
   supprimerPays:"Supprimer ce pays ?",
   cvFiscaux:"Puissance fiscale",
   coutBareme:"Coût total (barème)",
+  fermer:"Fermer",
   droits:"Tous droits réservés",
   sp95:"SP95",sp98:"SP98",e10:"E10",e85:"E85",b7:"B7",gpl:"GPL"
 },
@@ -935,6 +938,7 @@ en:{
   supprimerPays:"Delete this country?",
   cvFiscaux:"Tax horsepower",
   coutBareme:"Total cost (mileage rate)",
+  fermer:"Close",
   droits:"All rights reserved",
   sp95:"Petrol 95",sp98:"Petrol 98",e10:"E10 petrol",e85:"E85 ethanol",b7:"B7 diesel",gpl:"LPG"
 },
@@ -986,6 +990,7 @@ jour:"d",mois:"meses",an:"año",ans:"años",
   supprimerPays:"¿Eliminar este país?",
   cvFiscaux:"Potencia fiscal",
   coutBareme:"Coste total (baremo)",
+  fermer:"Cerrar",
   droits:"Todos los derechos reservados",
   sp95:"Gasolina 95",sp98:"Gasolina 98",e10:"Gasolina E10",e85:"Etanol E85",b7:"Diésel B7",gpl:"GLP"
 },
@@ -1037,6 +1042,7 @@ jour:"g",mois:"mesi",an:"anno",ans:"anni",
   supprimerPays:"Eliminare questo paese?",
   cvFiscaux:"Potenza fiscale",
   coutBareme:"Costo totale (rimborso)",
+  fermer:"Chiudi",
   droits:"Tutti i diritti riservati",
   sp95:"Benzina 95",sp98:"Benzina 98",e10:"Benzina E10",e85:"E85 etanolo",b7:"Diesel B7",gpl:"GPL"
 },
@@ -1088,6 +1094,7 @@ jour:"T",mois:"Monate",an:"Jahr",ans:"Jahre",
   supprimerPays:"Dieses Land löschen?",
   cvFiscaux:"Steuerliche PS",
   coutBareme:"Gesamtkosten (Pauschale)",
+  fermer:"Schließen",
   droits:"Alle Rechte vorbehalten",
   sp95:"Super 95",sp98:"Super Plus 98",e10:"E10",e85:"E85",b7:"Diesel B7",gpl:"LPG"
 },
@@ -1139,6 +1146,7 @@ jour:"d",mois:"meses",an:"ano",ans:"anos",
   supprimerPays:"Excluir este país?",
   cvFiscaux:"Potência fiscal",
   coutBareme:"Custo total (tabela)",
+  fermer:"Fechar",
   droits:"Todos os direitos reservados",
   sp95:"Gasolina 95",sp98:"Gasolina 98",e10:"Gasolina E10",e85:"Etanol E85",b7:"Diesel B7",gpl:"GPL"
  },
@@ -1327,6 +1335,7 @@ nl: {
   supprimerPays:"Dit land verwijderen?",
   cvFiscaux:"Fiscaal vermogen",
   coutBareme:"Totale kosten (km-vergoeding)",
+  fermer:"Sluiten",
 },
 jp: {
   accueil: "ホーム",
@@ -1513,6 +1522,7 @@ jp: {
   supprimerPays:"この国を削除しますか？",
   cvFiscaux:"課税馬力",
   coutBareme:"総コスト（基準額）",
+  fermer:"閉じる",
 },
 ko: {
   accueil: "홈",
@@ -1699,6 +1709,7 @@ ko: {
   supprimerPays:"이 국가를 삭제하시겠습니까?",
   cvFiscaux:"세금 마력",
   coutBareme:"총 비용（기준액）",
+  fermer:"닫기",
 },
 tr: {
   accueil: "Ana Sayfa",
@@ -1885,6 +1896,7 @@ tr: {
   supprimerPays:"Bu ülkeyi sil?",
   cvFiscaux:"Mali beygir gücü",
   coutBareme:"Toplam maliyet (tarife)",
+  fermer:"Kapat",
 }
 };
 function T(k){return(LANG[userLang]&&LANG[userLang][k])||LANG.fr[k]||k;}
@@ -2487,54 +2499,63 @@ function renderActivite(){
   var maxC=consos.length?Math.max.apply(null,consos).toFixed(2):null;
   var varC=minC&&maxC?+(maxC-minC).toFixed(2):null;
   var last=f.slice().sort(function(a,b){return b.date.localeCompare(a.date);})[0];
-var avgPpk=last&&last.ppl&&avgConso?+(last.ppl*avgConso/100).toFixed(3):null;
-var cost100=avgPpk?+(avgPpk*100).toFixed(2):null;
+  var avgPpk=last&&last.ppl&&avgConso?+(last.ppl*avgConso/100).toFixed(3):null;
+  var cost100=avgPpk?+(avgPpk*100).toFixed(2):null;
   var avgDist=f.length?+(totalKms/f.length).toFixed(0):null;
   var sorted=f.slice().sort(function(a,b){return b.rkm-a.rkm;});
   var maxDist=sorted[0]?sorted[0].rkm:null;
   var minLit=f.length?Math.min.apply(null,f.map(function(e){return e.lit;})).toFixed(2):null;
   var maxCost=f.length?Math.max.apply(null,f.map(function(e){return e.cost||0;})).toFixed(2):null;
   var minCost=f.length?Math.min.apply(null,f.map(function(e){return e.cost||0;})).toFixed(2):null;
+  var allDates=f.map(function(e){return e.date;}).sort();
+  var duree="--";
+  if(allDates.length>=2){var d1=new Date(allDates[0]),d2=new Date(allDates[allDates.length-1]);var days=Math.round((d2-d1)/(1000*60*60*24));if(days<30)duree=days+" "+T("jour");else if(days<365)duree=Math.round(days/30)+" "+T("mois");else{var ans=(days/365).toFixed(1);duree=ans+" "+(parseFloat(ans)>=2?T("ans"):T("an"));}}
 
-  function sec(title,items){
-    var h='<div class="card" style="margin-bottom:12px">';
-    h+='<div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:12px">'+title+'</div>';
-    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
-    items.forEach(function(it){
-      var col=it.col?it.col:"var(--text)";
-      h+='<div class="dc"><div class="dl">'+it.l+'</div><div class="dv" style="font-size:15px;font-weight:800;color:'+col+'">'+it.v+'</div>'+(it.u?'<div style="font-size:10px;color:var(--text3);margin-top:2px">'+it.u+'</div>':"")+'</div>';
-    });
-    h+='</div></div>';
+  if(!window.actOpen)window.actOpen={indic:true,carbu:false,conso:false,cout:false,util:false};
+
+  function accordion(id,ico,title,items){
+    var open=window.actOpen[id];
+    var h='<div class="card" style="margin-bottom:8px;padding:0;overflow:hidden">';
+    h+='<div onclick="window.actOpen[\''+id+'\']=!window.actOpen[\''+id+'\'];render()" style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;cursor:pointer">';
+    h+='<div style="font-size:13px;font-weight:800;color:var(--text)">'+title+'</div>';
+    h+='<span style="font-size:16px;color:var(--text3);transition:.3s">'+(open?'▾':'▸')+'</span>';
+    h+='</div>';
+    if(open){
+      h+='<div style="padding:0 12px 14px 12px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+      items.forEach(function(it){
+        var col=it.col?it.col:"var(--text)";
+        h+='<div class="dc"><div class="dl">'+it.l+'</div><div class="dv" style="font-size:15px;font-weight:800;color:'+col+'">'+it.v+'</div>'+(it.u?'<div style="font-size:10px;color:var(--text3);margin-top:2px">'+it.u+'</div>':"")+'</div>';
+      });
+      h+='</div></div>';
+    }
+    h+='</div>';
     return h;
   }
 
   var h="";
-  var allDates=f.map(function(e){return e.date;}).sort();
-var duree="--";
-if(allDates.length>=2){var d1=new Date(allDates[0]),d2=new Date(allDates[allDates.length-1]);var days=Math.round((d2-d1)/(1000*60*60*24));if(days<30)duree=days+" "+T("jour");else if(days<365)duree=Math.round(days/30)+" "+T("mois");else{var ans=(days/365).toFixed(1);duree=ans+" "+(parseFloat(ans)>=2?T("ans"):T("an"));}}
-h+=sec(T("actIndic"),[
+  h+=accordion("indic","",T("actIndic"),[
     {l:T("distTotale"),v:totalKms.toLocaleString(),u:"km"},
     {l:T("coutTotal"),v:totalSpend,u:userCurrency},
     {l:T("consoMoy"),v:avgConso||"--",u:uC+" km"},
     {l:T("duree"),v:duree}
   ]);
-  h+=sec(T("actCarbu"),[
+  h+=accordion("carbu","",T("actCarbu"),[
     {l:T("consommes"),v:totalLit,u:uF},
     {l:T("prixMoyen"),v:avgP||"--",u:uP},
     {l:T("prixMin"),v:minP||"--",u:uP,col:"var(--green)"},
     {l:T("prixMax"),v:maxP||"--",u:uP,col:"var(--red)"}
   ]);
-  h+=sec(T("actConso"),[
+  h+=accordion("conso","",T("actConso"),[
     {l:T("consoMin"),v:minC||"--",u:uC,col:"var(--green)"},
     {l:T("consoMax"),v:maxC||"--",u:uC,col:"var(--red)"},
     {l:T("variation"),v:varC||"--",u:uC},
     {l:T("consoMoyenne"),v:avgConso||"--",u:uC}
   ]);
-  h+=sec(T("actCout"),[
-{l:T("coutKm"),v:avgPpk||"--",u:userCurrency},
+  h+=accordion("cout","",T("actCout"),[
+    {l:T("coutKm"),v:avgPpk||"--",u:userCurrency},
     {l:T("cout100km"),v:cost100||"--",u:userCurrency}
   ]);
-  h+=sec(T("actUtil"),[
+  h+=accordion("util","",T("actUtil"),[
     {l:T("nbPleins"),v:f.length},
     {l:T("distMoy"),v:avgDist||"--",u:"km"}
   ]);
@@ -2551,7 +2572,7 @@ function renderHistorique(){
   var prev=sorted[idx+1];
   var fleche="";
   if(e.conso&&prev&&prev.conso){
-    fleche=e.conso<prev.conso?' <span style="color:#34d399;font-size:18px;font-weight:900">↓</span>':' <span style="color:#ef4444;font-size:18px;font-weight:900">↑</span>';
+    fleche=e.conso<prev.conso?' <span style="color:#10b981;font-size:18px;font-weight:900">↓</span>':' <span style="color:#ef4444;font-size:18px;font-weight:900">↑</span>';
   }
   return'<div class="card" style="padding:10px 14px">'+
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">'+
@@ -2564,7 +2585,7 @@ function renderHistorique(){
         '<button onclick="deleteEntry('+e.id+')" style="background:var(--red-bg);border:1.5px solid var(--red-bg);border-radius:8px;padding:5px 8px;color:var(--red);font-size:13px">🗑️</button>'+
       '</div>'+
     '</div>'+
-    '<div style="font-size:11px;color:var(--text3);margin-bottom:6px;margin-top:-6px">'+e.sta+sf+' • <span style="color:'+(getSlotColor(e.ctr)||"var(--text3)")+';font-weight:600">'+e.ctr+'</span></div>'+
+    '<div style="font-size:11px;color:var(--text3);margin-bottom:6px;margin-top:-6px">'+T(e.sta.toLowerCase().replace(/s$/,""))+sf+' • <span style="color:'+(getSlotColor(e.ctr)||"var(--text3)")+';font-weight:600">'+e.ctr+'</span></div>'+
     '<div style="display:flex;gap:30px;align-items:center">'+
       '<div style="background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:10px;padding:8px 12px;text-align:center;min-width:72px">'+
         '<div style="font-size:22px;font-weight:900;color:var(--text);letter-spacing:-1px">'+(e.conso||"--")+fleche+'</div>'+
@@ -2879,7 +2900,7 @@ function fermerGPS(){
     </div>
     <button onclick="stopGPS()" style="width:100%;background:#ef0000;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:700;color:#fff;cursor:pointer" id="mgps-btn-stop"></button>
 <button onclick="partagerTrajet()" id="mgps-btn-share" style="display:none;width:100%;margin-top:10px;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:14px;padding:14px;font-size:14px;font-weight:700;color:var(--blue);cursor:pointer">📤 Partager</button>
-<button onclick="fermerGPS()" id="mgps-btn-close" style="display:none;width:100%;margin-top:8px;background:none;border:none;padding:10px;font-size:13px;font-weight:600;color:var(--text3);cursor:pointer">✕ Fermer</button>
+<button onclick="fermerGPS()" id="mgps-btn-close" style="display:none;width:100%;margin-top:8px;background:none;border:none;padding:10px;font-size:13px;font-weight:600;color:var(--text3);cursor:pointer" data-t="fermer">✕ Fermer</button>
   </div>
 </div>
 </div>
