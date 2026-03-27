@@ -718,32 +718,48 @@ function parseYMD(s){
 }
 
 function getCtProchain(v){
-  if(!v.ctLastDate)return"--";
+  if(!v.ctLastDate){
+    if(!v.ctDate)return"--";
+    var mise=parseYMD(v.ctDate);
+    if(!mise)return"--";
+    var prochain=new Date(mise);
+    prochain.setFullYear(prochain.getFullYear()+4);
+    prochain.setDate(prochain.getDate()-1);
+    return prochain.toLocaleDateString();
+  }
   var interval=v.ctInterval||2;
   var base=parseYMD(v.ctLastDate);
   if(!base)return"--";
   var prochain=new Date(base);
   prochain.setFullYear(prochain.getFullYear()+interval);
-prochain.setDate(prochain.getDate()-1);
+  prochain.setDate(prochain.getDate()-1);
   return prochain.toLocaleDateString();
 }
-
 function checkCT(){
   var now=new Date();
   for(var i=0;i<vehicles.length;i++){
     var v=vehicles[i];
-    if(!v.ctDate)continue;
     if(ls("KarBu_ct_skip_"+v.id))continue;
-    var mise=parseYMD(v.ctDate);
-    if(!mise)continue;
-    var ageAns=(now-mise)/(1000*60*60*24*365.25);
-    if(ageAns<4)continue;
-    var interval=ageAns>=10?1:2;
-    var prochain=new Date(mise);
-    while(prochain<=now){
+    var prochain=null;
+
+    if(v.ctLastDate){
+      // Cas 2 — CT déjà passé
+      var lastCT=parseYMD(v.ctLastDate);
+      if(!lastCT)continue;
+      var interval=v.ctInterval||2;
+      prochain=new Date(lastCT);
       prochain.setFullYear(prochain.getFullYear()+interval);
-      if(prochain.getFullYear()>now.getFullYear()+100)break;
+      prochain.setDate(prochain.getDate()-1);
+    } else if(v.ctDate){
+      // Cas 1 — Voiture neuve, premier CT à 4 ans
+      var mise=parseYMD(v.ctDate);
+      if(!mise)continue;
+      prochain=new Date(mise);
+      prochain.setFullYear(prochain.getFullYear()+4);
+    } else {
+      continue;
     }
+
     var diffMonths=(prochain-now)/(1000*60*60*24*30);
     if(diffMonths<=1){showCtPopup(v);break;}
   }
@@ -751,7 +767,7 @@ function checkCT(){
 
 function showCtPopup(v){
   document.getElementById("mct-title").textContent=T("ctPopupTitre");
-  document.getElementById("mct-sub").textContent=v.name+" — "+T("ctPopupSub");
+  document.getElementById("mct-sub").textContent=v.name+" — "+T("ctPopupSub")+" : "+getCtProchain(v);
   document.getElementById("mct-btn-fait").textContent=T("ctFait");
   document.getElementById("mct-btn-rappel").textContent=T("ctRappeler");
   document.getElementById("mct").dataset.vid=v.id;
