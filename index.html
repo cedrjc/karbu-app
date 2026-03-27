@@ -263,7 +263,7 @@ button:active{transform:scale(.96)}
 <div id="cfg-veh-fuel"></div>
 <div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:10px" id="cfg-lbl-donnees">Donnees</div>
     <button class="btn-g" style="width:100%;margin-bottom:10px" onclick="exportCSV();closeConfig()" id="cfg-btn-export">Exporter des données</button>
-    <label class="btn-s" style="display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;border-radius:14px;padding:14px;width:100%"id="cfg-btn-import">Importer une sauvegarde<input type="file" accept=".csv" style="display:none;width:auto" onchange="importCSV(this);closeConfig()"/></label><button onclick="clearData();closeConfig()" style="width:100%;margin-top:10px;background:var(--red-bg);border:1.5px solid var(--red-bg);border-radius:14px;padding:14px;font-size:14px;font-weight:700;color:var(--red)"id="cfg-btn-delete">Supprimer toutes les données</button>
+    <label class="btn-s" style="display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;border-radius:14px;padding:14px;width:100%"id="cfg-btn-import">Importer une sauvegarde<input type="file" accept=".csv" style="display:none;width:auto" onchange="importCSV(this);closeConfig()"/></label><button onclick="clearData();closeConfig()" style="width:100%;margin-top:10px;background:none;border:1.5px solid var(--red);border-radius:14px;padding:14px;font-size:14px;font-weight:700;color:var(--red)"id="cfg-btn-delete">Supprimer toutes les données</button>
 <div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-top:20px;margin-bottom:10px" id="cfg-lbl-aide">Aide</div>
 <div class="card" style="padding:0;margin-bottom:12px">
   <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--border2);cursor:pointer" onclick="openAbout()">
@@ -410,7 +410,7 @@ html+='<button class="chip'+((v.cv||0)===6?" sel":"")+'" onclick="setVehCv(\''+v
 html+='<button class="chip'+((v.cv||0)===7?" sel":"")+'" onclick="setVehCv(\''+v.id+'\',7)">7CV+</button>';
 html+='</div>';
 }
-html+='<button onclick="deleteVeh(\''+v.id+'\')" style="width:100%;margin-top:4px;margin-bottom:16px;background:var(--red-bg);border:1.5px solid var(--red-bg);border-radius:14px;padding:6px;font-size:12px;font-weight:700;color:var(--red)">'+T("supprimerVeh")+'</button>';
+html+='<button onclick="deleteVeh(\''+v.id+'\')" style="width:100%;margin-top:4px;margin-bottom:16px;background:none;border:1.5px solid var(--red);border-radius:14px;padding:14px;font-size:14px;font-weight:700;color:var(--red)">'+T("supprimerVeh")+'</button>';
 });
 }
 var elecVehs=selV&&selV.type==="elec"?[selV]:[];
@@ -450,7 +450,7 @@ html+='<div style="display:flex;gap:8px;margin-bottom:16px">';
 html+='<button class="chip sel">'+T("electrique")+'</button>';
 html+='</div>';
 }
-html+='<button onclick="deleteVeh(\''+v.id+'\')" style="width:100%;margin-top:4px;margin-bottom:16px;background:var(--red-bg);border:1.5px solid var(--red-bg);border-radius:14px;padding:6px;font-size:12px;font-weight:700;color:var(--red)">'+T("supprimerVeh")+'</button>';
+html+='<button onclick="deleteVeh(\''+v.id+'\')" style="width:100%;margin-top:4px;margin-bottom:16px;background:none;border:1.5px solid var(--red);border-radius:14px;padding:10px;font-size:14px;font-weight:700;color:var(--red)">'+T("supprimerVeh")+'</button>';
 });
 }
 cfgVehFuel.innerHTML=html;
