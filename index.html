@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-title" content="KarBu"/>
 <link rel="manifest" href="/manifest.json"/>
-<title>KarBu</title>
+<title>KarBu - Carnet de bord Auto</title>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-T5QZGRWSXF"></script>
 <script>
@@ -112,7 +112,7 @@ button:active{transform:scale(.96)}
       <div id="hdr-sub" style="font-size:11px;color:var(--text3);margin-top:1px;font-weight:500"></div>
     </div>
     <button id="gps-btn" onclick="toggleGPS()" style="background:none;border:none;cursor:pointer;padding:4px;display:none;line-height:1">
-  <div style="font-size:20px;line-height:1" id="gps-ico">📍</div>
+  <div style="font-size:20px;line-height:1" id="gps-ico">🛣️⏱️</div>
 </button>
 	<button onclick="openConfig()" id="tbtn" style="background:none;border:none;font-size:24px;padding:4px;cursor:pointer">⚙️</button>
   </div>
@@ -152,7 +152,7 @@ button:active{transform:scale(.96)}
     <input id="nv-name" placeholder="ex : Nissan GT-R35"/>
 <div class="lbl" style="margin-top:14px"><span id="cap-lbl">Réservoir</span> <span id="cap-unit" style="font-weight:500;color:var(--text3)">(litres)</span></div>
 <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
-  <input type="number" id="nv-cap" placeholder="60" style="max-width:80px"/>
+  <input type="number" id="nv-cap" placeholder="45" style="max-width:80px"/>
   <span id="reserve-lbl" style="font-size:12px;color:var(--text3);font-weight:600">dont réserve</span>
   <button type="button" onclick="adjustReserve(-1)" style="width:28px;height:28px;border-radius:50%;border:1px solid var(--border2);background:var(--card);font-size:16px;cursor:pointer">➖</button>
   <span id="nv-reserve-val" style="font-size:16px;font-weight:800;min-width:24px;text-align:center">10</span>
@@ -448,17 +448,10 @@ html+='</div>';
 html+='<div style="font-size:13px;color:var(--text3);margin-bottom:16px">'+T("ctProchain")+' : <strong>'+getCtProchain(v)+'</strong></div>';
 if(savedCountries[0]==="France"){
 html+='<div style="font-size:10px;color:var(--text3);font-weight:500;margin-bottom:6px">('+T("cvFiscaux")+')</div>';
-html+='<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">';
-html+='<button class="chip'+((v.cv||0)===3?" sel":"")+'" onclick="setVehCv(\''+v.id+'\',3)">3CV</button>';
-html+='<button class="chip'+((v.cv||0)===4?" sel":"")+'" onclick="setVehCv(\''+v.id+'\',4)">4CV</button>';
-html+='<button class="chip'+((v.cv||0)===5?" sel":"")+'" onclick="setVehCv(\''+v.id+'\',5)">5CV</button>';
-html+='<button class="chip'+((v.cv||0)===6?" sel":"")+'" onclick="setVehCv(\''+v.id+'\',6)">6CV</button>';
-html+='<button class="chip'+((v.cv||0)===7?" sel":"")+'" onclick="setVehCv(\''+v.id+'\',7)">7CV+</button>';
-html+='</div>';
-}
 html+='<div style="display:flex;gap:8px;margin-bottom:16px">';
 html+='<button class="chip sel">'+T("electrique")+'</button>';
 html+='</div>';
+}
 html+='<button onclick="deleteVeh(\''+v.id+'\')" style="width:100%;margin-top:4px;margin-bottom:16px;background:var(--red-bg);border:1.5px solid var(--red-bg);border-radius:14px;padding:6px;font-size:12px;font-weight:700;color:var(--red)">'+T("supprimerVeh")+'</button>';
 });
 }
@@ -593,13 +586,12 @@ document.getElementById("mgps-btn-close").textContent="✕ "+T("fermer");
         var km=Math.round(gpsDistance/100)/10;
         document.getElementById("mgps-km").textContent=km+" km";
         var s=getStats();
-        if(s&&s.avgPpk){
-          document.getElementById("mgps-cout").textContent=(km*s.avgPpk).toFixed(2)+" "+userCurrency;
-        }
+        if(s&&s.avgPrixActuel){
+  document.getElementById("mgps-cout").textContent=(km*s.avgPrixActuel).toFixed(2)+" "+userCurrency;
+}
         var distEl=document.getElementById("gps-dist");
         if(distEl&&km>0){distEl.style.display="inline";distEl.textContent=km+"km";}
       },function(err){console.warn("GPS error",err);},{enableHighAccuracy:true,maximumAge:0,timeout:10000});
-      ico.textContent="⏹️";
     });
   } else {
     stopGPS();
@@ -623,7 +615,7 @@ function stopGPS(){
 if(btnClose)btnClose.style.display="block";
       shareBtn.dataset.km=km;
       var s=getStats();
-      shareBtn.dataset.cout=s&&s.avgPpk?(km*s.avgPpk).toFixed(2):"--";
+      shareBtn.dataset.cout=s&&s.avgPrixActuel?(km*s.avgPrixActuel).toFixed(2):"--";
     }
     var btnStop=document.getElementById("mgps-btn-stop");
     if(btnStop)btnStop.style.display="none";
@@ -734,6 +726,7 @@ function getCtProchain(v){
   if(!base)return"--";
   var prochain=new Date(base);
   prochain.setFullYear(prochain.getFullYear()+interval);
+prochain.setDate(prochain.getDate()-1);
   return prochain.toLocaleDateString();
 }
 
@@ -842,9 +835,19 @@ var LANG_COUNTRY={
   en:{title:"Your country",sub:"What is your main country? It will be used by default.",lbl:"Country",btn:"Confirm",ph:"ex : United Kingdom"},
   es:{title:"Su pais",sub:"Cual es su pais principal? Se usara por defecto.",lbl:"Pais",btn:"Confirmar",ph:"ex : Espana"},
   de:{title:"Ihr Land",sub:"Was ist Ihr Hauptland? Es wird standardmassig verwendet.",lbl:"Land",btn:"Bestatigen",ph:"ex : Deutschland"},
-  it:{title:"Il tuo paese",sub:"Qual e il tuo paese principale? Sara usato per impostazione predefinita.",lbl:"Paese",btn:"Conferma",ph:"ex : Italia"}
+  it:{title:"Il tuo paese",sub:"Qual e il tuo paese principale? Sara usato per impostazione predefinita.",lbl:"Paese",btn:"Conferma",ph:"ex : Italia"},
+  nl:{title:"Uw land",sub:"Wat is uw hoofdland? Het wordt standaard gebruikt.",lbl:"Land",btn:"Bevestigen",ph:"ex : Nederland"},
+  pt:{title:"Seu país",sub:"Qual é o seu país principal? Será usado por padrão.",lbl:"País",btn:"Confirmar",ph:"ex : Portugal"},
+  ja:{title:"あなたの国",sub:"メインの国はどこですか？デフォルトで使用されます。",lbl:"国",btn:"確認",ph:"例：日本"},
+  ko:{title:"당신의 국가",sub:"주 국가는 어디입니까？기본으로 사용됩니다。",lbl:"국가",btn:"확인",ph:"예：한국"},
+  tr:{title:"Ülkeniz",sub:"Ana ülkeniz hangisi? Varsayılan olarak kullanılacak.",lbl:"Ülke",btn:"Onayla",ph:"örn : Türkiye"}
 };
-var userLang=ls("KarBu_lang",null)||(navigator.language||"fr").substring(0,2).toLowerCase();
+var savedLang=ls("KarBu_lang",null);
+var userLang=savedLang||function(){
+  var nav=(navigator.language||"fr").substring(0,2).toLowerCase();
+  var supported=["fr","en","de","es","it","nl","pt","ja","ko","tr"];
+  return supported.indexOf(nav)>=0?nav:"en";
+}();
 const LANG={
 fr:{
   accueil:"Accueil",graphiques:"Graphiques",ajouter:"Ajouter",historique:"Historique",activite:"Activité",
@@ -896,6 +899,7 @@ ct:"Contrôle technique",ctDate:"Date de mise en circulation",ctProchain:"Procha
   coutBareme:"Coût total (barème)",
   fermer:"Fermer",
   scanTitre:"Scan ticket",scanSub:"Fonctionnalité bientôt disponible — v3.0 en cours de préparation ! Mai 2026",
+  coutCarbu:"Coût carburant",coutElec:"Coût énergie",
   droits:"Tous droits réservés",
   sp95:"SP95",sp98:"SP98",e10:"E10",e85:"E85",b7:"B7",gpl:"GPL"
 },
@@ -949,6 +953,7 @@ en:{
   coutBareme:"Total cost (mileage rate)",
   fermer:"Close",
   scanTitre:"Ticket scan",scanSub:"Feature coming soon — v3.0 in preparation! May 2026",
+  coutCarbu:"Fuel cost",coutElec:"Energy cost",
   droits:"All rights reserved",
   sp95:"Petrol 95",sp98:"Petrol 98",e10:"E10 petrol",e85:"E85 ethanol",b7:"B7 diesel",gpl:"LPG"
 },
@@ -1002,6 +1007,7 @@ jour:"d",mois:"meses",an:"año",ans:"años",
   coutBareme:"Coste total (baremo)",
   fermer:"Cerrar",
   scanTitre:"Escanear ticket",scanSub:"Función próximamente — v3.0 en preparación! Mayo 2026",
+  coutCarbu:"Coste combustible",coutElec:"Coste energía",
   droits:"Todos los derechos reservados",
   sp95:"Gasolina 95",sp98:"Gasolina 98",e10:"Gasolina E10",e85:"Etanol E85",b7:"Diésel B7",gpl:"GLP"
 },
@@ -1055,6 +1061,7 @@ jour:"g",mois:"mesi",an:"anno",ans:"anni",
   coutBareme:"Costo totale (rimborso)",
   fermer:"Chiudi",
   scanTitre:"Scansiona ticket",scanSub:"Funzione disponibile a breve — v3.0 in preparazione! Maggio 2026",
+  coutCarbu:"Costo carburante",coutElec:"Costo energia",
   droits:"Tutti i diritti riservati",
   sp95:"Benzina 95",sp98:"Benzina 98",e10:"Benzina E10",e85:"E85 etanolo",b7:"Diesel B7",gpl:"GPL"
 },
@@ -1108,6 +1115,7 @@ jour:"T",mois:"Monate",an:"Jahr",ans:"Jahre",
   coutBareme:"Gesamtkosten (Pauschale)",
   fermer:"Schließen",
   scanTitre:"Ticket scannen",scanSub:"Funktion demnächst verfügbar — v3.0 in Vorbereitung! Mai 2026",
+  coutCarbu:"Kraftstoffkosten",coutElec:"Energiekosten",
   droits:"Alle Rechte vorbehalten",
   sp95:"Super 95",sp98:"Super Plus 98",e10:"E10",e85:"E85",b7:"Diesel B7",gpl:"LPG"
 },
@@ -1161,6 +1169,7 @@ jour:"d",mois:"meses",an:"ano",ans:"anos",
   coutBareme:"Custo total (tabela)",
   fermer:"Fechar",
   scanTitre:"Digitalizar ticket",scanSub:"Funcionalidade em breve — v3.0 em preparação! Maio 2026",
+  coutCarbu:"Custo combustível",coutElec:"Custo energia",
   droits:"Todos os direitos reservados",
   sp95:"Gasolina 95",sp98:"Gasolina 98",e10:"Gasolina E10",e85:"Etanol E85",b7:"Diesel B7",gpl:"GPL"
  },
@@ -1350,6 +1359,7 @@ nl: {
   cvFiscaux:"Fiscaal vermogen",
   coutBareme:"Totale kosten (km-vergoeding)",
   fermer:"Sluiten",
+  coutCarbu:"Brandstofkosten",coutElec:"Energiekosten",
   scanTitre:"Ticket scannen",scanSub:"Functie binnenkort beschikbaar — v3.0 in voorbereiding! Mei 2026",
 },
 jp: {
@@ -1539,6 +1549,7 @@ jp: {
   coutBareme:"総コスト（基準額）",
   fermer:"閉じる",
   scanTitre:"チケットスキャン",scanSub:"まもなく利用可能 — v3.0準備中！2026年5月",
+  coutCarbu:"燃料コスト",coutElec:"エネルギーコスト",
 },
 ko: {
   accueil: "홈",
@@ -1727,6 +1738,7 @@ ko: {
   coutBareme:"총 비용（기준액）",
   fermer:"닫기",
   scanTitre:"티켓 스캔",scanSub:"곧 출시 예정 — v3.0 준비 중！2026년 5월",
+  coutCarbu:"연료 비용",coutElec:"에너지 비용",
 },
 tr: {
   accueil: "Ana Sayfa",
@@ -1915,6 +1927,7 @@ tr: {
   coutBareme:"Toplam maliyet (tarife)",
   fermer:"Kapat",
   scanTitre:"Fiş tara",scanSub:"Yakında mevcut — v3.0 hazırlanıyor! Mayıs 2026",
+  coutCarbu:"Yakıt maliyeti",coutElec:"Enerji maliyeti",
 }
 };
 function T(k){return(LANG[userLang]&&LANG[userLang][k])||LANG.fr[k]||k;}
@@ -2029,8 +2042,10 @@ var t=document.getElementById("mveh-title");
   document.querySelectorAll("#ft-sp95,#ft-sp98,#ft-e10,#ft-e85,#ft-b7,#ft-gpl").forEach(function(b){b.classList.remove("sel");});
   document.getElementById("ft-sp95").classList.add("sel");
   document.getElementById("nv-cap").value="";
+document.getElementById("nv-cap").placeholder="50";
+document.getElementById("nv-name").placeholder="ex : Nissan GT-R35";
   document.getElementById("cap-unit").textContent="("+T("litres")+")";
-  document.getElementById("nv-reserve-val").textContent="10";
+  document.getElementById("nv-reserve-val").textContent="8";
   document.getElementById("mveh").style.display="flex";
 }
 function closeVehModal(){document.getElementById("mveh").style.display="none";}
@@ -2045,6 +2060,7 @@ function selectVType(tp){
   document.getElementById("nv-cap").placeholder=tp==="fuel"?"45":"26,8";
   document.getElementById("reserve-lbl").textContent=tp==="fuel"?T("reserve"):T("tampon");
   document.getElementById("reserve-unit").textContent=tp==="fuel"?"L":"kWh";
+  document.getElementById("nv-name").placeholder=tp==="fuel"?"ex : Nissan GT-R35":"ex : Dacia Spring";
 }
 function adjustReserve(delta){
   var el=document.getElementById("nv-reserve-val");
@@ -2060,7 +2076,7 @@ function selectFuelType(ft){
 }
 function addVehicle(){
   var name=document.getElementById("nv-name").value.trim();if(!name)return;
-  var cap=parseFloat(document.getElementById("nv-cap").value)||null;
+var cap=parseFloat(document.getElementById("nv-cap").value)||(newVehType==="elec"?26.8:50);
 var reserve=parseInt(document.getElementById("nv-reserve-val").textContent)||10;
 var v={id:"v"+Date.now(),name:name,color:"#4f8ef7",type:newVehType,fuel:newVehType==="fuel"?newFuelType:null,cap:cap,reserve:reserve,vidKm:null,vidDate:null,vidIntervalKm:10000,vidIntervalMois:12,ctDate:null,cv:null};
   vehicles.push(v);activeVid=v.id;
@@ -2130,7 +2146,7 @@ function getStats(){
   var pplDiff=last&&prev?+(last.ppl-prev.ppl).toFixed(3):null;
   var consoDiff=last&&last.conso&&avgConso?+(last.conso-avgConso).toFixed(2):null;
   var cap=veh&&veh.cap?veh.cap:null;
-var reserve=veh&&veh.reserve?veh.reserve:10;
+var reserve=veh&&veh.reserve?veh.reserve:8;
 var autonomie=cap&&avgConso?+((cap-reserve)/(avgConso/100)).toFixed(0):null;var avgKm=f.length?+(f.reduce(function(a,b){return a+(b.rkm||0);},0)/f.length).toFixed(0):null;
 var months=f.length>=2?Math.max(1,Math.round((new Date(f[0].date)-new Date(f[f.length-1].date))/(1000*60*60*24*30))):1;
 var avgMonthCost=totalSpend&&months?+(totalSpend/months).toFixed(2):null;
@@ -2837,7 +2853,8 @@ var veh=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){v
 var bareme={3:0.529,4:0.606,5:0.636,6:0.665,7:0.697};
 var tauxBareme=veh&&veh.type==="elec"?0.799:(veh&&veh.cv?bareme[veh.cv]||0.697:null);
 var coutBareme=tauxBareme?(km*tauxBareme).toFixed(2):null;
-var txt=T("partagerTitre")+"\n"+T("kmTrajet")+": "+km+" km\n⛽ "+T("coutTrajet")+": "+cout+" "+userCurrency+(coutBareme?"\n🚗 "+T("coutBareme")+": "+coutBareme+" "+userCurrency:"")+"\n🕐 "+heure+" — "+dureeMin+" min\n"+now+"\n\nKarBu — karbu.net";
+var isElec=veh&&veh.type==="elec";
+var txt=T("partagerTitre")+"\n🚗 "+T("kmTrajet")+": "+km+" km\n"+(isElec?"⚡ "+T("coutElec"):"⛽ "+T("coutCarbu"))+": "+cout+" "+userCurrency+(coutBareme?"\n🚗 "+T("coutBareme")+": "+coutBareme+" "+userCurrency:"")+"\n🕐 "+heure+" — "+dureeMin+" min\n"+now+"\n\nKarBu — karbu.net";
   if(navigator.share){
     navigator.share({title:"KarBu",text:txt});
   } else {
