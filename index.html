@@ -2987,7 +2987,7 @@ function afficherBornes(bornes,lat,lng){
     var puissance=b.puissance_nominale?b.puissance_nominale+" kW":"--";
     var connecteur=b.type_prise_principale||"";
 
-    html+='<div class="card" style="padding:12px;margin-bottom:8px">';
+    html+='<div class="card" style="padding:12px;margin-bottom:8px" oncontextmenu="epinglerStation('+JSON.stringify(s)+')" ontouchstart="startLongPress(this,'+JSON.stringify(s)+')" ontouchend="cancelLongPress()">';
     html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
     html+='<div style="font-size:14px;font-weight:800">'+couleur+' '+nom+'</div>';
     html+='<div style="font-size:14px;font-weight:900;color:var(--blue)">'+puissance+'</div>';
@@ -3043,7 +3043,7 @@ var statut=ouvert?"🟢":automate?"🟠":"🔴";
     var nom=s.adresse||"Station";
     var adresse=s.ville||"";
 
-    html+='<div class="card" style="padding:12px;margin-bottom:8px">';
+    html+='<div class="card" style="padding:12px;margin-bottom:8px" oncontextmenu="epinglerStation('+JSON.stringify(s)+')" ontouchstart="startLongPress(this,'+JSON.stringify(s)+')" ontouchend="cancelLongPress()">';
     html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
     html+='<div style="font-size:14px;font-weight:800">'+statut+' '+nom+'</div>';
     html+='<div style="font-size:18px;font-weight:900;color:var(--blue)">'+prix+' '+userCurrency+'/L</div>';
@@ -3117,6 +3117,25 @@ function afficherCarte(){
     });
   }
 }
+var longPressTimer=null;
+
+function startLongPress(el,s){
+  longPressTimer=setTimeout(function(){
+    epinglerStation(s);
+  },600);
+}
+
+function cancelLongPress(){
+  if(longPressTimer)clearTimeout(longPressTimer);
+}
+
+function epinglerStation(s){
+  var veh=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
+  if(!veh)return;
+  veh.stationPref=s;
+  saveAll();
+  showToast("⭐ Station préférée enregistrée !");
+}  
 </script>
 <div id="mhelp" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.4);align-items:center;justify-content:center;padding:24px">
   <div class="card" style="width:100%;max-width:340px;padding:24px;max-height:80vh;overflow-y:auto">
