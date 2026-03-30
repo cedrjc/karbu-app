@@ -2945,14 +2945,13 @@ function fetchPrix(lat,lng){
   document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">⏳ Chargement...</div>';
   var rayon=10;
   var apiUrl="https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=within_distance(geom,geom'POINT("+lng+" "+lat+")',"+rayon+"km)&limit=20";
-  var url="https://api.allorigins.win/get?url="+encodeURIComponent(apiUrl);
+  var url="https://thingproxy.freeboard.io/fetch/"+apiUrl;
   fetch(url)
     .then(function(r){return r.json();})
     .then(function(data){
       try{
-        var parsed=JSON.parse(data.contents);
-        var stations=parsed.results||parsed.records||parsed||[];
-        document.getElementById("mprix-content").innerHTML='<div style="padding:10px;font-size:10px">DEBUG: '+stations.length+' stations — '+JSON.stringify(parsed).substring(0,200)+'</div>';
+        var stations=data.results||data.records||[];
+        document.getElementById("mprix-content").innerHTML='<div style="padding:10px;font-size:10px">DEBUG: '+stations.length+' stations — '+JSON.stringify(data).substring(0,200)+'</div>';
       }catch(e){
         document.getElementById("mprix-content").innerHTML='<div style="padding:10px;color:red">ERREUR: '+e.message+'</div>';
       }
