@@ -2945,12 +2945,12 @@ function fetchPrix(lat,lng){
   document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">⏳ Chargement...</div>';
   var rayon=10;
   var apiUrl="https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=within_distance(geom,geom'POINT("+lng+" "+lat+")',"+rayon+"km)&limit=20";
-  var url="https://corsproxy.io/?"+encodeURIComponent(apiUrl);
+  var url="https://api.allorigins.win/get?url="+encodeURIComponent(apiUrl);
   fetch(url)
     .then(function(r){return r.json();})
     .then(function(data){
-      console.log("DATA:",JSON.stringify(data).substring(0,500));
-afficherPrix(data.results||data.records||[],lat,lng);
+      var parsed=JSON.parse(data.contents);
+      afficherPrix(parsed.results||parsed.records||[],lat,lng);
     })
     .catch(function(){
       document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ Erreur réseau</div>';
