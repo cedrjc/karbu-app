@@ -3201,7 +3201,7 @@ function afficherCarte(){
 </div>
 <!-- BOTTOM SHEET PRIX STATION -->
 <div id="mprix-overlay" class="gps-overlay" onclick="fermerPrix()" style="display:none"></div>
-<div id="mprix" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--card);border-radius:20px 20px 0 0;z-index:90;max-height:90vh;flex-direction:column">  <div style="padding:16px 16px 8px 16px">
+<div id="mprix" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--card);border-radius:20px 20px 0 0;z-index:90;max-height:90vh;flex-direction:column;overflow:hidden">  <div style="padding:16px 16px 8px 16px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
       <div style="font-size:15px;font-weight:800" id="mprix-title">⛽ Prix Station</div>
       <button onclick="fermerPrix()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3)">✕</button>
@@ -3212,7 +3212,7 @@ function afficherCarte(){
       <button class="chip" onclick="setPrixVue('carte')" id="mprix-v-carte">🗺️ Carte</button>
     </div>
   </div>
-  <div id="mprix-content" style="flex:1;overflow-y:scroll;-webkit-overflow-scrolling:touch;padding:0 16px 16px 16px;max-height:60vh">
+  <div id="mprix-content" style="height:60vh;overflow-y:scroll;-webkit-overflow-scrolling:touch;padding:0 16px 16px 16px;overscroll-behavior:contain">
     📍 Recherche des stations autour de vous...
   </div>
   <div id="mprix-map" style="display:none;height:300px;width:100%"></div>
