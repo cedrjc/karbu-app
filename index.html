@@ -3055,7 +3055,10 @@ html+='<div class="card" style="padding:12px;margin-bottom:8px" ontouchstart="st
     html+='<div style="font-size:10px;color:var(--text3)">📍 '+dist+'</div>';
     html+='<div style="font-size:10px;color:var(--text3)">MAJ: '+maj+'</div>';
     html+='</div>';
-    html+='<button onclick="ouvrirGPS(\''+s.adresse+'\',\''+s.cp+' '+s.ville+'\')" style="width:100%;margin-top:8px;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:10px;padding:6px;font-size:12px;font-weight:700;color:var(--blue)">🧭 '+T("yAller")+'</button>';
+    html+='<div style="display:flex;gap:8px;margin-top:8px">';
+html+='<button onclick="ouvrirGPS(\''+s.adresse+'\',\''+s.cp+' '+s.ville+'\')" style="flex:1;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:10px;padding:6px;font-size:12px;font-weight:700;color:var(--blue)">🧭 '+T("yAller")+'</button>';
+html+='<button onclick="epinglerStation(prixStationsData['+filtered.indexOf(s)+'])" style="background:var(--card2);border:1.5px solid var(--border3);border-radius:10px;padding:6px;font-size:16px">⭐</button>';
+html+='</div>';
     html+='</div>';
   });
 
