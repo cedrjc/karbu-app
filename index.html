@@ -2943,7 +2943,7 @@ function chargerPrix(){
 function fetchPrix(lat,lng){
   document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">⏳ '+T("chargement")+'...</div>';
   var rayon=10;
-  var url="https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=within_distance(geom,geom%27POINT("+lng+" "+lat+")%27,"+rayon+"km)&limit=20&order_by=dist(geom,geom%27POINT("+lng+" "+lat+")%27)";
+url="https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=within_distance(geom,geom'POINT("+lng+" "+lat+")',"+rayon+"km)&limit=20&order_by=dist(geom,geom'POINT("+lng+" "+lat+")')";
   fetch(url)
     .then(function(r){return r.json();})
     .then(function(data){
@@ -2955,7 +2955,7 @@ function fetchPrix(lat,lng){
 }
 function fetchBornes(lat,lng){
   document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">⏳ '+T("chargement")+'...</div>';
-  var url="https://data.gouv.fr/api/explore/v2.1/catalog/datasets/consolidation-etalab-schema-irve-statique-v-2-3-0-20230222/records?where=within_distance(consolidated_longitude,consolidated_latitude,geom%27POINT("+lng+" "+lat+")%27,10km)&limit=20";
+  var url="https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/bornes-irve/records?where=within_distance("+lng+" "+lat+")%27,10km)&limit=20";
   fetch(url)
     .then(function(r){return r.json();})
     .then(function(data){
