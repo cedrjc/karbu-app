@@ -2944,21 +2944,16 @@ function chargerPrix(){
 function fetchPrix(lat,lng){
   document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">⏳ Chargement...</div>';
   var rayon=10;
-  var xhr=new XMLHttpRequest();
-  xhr.open("GET","https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=within_distance%28geom%2Cgeom%27POINT%28"+lng+"%20"+lat+"%29%27%2C"+rayon+"km%29&limit=20",true);
-  xhr.setRequestHeader("Accept","application/json");
-  xhr.onload=function(){
-    if(xhr.status===200){
-      var data=JSON.parse(xhr.responseText);
+  var apiUrl="https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=within_distance(geom,geom'POINT("+lng+" "+lat+")',"+rayon+"km)&limit=20";
+  var url="https://corsproxy.io/?"+encodeURIComponent(apiUrl);
+  fetch(url)
+    .then(function(r){return r.json();})
+    .then(function(data){
       afficherPrix(data.results||data.records||[],lat,lng);
-    } else {
-      document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ Erreur '+xhr.status+'</div>';
-    }
-  };
-  xhr.onerror=function(){
-    document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ Erreur réseau</div>';
-  };
-  xhr.send();
+    })
+    .catch(function(){
+      document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ Erreur réseau</div>';
+    });
 }
 function fetchBornes(lat,lng){
   document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">⏳ '+T("chargement")+'...</div>';
