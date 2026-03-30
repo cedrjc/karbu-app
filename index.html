@@ -3045,8 +3045,7 @@ var statut=ouvert?"🟢":automate?"🟠":"🔴";
     var nom=s.adresse||"Station";
     var adresse=s.ville||"";
 
-    var sId=s.id||s.adresse;
-html+='<div class="card" style="padding:12px;margin-bottom:8px" ontouchstart="startLongPress(this,\''+sId+'\')" ontouchend="cancelLongPress()">';
+    html+='<div class="card" style="padding:12px;margin-bottom:8px">';
     html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
     html+='<div style="font-size:14px;font-weight:800">'+statut+' '+nom+'</div>';
     html+='<div style="font-size:18px;font-weight:900;color:var(--blue)">'+prix+' '+userCurrency+'/L</div>';
@@ -3126,16 +3125,6 @@ function afficherCarte(){
 }
 var longPressTimer=null;
 
-function startLongPress(el,sId){
-  longPressTimer=setTimeout(function(){
-    var s=prixStationsData.find(function(x){return (x.id||x.adresse)==sId;});
-    if(s)epinglerStation(s);
-  },600);
-}
-
-function cancelLongPress(){
-  if(longPressTimer)clearTimeout(longPressTimer);
-}
 
 function epinglerStation(s){
   var veh=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
@@ -3143,7 +3132,14 @@ function epinglerStation(s){
   veh.stationPref=s;
   saveAll();
   showToast("⭐ "+T("stationPrefEnregistree"));
-  chargerPrix();
+  // Mettre à jour toutes les étoiles sans recharger
+  document.querySelectorAll("#mprix-content .card").forEach(function(card,idx){
+    var btn=card.querySelector("button:last-child");
+    if(btn){
+      var station=prixStationsData[idx];
+      if(station)btn.textContent=station.id===s.id?"⭐":"☆";
+    }
+  });
 }  
 </script>
 <div id="mhelp" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.4);align-items:center;justify-content:center;padding:24px">
