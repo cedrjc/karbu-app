@@ -2987,7 +2987,8 @@ function afficherBornes(bornes,lat,lng){
     var puissance=b.puissance_nominale?b.puissance_nominale+" kW":"--";
     var connecteur=b.type_prise_principale||"";
 
-    html+='<div class="card" style="padding:12px;margin-bottom:8px" oncontextmenu="epinglerStation('+JSON.stringify(s)+')" ontouchstart="startLongPress(this,'+JSON.stringify(s)+')" ontouchend="cancelLongPress()">';
+    var sId=s.id||s.adresse;
+html+='<div class="card" style="padding:12px;margin-bottom:8px" ontouchstart="startLongPress(this,\''+sId+'\')" ontouchend="cancelLongPress()">';
     html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
     html+='<div style="font-size:14px;font-weight:800">'+couleur+' '+nom+'</div>';
     html+='<div style="font-size:14px;font-weight:900;color:var(--blue)">'+puissance+'</div>';
@@ -3043,7 +3044,8 @@ var statut=ouvert?"🟢":automate?"🟠":"🔴";
     var nom=s.adresse||"Station";
     var adresse=s.ville||"";
 
-    html+='<div class="card" style="padding:12px;margin-bottom:8px" oncontextmenu="epinglerStation('+JSON.stringify(s)+')" ontouchstart="startLongPress(this,'+JSON.stringify(s)+')" ontouchend="cancelLongPress()">';
+    var sId=s.id||s.adresse;
+html+='<div class="card" style="padding:12px;margin-bottom:8px" ontouchstart="startLongPress(this,\''+sId+'\')" ontouchend="cancelLongPress()">';
     html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
     html+='<div style="font-size:14px;font-weight:800">'+statut+' '+nom+'</div>';
     html+='<div style="font-size:18px;font-weight:900;color:var(--blue)">'+prix+' '+userCurrency+'/L</div>';
@@ -3119,9 +3121,10 @@ function afficherCarte(){
 }
 var longPressTimer=null;
 
-function startLongPress(el,s){
+function startLongPress(el,sId){
   longPressTimer=setTimeout(function(){
-    epinglerStation(s);
+    var s=prixStationsData.find(function(x){return (x.id||x.adresse)==sId;});
+    if(s)epinglerStation(s);
   },600);
 }
 
