@@ -3035,8 +3035,9 @@ function afficherPrix(stations,lat,lng){
   var html="";
   filtered.slice(0,10).forEach(function(s){
     var prix=s[fuelKey]?s[fuelKey].toFixed(3):"--";
-    var ouvert=s.horaires_automate_24_24==="Oui"||(s[majKey]&&new Date(s[majKey])>new Date(Date.now()-24*60*60*1000));
-    var statut=ouvert?"🟢":"🔴";
+    var automate=s.horaires_automate_24_24==="Oui";
+var ouvert=!automate&&s[majKey]&&new Date(s[majKey])>new Date(Date.now()-24*60*60*1000);
+var statut=ouvert?"🟢":automate?"🟠":"🔴";
     var maj=s[majKey]?new Date(s[majKey]).toLocaleString():"--";
     var dist=s.geom?Math.round(calcDist({lat:lat,lng:lng},{lat:s.geom.lat,lng:s.geom.lon})/100)/10+" km":"--";
     var nom=s.adresse||"Station";
@@ -3062,9 +3063,10 @@ function afficherPrix(stations,lat,lng){
   if(filtered.length){
     var best=filtered[0];
     var bestPrix=best[fuelKey]?best[fuelKey].toFixed(3):"--";
-    var bestOuvert=best.horaires_automate_24_24==="Oui";
-    var el=document.getElementById("prix-station-val");
-    if(el)el.innerHTML=bestPrix+' € '+(bestOuvert?"🟢":"🔴");
+    var bestAutomate=best.horaires_automate_24_24==="Oui";
+var bestOuvert=!bestAutomate&&best[majKey]&&new Date(best[majKey])>new Date(Date.now()-24*60*60*1000);
+var el=document.getElementById("prix-station-val");
+if(el)el.innerHTML=bestPrix+' € '+(bestOuvert?"🟢":bestAutomate?"🟠":"🔴");
     var elMaj=document.getElementById("prix-station-maj");
     if(elMaj&&best[majKey])elMaj.textContent="MAJ: "+new Date(best[majKey]).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
   }
