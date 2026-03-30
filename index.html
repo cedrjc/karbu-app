@@ -2944,7 +2944,7 @@ function chargerPrix(){
 function fetchPrix(lat,lng){
   document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">⏳ '+T("chargement")+'...</div>';
   var rayon=10;
-url="https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=within_distance(geom,geom'POINT("+lng+" "+lat+")',"+rayon+"km)&limit=20&order_by=dist(geom,geom'POINT("+lng+" "+lat+")')";
+url="https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=within_distance(geom,geom'POINT("+lng+" "+lat+")',"+rayon+"km)&limit=20&order_by=dist(geom,geom'POINT("+lng+" "+lat+")')&timezone=Europe/Paris";
   fetch(url)
     .then(function(r){return r.json();})
     .then(function(data){
@@ -2956,7 +2956,7 @@ url="https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-ca
 }
 function fetchBornes(lat,lng){
   document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">⏳ '+T("chargement")+'...</div>';
-  var url="https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/bornes-irve/records?where=within_distance("+lng+" "+lat+")%27,10km)&limit=20";
+  var url="https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/bornes-irve/records?where=within_distance(geo_point_borne,geom'POINT("+lng+" "+lat+")',10km)&limit=20";
   fetch(url)
     .then(function(r){return r.json();})
     .then(function(data){
