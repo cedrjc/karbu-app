@@ -2948,12 +2948,13 @@ function fetchPrix(lat,lng){
   fetch(url)
     .then(function(r){return r.json();})
     .then(function(data){
-var stations=data.results||data.records||[];
+     var stations=data.results||data.records||[];
 if(stations.length===0){
   document.getElementById("mprix-content").innerHTML='<div style="padding:10px;font-size:11px;color:var(--text)">'+JSON.stringify(data).substring(0,400)+'</div>';
 }else{
   afficherPrix(stations,lat,lng);
-}    })
+}
+    })
     .catch(function(){
       document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ Erreur réseau</div>';
     });
@@ -3004,42 +3005,42 @@ function afficherPrix(stations,lat,lng){
   var isElec=veh&&veh.type==="elec";
   var fuelType=veh&&veh.fuel?veh.fuel:"sp95";
 
-  // Correspondance entre type de carburant KarBu et API
   var fuelMap={
-    "sp95":"prix_sp95",
-    "sp98":"prix_sp98",
-    "e10":"prix_e10",
-    "e85":"prix_e85",
-    "b7":"prix_gazole",
-    "gpl":"prix_gplc"
+    "sp95":"sp95_prix",
+    "sp98":"sp98_prix",
+    "e10":"e10_prix",
+    "e85":"e85_prix",
+    "b7":"gazole_prix",
+    "gpl":"gplc_prix"
   };
-  var fuelKey=fuelMap[fuelType]||"prix_sp95";
+  var fuelMajMap={
+    "sp95":"sp95_maj",
+    "sp98":"sp98_maj",
+    "e10":"e10_maj",
+    "e85":"e85_maj",
+    "b7":"gazole_maj",
+    "gpl":"gplc_maj"
+  };
+  var fuelKey=fuelMap[fuelType]||"gazole_prix";
+  var majKey=fuelMajMap[fuelType]||"gazole_maj";
 
   if(!stations||!stations.length){
     document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">😔 '+T("aucuneStation")+'</div>';
     return;
   }
 
-  // Filtrer selon Major/Autres/Toutes
-  var filtered=stations.filter(function(s){
-    if(prixFiltre==="major")return s.marque&&["Total","TotalAccess","BP","Shell","Esso","Esso Express","Intermarché","Carrefour","Leclerc"].indexOf(s.marque)>=0;
-    if(prixFiltre==="autres")return !s.marque||["Total","TotalAccess","BP","Shell","Esso","Esso Express","Intermarché","Carrefour","Leclerc"].indexOf(s.marque)<0;
-    return true;
-  });
-
-  // Trier par prix croissant
-  filtered=filtered.filter(function(s){return s[fuelKey];});
-  filtered.sort(function(a,b){return a[fuelKey]-b[fuelKey];});
+  var filtered=stations.slice();
+  filtered.sort(function(a,b){return (a[fuelKey]||999)-(b[fuelKey]||999);});
 
   var html="";
   filtered.slice(0,10).forEach(function(s){
     var prix=s[fuelKey]?s[fuelKey].toFixed(3):"--";
-    var ouvert=s.horaires_automate_24_24||!s.ferme;
+    var ouvert=s.horaires_automate_24_24==="Oui"||(s[majKey]&&new Date(s[majKey])>new Date(Date.now()-24*60*60*1000));
     var statut=ouvert?"🟢":"🔴";
-    var maj=s.prix_maj?new Date(s.prix_maj).toLocaleString():"--";
-    var dist=s.dist?Math.round(s.dist/100)/10+" km":"--";
-    var nom=s.marque||s.adresse||"Station";
-    var adresse=s.adresse||"";
+    var maj=s[majKey]?new Date(s[majKey]).toLocaleString():"--";
+    var dist=s.geom?Math.round(calcDist({lat:lat,lng:lng},{lat:s.geom.lat,lng:s.geom.lon})/100)/10+" km":"--";
+    var nom=s.adresse||"Station";
+    var adresse=s.ville||"";
 
     html+='<div class="card" style="padding:12px;margin-bottom:8px">';
     html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
@@ -3051,21 +3052,21 @@ function afficherPrix(stations,lat,lng){
     html+='<div style="font-size:10px;color:var(--text3)">📍 '+dist+'</div>';
     html+='<div style="font-size:10px;color:var(--text3)">MAJ: '+maj+'</div>';
     html+='</div>';
-    html+='<button onclick="ouvrirGPS(\''+s.adresse+'\',\''+s.cp+' '+s.ville+'\')" style="width:100%;margin-top:8px;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:10px;padding:6px;font-size:12px;font-weight:700;color:var(--blue)">🧭 '+T("yAller")+'</div>';
+    html+='<button onclick="ouvrirGPS(\''+s.adresse+'\',\''+s.cp+' '+s.ville+'\')" style="width:100%;margin-top:8px;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:10px;padding:6px;font-size:12px;font-weight:700;color:var(--blue)">🧭 '+T("yAller")+'</button>';
     html+='</div>';
   });
-prixStationsData=filtered;
+
+  prixStationsData=filtered;
   document.getElementById("mprix-content").innerHTML=html;
 
-  // Mettre à jour la card-sm sur l'accueil
   if(filtered.length){
     var best=filtered[0];
     var bestPrix=best[fuelKey]?best[fuelKey].toFixed(3):"--";
-    var bestOuvert=best.horaires_automate_24_24||!best.ferme;
+    var bestOuvert=best.horaires_automate_24_24==="Oui";
     var el=document.getElementById("prix-station-val");
     if(el)el.innerHTML=bestPrix+' € '+(bestOuvert?"🟢":"🔴");
     var elMaj=document.getElementById("prix-station-maj");
-    if(elMaj&&best.prix_maj)elMaj.textContent="MAJ: "+new Date(best.prix_maj).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    if(elMaj&&best[majKey])elMaj.textContent="MAJ: "+new Date(best[majKey]).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
   }
 }
 
@@ -3203,11 +3204,7 @@ function afficherCarte(){
       <div style="font-size:15px;font-weight:800" id="mprix-title">⛽ Prix Station</div>
       <button onclick="fermerPrix()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3)">✕</button>
     </div>
-    <div style="display:none;gap:8px;margin-bottom:12px" id="mprix-filtres">
-      <button class="chip sel" onclick="setPrixFiltre('toutes')" id="mprix-f-toutes">Toutes</button>
-      <button class="chip" onclick="setPrixFiltre('major')" id="mprix-f-major">Major</button>
-      <button class="chip" onclick="setPrixFiltre('autres')" id="mprix-f-autres">Autres</button>
-    </div>
+    <div style="display:none" id="mprix-filtres"></div>
     <div style="display:flex;gap:8px;margin-bottom:8px">
       <button class="chip sel" onclick="setPrixVue('liste')" id="mprix-v-liste">📋 Liste</button>
       <button class="chip" onclick="setPrixVue('carte')" id="mprix-v-carte">🗺️ Carte</button>
