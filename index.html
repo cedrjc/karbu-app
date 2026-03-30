@@ -2949,11 +2949,14 @@ function fetchPrix(lat,lng){
   fetch(url)
     .then(function(r){return r.json();})
     .then(function(data){
-  var parsed=JSON.parse(data.contents);
-  console.log("PARSED:",JSON.stringify(parsed).substring(0,300));
-  var stations=parsed.results||parsed.records||parsed||[];
-  afficherPrix(stations,lat,lng);
-})
+      try{
+        var parsed=JSON.parse(data.contents);
+        var stations=parsed.results||parsed.records||parsed||[];
+        document.getElementById("mprix-content").innerHTML='<div style="padding:10px;font-size:10px">DEBUG: '+stations.length+' stations — '+JSON.stringify(parsed).substring(0,200)+'</div>';
+      }catch(e){
+        document.getElementById("mprix-content").innerHTML='<div style="padding:10px;color:red">ERREUR: '+e.message+'</div>';
+      }
+    })
     .catch(function(){
       document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ Erreur réseau</div>';
     });
