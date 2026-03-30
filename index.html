@@ -2941,25 +2941,7 @@ function chargerPrix(){
   });
 }
 
-function fetchPrix(lat,lng){
-  document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">⏳ Chargement...</div>';
-  var rayon=10;
-  var apiUrl="https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=within_distance(geom,geom'POINT("+lng+" "+lat+")',"+rayon+"km)&limit=20";
-  var url="https://thingproxy.freeboard.io/fetch/"+apiUrl;
-  fetch(url)
-    .then(function(r){return r.json();})
-    .then(function(data){
-      try{
-        var stations=data.results||data.records||[];
-     afficherPrix(stations,lat,lng);
-	  }catch(e){
-        document.getElementById("mprix-content").innerHTML='<div style="padding:10px;color:red">ERREUR: '+e.message+'</div>';
-      }
-    })
-    .catch(function(){
-      document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ Erreur réseau</div>';
-    });
-}
+afficherPrix(stations,lat,lng);
 function fetchBornes(lat,lng){
   document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">⏳ '+T("chargement")+'...</div>';
   var url="https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/bornes-irve/records?where=within_distance("+lng+" "+lat+")%27,10km)&limit=20";
