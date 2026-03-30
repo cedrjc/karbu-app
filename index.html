@@ -2948,8 +2948,12 @@ function fetchPrix(lat,lng){
   fetch(url)
     .then(function(r){return r.json();})
     .then(function(data){
-      afficherPrix(data.results||[],lat,lng);
-    })
+var stations=data.results||data.records||[];
+if(stations.length===0){
+  document.getElementById("mprix-content").innerHTML='<div style="padding:10px;font-size:11px;color:var(--text)">'+JSON.stringify(data).substring(0,400)+'</div>';
+}else{
+  afficherPrix(stations,lat,lng);
+}    })
     .catch(function(){
       document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ Erreur réseau</div>';
     });
