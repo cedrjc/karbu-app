@@ -2949,7 +2949,8 @@ function fetchPrix(lat,lng){
   fetch(url)
     .then(function(r){return r.json();})
     .then(function(data){
-      afficherPrix(data.results||data.records||[],lat,lng);
+      console.log("DATA:",JSON.stringify(data).substring(0,500));
+afficherPrix(data.results||data.records||[],lat,lng);
     })
     .catch(function(){
       document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ Erreur réseau</div>';
