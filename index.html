@@ -100,6 +100,8 @@ button:active{transform:scale(.96)}
 .bs-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:299;display:none;}
 .bs-overlay.open{display:block;}
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 <div class="header">
@@ -914,6 +916,13 @@ ct:"Contrôle technique",ctDate:"Date de mise en circulation",ctProchain:"Procha
   fermer:"Fermer",
   scanTitre:"Scan ticket",scanSub:"Fonctionnalité bientôt disponible — v3.0 en cours de préparation ! Mai 2026",
   coutCarbu:"Coût carburant",coutElec:"Coût énergie",
+  rechercheStations:"Recherche des stations autour de vous",
+chargement:"Chargement",
+erreurChargement:"Erreur de chargement — vérifiez votre connexion",
+aucuneStation:"Aucune station trouvée autour de vous",
+yAller:"Y aller",
+aucuneBorne:"Aucune borne de recharge trouvée autour de vous",
+prixBorne:"Prix Borne",
   droits:"Tous droits réservés",
   sp95:"SP95",sp98:"SP98",e10:"E10",e85:"E85",b7:"B7",gpl:"GPL"
 },
@@ -2276,7 +2285,8 @@ h+='<div class="card-sm" style="text-align:center"><div style="font-size:10px;co
 var f=getFiltered();var allDates=f.map(function(e){return e.date;}).sort();var duree="--";
 if(allDates.length>=2){var d1=new Date(allDates[0]),d2=new Date(allDates[allDates.length-1]);var days=Math.round((d2-d1)/(1000*60*60*24));if(days<30)duree=days+" "+T("jour");else if(days<365)duree=Math.round(days/30)+" "+T("mois");else{var ans=(days/365).toFixed(1);duree=ans+" "+(parseFloat(ans)>=2?T("ans"):T("an"));}}
 if(s.autonomie){
-h+='<div class="card-sm" style="text-align:center;opacity:.5"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">⛽ '+T("prixStation")+'</div><div style="font-size:20px;font-weight:900;color:var(--text3)">--</div><div style="font-size:10px;color:var(--text3);margin-top:5px">'+T("comingSoon")+'</div></div>';
+var iconePrix=s.isElec?"⚡":"⛽";
+h+='<div class="card-sm" onclick="ouvrirPrix()" style="text-align:center;cursor:pointer"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">'+iconePrix+' '+T(s.isElec?"prixBorne":"prixStation")+'</div><div style="font-size:18px;font-weight:900;color:var(--text)" id="prix-station-val">--</div><div style="font-size:10px;color:var(--text3);margin-top:4px" id="prix-station-maj">'+T("voirPrix")+'</div></div>';
 }
 h+='</div>';
   if(s.last){
@@ -2890,6 +2900,215 @@ function fermerGPS(){
   if(btnStop)btnStop.style.display="block";
   gpsDistance=0;
 }
+var prixFiltre="toutes";
+
+function ouvrirPrix(){
+  var veh=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
+  var isElec=veh&&veh.type==="elec";
+  document.getElementById("mprix-filtres").style.display=isElec?"none":"flex";
+  document.getElementById("mprix").style.display="block";
+  document.getElementById("mprix-overlay").style.display="block";
+  chargerPrix();
+  var titrePrix=isElec?"⚡ "+T("prixBorne"):"⛽ "+T("prixStation");
+document.getElementById("mprix-title").textContent=titrePrix;
+}
+
+function fermerPrix(){
+  document.getElementById("mprix").style.display="none";
+  document.getElementById("mprix-overlay").style.display="none";
+}
+
+function setPrixFiltre(f){
+  prixFiltre=f;
+  document.querySelectorAll("#mprix-filtres .chip").forEach(function(b){b.classList.remove("sel");});
+  document.getElementById("mprix-f-"+f).classList.add("sel");
+  chargerPrix();
+}
+
+function chargerPrix(){
+  document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">📍 '+T("rechercheStations")+'...</div>';
+  var veh=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
+  var isElec=veh&&veh.type==="elec";
+  navigator.geolocation.getCurrentPosition(function(pos){
+    if(isElec){
+      fetchBornes(pos.coords.latitude,pos.coords.longitude);
+    } else {
+      fetchPrix(pos.coords.latitude,pos.coords.longitude);
+    }
+  },function(){
+    document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ '+T("gpsIndispo")+'</div>';
+  });
+}
+
+function fetchPrix(lat,lng){
+  document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">⏳ '+T("chargement")+'...</div>';
+  var rayon=10;
+  var url="https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=within_distance(geom,geom%27POINT("+lng+" "+lat+")%27,"+rayon+"km)&limit=20&order_by=dist(geom,geom%27POINT("+lng+" "+lat+")%27)";
+  fetch(url)
+    .then(function(r){return r.json();})
+    .then(function(data){
+      afficherPrix(data.results,lat,lng);
+    })
+    .catch(function(){
+      document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ '+T("erreurChargement")+'</div>';
+    });
+}
+function fetchBornes(lat,lng){
+  document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">⏳ '+T("chargement")+'...</div>';
+  var url="https://data.gouv.fr/api/explore/v2.1/catalog/datasets/consolidation-etalab-schema-irve-statique-v-2-3-0-20230222/records?where=within_distance(consolidated_longitude,consolidated_latitude,geom%27POINT("+lng+" "+lat+")%27,10km)&limit=20";
+  fetch(url)
+    .then(function(r){return r.json();})
+    .then(function(data){
+      afficherBornes(data.results,lat,lng);
+    })
+    .catch(function(){
+      document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ '+T("erreurChargement")+'</div>';
+    });
+}
+
+function afficherBornes(bornes,lat,lng){
+  if(!bornes||!bornes.length){
+    document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">😔 '+T("aucuneBorne")+'</div>';
+    return;
+  }
+
+  var html="";
+  bornes.slice(0,10).forEach(function(b){
+    var statut=b.statut_pdc;
+    var couleur=statut==="Disponible"?"🟢":statut==="Occupé"?"🟠":"🔴";
+    var nom=b.nom_station||b.nom_operateur||"Borne";
+    var adresse=b.adresse_station||"";
+    var puissance=b.puissance_nominale?b.puissance_nominale+" kW":"--";
+    var connecteur=b.type_prise_principale||"";
+
+    html+='<div class="card" style="padding:12px;margin-bottom:8px">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+    html+='<div style="font-size:14px;font-weight:800">'+couleur+' '+nom+'</div>';
+    html+='<div style="font-size:14px;font-weight:900;color:var(--blue)">'+puissance+'</div>';
+    html+='</div>';
+    html+='<div style="font-size:11px;color:var(--text3)">'+adresse+'</div>';
+    html+='<div style="font-size:10px;color:var(--text3);margin-top:4px">🔌 '+connecteur+'</div>';
+    html+='<button onclick="ouvrirGPS(\''+adresse+'\',\'\')" style="width:100%;margin-top:8px;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:10px;padding:6px;font-size:12px;font-weight:700;color:var(--blue)">🧭 '+T("yAller")+'</button>';
+    html+='</div>';
+  });
+prixStationsData=bornes;
+  document.getElementById("mprix-content").innerHTML=html;
+}
+function afficherPrix(stations,lat,lng){
+  var veh=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
+  var isElec=veh&&veh.type==="elec";
+  var fuelType=veh&&veh.fuel?veh.fuel:"sp95";
+
+  // Correspondance entre type de carburant KarBu et API
+  var fuelMap={
+    "sp95":"prix_sp95",
+    "sp98":"prix_sp98",
+    "e10":"prix_e10",
+    "e85":"prix_e85",
+    "b7":"prix_gazole",
+    "gpl":"prix_gplc"
+  };
+  var fuelKey=fuelMap[fuelType]||"prix_sp95";
+
+  if(!stations||!stations.length){
+    document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">😔 '+T("aucuneStation")+'</div>';
+    return;
+  }
+
+  // Filtrer selon Major/Autres/Toutes
+  var filtered=stations.filter(function(s){
+    if(prixFiltre==="major")return s.marque&&["Total","TotalAccess","BP","Shell","Esso","Esso Express","Intermarché","Carrefour","Leclerc"].indexOf(s.marque)>=0;
+    if(prixFiltre==="autres")return !s.marque||["Total","TotalAccess","BP","Shell","Esso","Esso Express","Intermarché","Carrefour","Leclerc"].indexOf(s.marque)<0;
+    return true;
+  });
+
+  // Trier par prix croissant
+  filtered=filtered.filter(function(s){return s[fuelKey];});
+  filtered.sort(function(a,b){return a[fuelKey]-b[fuelKey];});
+
+  var html="";
+  filtered.slice(0,10).forEach(function(s){
+    var prix=s[fuelKey]?s[fuelKey].toFixed(3):"--";
+    var ouvert=s.horaires_automate_24_24||!s.ferme;
+    var statut=ouvert?"🟢":"🔴";
+    var maj=s.prix_maj?new Date(s.prix_maj).toLocaleString():"--";
+    var dist=s.dist?Math.round(s.dist/100)/10+" km":"--";
+    var nom=s.marque||s.adresse||"Station";
+    var adresse=s.adresse||"";
+
+    html+='<div class="card" style="padding:12px;margin-bottom:8px">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+    html+='<div style="font-size:14px;font-weight:800">'+statut+' '+nom+'</div>';
+    html+='<div style="font-size:18px;font-weight:900;color:var(--blue)">'+prix+' '+userCurrency+'/L</div>';
+    html+='</div>';
+    html+='<div style="font-size:11px;color:var(--text3)">'+adresse+'</div>';
+    html+='<div style="display:flex;justify-content:space-between;margin-top:4px">';
+    html+='<div style="font-size:10px;color:var(--text3)">📍 '+dist+'</div>';
+    html+='<div style="font-size:10px;color:var(--text3)">MAJ: '+maj+'</div>';
+    html+='</div>';
+    html+='<button onclick="ouvrirGPS(\''+s.adresse+'\',\''+s.cp+' '+s.ville+'\')" style="width:100%;margin-top:8px;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:10px;padding:6px;font-size:12px;font-weight:700;color:var(--blue)">🧭 '+T("yAller")+'</div>';
+    html+='</div>';
+  });
+prixStationsData=filtered;
+  document.getElementById("mprix-content").innerHTML=html;
+
+  // Mettre à jour la card-sm sur l'accueil
+  if(filtered.length){
+    var best=filtered[0];
+    var bestPrix=best[fuelKey]?best[fuelKey].toFixed(3):"--";
+    var bestOuvert=best.horaires_automate_24_24||!best.ferme;
+    var el=document.getElementById("prix-station-val");
+    if(el)el.innerHTML=bestPrix+' € '+(bestOuvert?"🟢":"🔴");
+    var elMaj=document.getElementById("prix-station-maj");
+    if(elMaj&&best.prix_maj)elMaj.textContent="MAJ: "+new Date(best.prix_maj).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  }
+}
+
+function ouvrirGPS(adresse,ville){
+  var query=encodeURIComponent(adresse+" "+ville);
+  window.open("https://www.google.com/maps/search/?api=1&query="+query,"_blank");
+}
+var prixVue="liste";
+var prixMap=null;
+var prixStationsData=[];
+
+function setPrixVue(vue){
+  prixVue=vue;
+  document.querySelectorAll("#mprix-filtres ~ div .chip").forEach(function(b){b.classList.remove("sel");});
+  document.getElementById("mprix-v-"+vue).classList.add("sel");
+  if(vue==="carte"){
+    document.getElementById("mprix-content").style.display="none";
+    document.getElementById("mprix-map").style.display="block";
+    setTimeout(function(){afficherCarte();},100);
+  } else {
+    document.getElementById("mprix-content").style.display="block";
+    document.getElementById("mprix-map").style.display="none";
+  }
+}
+
+function afficherCarte(){
+  if(!prixMap){
+    prixMap=L.map("mprix-map").setView([46.5,2.3],6);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
+      attribution:"© OpenStreetMap"
+    }).addTo(prixMap);
+  }
+  prixMap.eachLayer(function(l){if(l instanceof L.Marker)prixMap.removeLayer(l);});
+  if(prixStationsData.length){
+    prixMap.setView([prixStationsData[0].latitude,prixStationsData[0].longitude],13);
+    prixStationsData.forEach(function(s){
+      if(!s.latitude||!s.longitude)return;
+      var veh=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
+      var fuelMap={"sp95":"prix_sp95","sp98":"prix_sp98","e10":"prix_e10","e85":"prix_e85","b7":"prix_gazole","gpl":"prix_gplc"};
+      var fuelKey=fuelMap[veh&&veh.fuel?veh.fuel:"sp95"]||"prix_sp95";
+      var prix=s[fuelKey]?s[fuelKey].toFixed(3):"--";
+      var nom=s.marque||s.adresse||"Station";
+      L.marker([s.latitude,s.longitude])
+        .addTo(prixMap)
+        .bindPopup("<b>"+nom+"</b><br>"+prix+" €/L<br><a href='https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(s.adresse+" "+s.ville)+"' target='_blank'>🧭 Y aller</a>");
+    });
+  }
+}
 </script>
 <div id="mhelp" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.4);align-items:center;justify-content:center;padding:24px">
   <div class="card" style="width:100%;max-width:340px;padding:24px;max-height:80vh;overflow-y:auto">
@@ -2971,6 +3190,29 @@ function fermerGPS(){
 <div id="mscan-sub" style="font-size:13px;color:var(--text3);margin-bottom:20px">Fonctionnalité bientôt disponible — v3.0 en cours de préparation ! MAI 2026</div>
     <button id="mscan-btn-fermer" onclick="document.getElementById('mscan').style.display='none'" style="width:100%;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:14px;padding:12px;font-size:14px;font-weight:700;color:var(--blue);cursor:pointer">Fermer</button>
   </div>
+</div>
+<!-- BOTTOM SHEET PRIX STATION -->
+<div id="mprix-overlay" class="gps-overlay" onclick="fermerPrix()" style="display:none"></div>
+<div id="mprix" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--card);border-radius:20px 20px 0 0;z-index:150;max-height:90vh;display:flex;flex-direction:column">
+  <div style="padding:16px 16px 8px 16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-size:15px;font-weight:800" id="mprix-title">⛽ Prix Station</div>
+      <button onclick="fermerPrix()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3)">✕</button>
+    </div>
+    <div style="display:none;gap:8px;margin-bottom:12px" id="mprix-filtres">
+      <button class="chip sel" onclick="setPrixFiltre('toutes')" id="mprix-f-toutes">Toutes</button>
+      <button class="chip" onclick="setPrixFiltre('major')" id="mprix-f-major">Major</button>
+      <button class="chip" onclick="setPrixFiltre('autres')" id="mprix-f-autres">Autres</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <button class="chip sel" onclick="setPrixVue('liste')" id="mprix-v-liste">📋 Liste</button>
+      <button class="chip" onclick="setPrixVue('carte')" id="mprix-v-carte">🗺️ Carte</button>
+    </div>
+  </div>
+  <div id="mprix-content" style="flex:1;overflow-y:auto;padding:0 16px 16px 16px">
+    📍 Recherche des stations autour de vous...
+  </div>
+  <div id="mprix-map" style="display:none;height:300px;width:100%"></div>
 </div>
 </body>
 </html>
