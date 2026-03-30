@@ -2944,8 +2944,10 @@ function chargerPrix(){
 function fetchPrix(lat,lng){
   document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">⏳ '+T("chargement")+'...</div>';
   var rayon=10;
-var apos="'";
-var url="https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=within_distance(geom,geom"+apos+"POINT("+lng+" "+lat+")"+apos+","+rayon+"km)&limit=20&order_by=dist(geom,geom"+apos+"POINT("+lng+" "+lat+")"+apos+")&timezone=Europe%2FParis";
+  var base="https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records";
+  var where="within_distance(geom,geom\u0027POINT("+lng+" "+lat+")\u0027,"+rayon+"km)";
+  var order="dist(geom,geom\u0027POINT("+lng+" "+lat+")\u0027)";
+  var url=base+"?where="+encodeURIComponent(where)+"&limit=20&order_by="+encodeURIComponent(order);
   fetch(url)
     .then(function(r){return r.json();})
     .then(function(data){
