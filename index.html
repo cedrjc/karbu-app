@@ -924,6 +924,7 @@ aucuneStation:"Aucune station trouvée autour de vous",
 yAller:"Y aller",
 aucuneBorne:"Aucune borne de recharge trouvée autour de vous",
 prixBorne:"Prix Borne",
+stationPrefEnregistree:"Station préférée enregistrée !",
   droits:"Tous droits réservés",
   sp95:"SP95",sp98:"SP98",e10:"E10",e85:"E85",b7:"B7",gpl:"GPL"
 },
@@ -3057,7 +3058,8 @@ html+='<div class="card" style="padding:12px;margin-bottom:8px" ontouchstart="st
     html+='</div>';
     html+='<div style="display:flex;gap:8px;margin-top:8px">';
 html+='<button onclick="ouvrirGPS(\''+s.adresse+'\',\''+s.cp+' '+s.ville+'\')" style="flex:1;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:10px;padding:6px;font-size:12px;font-weight:700;color:var(--blue)">🧭 '+T("yAller")+'</button>';
-html+='<button onclick="epinglerStation(prixStationsData['+filtered.indexOf(s)+'])" style="background:var(--card2);border:1.5px solid var(--border3);border-radius:10px;padding:6px;font-size:16px">⭐</button>';
+var isPref=veh&&veh.stationPref&&veh.stationPref.id===s.id;
+html+='<button onclick="epinglerStation(prixStationsData['+filtered.indexOf(s)+'])" style="background:var(--card2);border:1.5px solid var(--border3);border-radius:10px;padding:6px;font-size:16px">'+(isPref?"⭐":"☆")+'</button>';
 html+='</div>';
     html+='</div>';
   });
@@ -3140,7 +3142,8 @@ function epinglerStation(s){
   if(!veh)return;
   veh.stationPref=s;
   saveAll();
-  showToast("⭐ Station préférée enregistrée !");
+  showToast("⭐ "+T("stationPrefEnregistree"));
+  chargerPrix();
 }  
 </script>
 <div id="mhelp" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.4);align-items:center;justify-content:center;padding:24px">
