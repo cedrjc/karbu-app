@@ -2942,19 +2942,18 @@ function chargerPrix(){
 }
 
 function fetchPrix(lat,lng){
-  document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">⏳ '+T("chargement")+'...</div>';
+  document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">⏳ Chargement...</div>';
   var rayon=10;
-  var base="https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records";
-  var where="within_distance(geom,geom\u0027POINT("+lng+" "+lat+")\u0027,"+rayon+"km)";
-  var order="dist(geom,geom\u0027POINT("+lng+" "+lat+")\u0027)";
-  var url=base+"?where="+encodeURIComponent(where)+"&limit=20&order_by="+encodeURIComponent(order);
+  var where="within_distance(geom,geom'POINT("+lng+" "+lat+")',"+rayon+"km)";
+  var order="dist(geom,geom'POINT("+lng+" "+lat+")')";
+  var url="https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where="+encodeURIComponent(where)+"&limit=20&order_by="+encodeURIComponent(order);
   fetch(url)
     .then(function(r){return r.json();})
     .then(function(data){
       afficherPrix(data.results,lat,lng);
     })
     .catch(function(){
-      document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ '+T("erreurChargement")+'</div>';
+      document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ Erreur de chargement</div>';
     });
 }
 function fetchBornes(lat,lng){
