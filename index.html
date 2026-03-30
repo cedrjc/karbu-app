@@ -2945,12 +2945,12 @@ function fetchPrix(lat,lng){
   document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">⏳ Chargement...</div>';
   var rayon=10;
   var xhr=new XMLHttpRequest();
-  var url="https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records";
-  xhr.open("GET",url+"?where=within_distance(geom%2Cgeom%27POINT("+lng+"%20"+lat+")%27%2C"+rayon+"km)&limit=20&order_by=dist(geom%2Cgeom%27POINT("+lng+"%20"+lat+")%27)",true);
+  xhr.open("GET","https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=within_distance%28geom%2Cgeom%27POINT%28"+lng+"%20"+lat+"%29%27%2C"+rayon+"km%29&limit=20",true);
+  xhr.setRequestHeader("Accept","application/json");
   xhr.onload=function(){
     if(xhr.status===200){
       var data=JSON.parse(xhr.responseText);
-      afficherPrix(data.results,lat,lng);
+      afficherPrix(data.results||data.records||[],lat,lng);
     } else {
       document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ Erreur '+xhr.status+'</div>';
     }
