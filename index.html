@@ -2285,7 +2285,7 @@ h+='<div class="card-sm" style="text-align:center"><div style="font-size:10px;co
 
 var f=getFiltered();var allDates=f.map(function(e){return e.date;}).sort();var duree="--";
 if(allDates.length>=2){var d1=new Date(allDates[0]),d2=new Date(allDates[allDates.length-1]);var days=Math.round((d2-d1)/(1000*60*60*24));if(days<30)duree=days+" "+T("jour");else if(days<365)duree=Math.round(days/30)+" "+T("mois");else{var ans=(days/365).toFixed(1);duree=ans+" "+(parseFloat(ans)>=2?T("ans"):T("an"));}}
-if(s.autonomie){
+if(true){
 var iconePrix=s.isElec?"⚡":"⛽";
 h+='<div class="card-sm" onclick="ouvrirPrix()" style="text-align:center;cursor:pointer"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">'+iconePrix+' '+T(s.isElec?"prixBorne":"prixStation")+'</div><div style="font-size:18px;font-weight:900;color:var(--text)" id="prix-station-val">--</div><div style="font-size:10px;color:var(--text3);margin-top:4px" id="prix-station-maj">'+T("voirPrix")+'</div></div>';
 }
@@ -2962,7 +2962,7 @@ function fetchPrix(lat,lng){
 }
 function fetchBornes(lat,lng){
   document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">⏳ '+T("chargement")+'...</div>';
-  var url="https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/bornes-irve/records?where=within_distance(geo_point_borne,geom'POINT("+lng+" "+lat+")',10km)&limit=20";
+  var url="https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/bornes-irve/records?where=within_distance("+lng+" "+lat+")%27,10km)&limit=20";
   fetch(url)
     .then(function(r){return r.json();})
     .then(function(data){
