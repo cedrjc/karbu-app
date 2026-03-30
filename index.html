@@ -2951,8 +2951,8 @@ function fetchPrix(lat,lng){
     .then(function(data){
       try{
         var stations=data.results||data.records||[];
-        document.getElementById("mprix-content").innerHTML='<div style="padding:10px;font-size:10px">DEBUG: '+stations.length+' stations — '+JSON.stringify(data).substring(0,200)+'</div>';
-      }catch(e){
+     afficherPrix(stations,lat,lng);
+	  }catch(e){
         document.getElementById("mprix-content").innerHTML='<div style="padding:10px;color:red">ERREUR: '+e.message+'</div>';
       }
     })
