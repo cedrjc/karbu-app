@@ -3136,22 +3136,16 @@ var longPressTimer=null;
 
 
 function epinglerStation(stationId){
-  var veh=null;
-  for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
+  var veh=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
   if(!veh)return;
-  var s=null;
-  for(var j=0;j<prixStationsData.length;j++){
-    if(String(prixStationsData[j].id)===String(stationId)){s=prixStationsData[j];break;}
-  }
-  if(!s){alert("Station non trouvée: "+stationId);return;}
+  var s=null;for(var j=0;j<prixStationsData.length;j++){if(String(prixStationsData[j].id)===String(stationId)){s=prixStationsData[j];break;}}
+  if(!s)return;
   veh.stationPref=s;
   saveAll();
   showToast("⭐ "+T("stationPrefEnregistree"));
-  prixStationsData.forEach(function(station){
-    var btn=document.getElementById("star-"+station.id);
-    if(btn)btn.textContent=String(station.id)===String(stationId)?"⭐":"☆";
-  });
+  chargerPrix();
 }
+
 </script>
 <div id="mhelp" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.4);align-items:center;justify-content:center;padding:24px">
   <div class="card" style="width:100%;max-width:340px;padding:24px;max-height:80vh;overflow-y:auto">
