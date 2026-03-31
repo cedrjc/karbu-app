@@ -3063,7 +3063,7 @@ var statut=ouvert?"🟢":automate?"🟠":"🔴";
     html+='<div style="display:flex;gap:8px;margin-top:8px">';
 html+='<button onclick="ouvrirGPS(\''+s.adresse+'\',\''+s.cp+' '+s.ville+'\')" style="flex:1;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:10px;padding:6px;font-size:12px;font-weight:700;color:var(--blue)">🧭 '+T("yAller")+'</button>';
 var isPref=veh&&veh.stationPref&&String(veh.stationPref.id)===String(s.id);
-html+='<button id="star-'+s.id+'" onclick="epinglerStation(prixStationsData.find(function(x){return String(x.id)===\''+s.id+'\'}))" style="background:var(--card2);border:1.5px solid var(--border3);border-radius:10px;padding:6px;font-size:16px">'+(isPref?"⭐":"☆")+'</button>';
+html+='<button id="star-'+s.id+'" onclick="epinglerStation(\''+s.id+'\')" style="background:var(--card2);border:1.5px solid var(--border3);border-radius:10px;padding:6px;font-size:16px">'+(isPref?"⭐":"☆")+'</button>';
 html+='</div>';
     html+='</div>';
   });
@@ -3135,20 +3135,23 @@ function afficherCarte(){
 var longPressTimer=null;
 
 
-function epinglerStation(s){
-  console.log("STATION ID:",s?s.id:"undefined");
-  var veh=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
+function epinglerStation(stationId){
+  var veh=null;
+  for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
   if(!veh)return;
+  var s=null;
+  for(var j=0;j<prixStationsData.length;j++){
+    if(String(prixStationsData[j].id)===String(stationId)){s=prixStationsData[j];break;}
+  }
+  if(!s){alert("Station non trouvée: "+stationId);return;}
   veh.stationPref=s;
   saveAll();
   showToast("⭐ "+T("stationPrefEnregistree"));
-  // Mettre à jour toutes les étoiles sans recharger
   prixStationsData.forEach(function(station){
-  var btn=document.getElementById("star-"+station.id);
-  if(btn)btn.textContent=String(station.id)===String(s.id)?"⭐":"☆";
-});
-render();
-}  
+    var btn=document.getElementById("star-"+station.id);
+    if(btn)btn.textContent=String(station.id)===String(stationId)?"⭐":"☆";
+  });
+}
 </script>
 <div id="mhelp" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.4);align-items:center;justify-content:center;padding:24px">
   <div class="card" style="width:100%;max-width:340px;padding:24px;max-height:80vh;overflow-y:auto">
