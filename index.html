@@ -100,6 +100,8 @@ button:active{transform:scale(.96)}
 .bs-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:299;display:none;}
 .bs-overlay.open{display:block;}
 .gps-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:89;display:none;}
+.star-btn{background:var(--card2);border:1.5px solid var(--border3);border-radius:10px;padding:6px;font-size:16px;color:var(--text)}
+.star-btn.sel{color:gold}
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -2909,6 +2911,10 @@ function fermerGPS(){
 }
 var prixFiltre="toutes";
 
+var prixVue="liste";
+var prixMap=null;
+var prixStationsData=[];
+
 function ouvrirPrix(){
   var veh=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
   var isElec=veh&&veh.type==="elec";
@@ -2955,11 +2961,7 @@ function fetchPrix(lat,lng){
     .then(function(r){return r.json();})
     .then(function(data){
      var stations=data.results||data.records||[];
-if(stations.length===0){
-  document.getElementById("mprix-content").innerHTML='<div style="padding:10px;font-size:11px;color:var(--text)">'+JSON.stringify(data).substring(0,400)+'</div>';
-}else{
-  afficherPrix(stations,lat,lng);
-}
+afficherPrix(stations,lat,lng);
     })
     .catch(function(){
       document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ Erreur réseau</div>';
@@ -2993,8 +2995,7 @@ function afficherBornes(bornes,lat,lng){
     var puissance=b.puissance_nominale?b.puissance_nominale+" kW":"--";
     var connecteur=b.type_prise_principale||"";
 
-    var sId=s.id||s.adresse;
-html+='<div class="card" style="padding:12px;margin-bottom:8px" ontouchstart="startLongPress(this,\''+sId+'\')" ontouchend="cancelLongPress()">';
+    html+='<div class="card" style="padding:12px;margin-bottom:8px">';
     html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
     html+='<div style="font-size:14px;font-weight:800">'+couleur+' '+nom+'</div>';
     html+='<div style="font-size:14px;font-weight:900;color:var(--blue)">'+puissance+'</div>';
@@ -3063,8 +3064,7 @@ var statut=ouvert?"🟢":automate?"🟠":"🔴";
     html+='<div style="display:flex;gap:8px;margin-top:8px">';
 html+='<button onclick="ouvrirGPS(\''+s.adresse+'\',\''+s.cp+' '+s.ville+'\')" style="flex:1;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:10px;padding:6px;font-size:12px;font-weight:700;color:var(--blue)">🧭 '+T("yAller")+'</button>';
 var isPref=veh&&veh.stationPref&&String(veh.stationPref.id)===String(s.id);
-html+='<button id="star-'+s.id+'" onclick="epinglerStation(\''+s.id+'\')" style="background:var(--card2);border:1.5px solid var(--border3);border-radius:10px;padding:6px;font-size:16px">'+(isPref?"⭐":"☆")+'</button>';
-html+='</div>';
+html+='<button id="star-'+s.id+'" onclick="epinglerStation(this)" data-sid="'+s.id+'" class="star-btn'+(isPref?" sel":"")+'">'+(isPref?"⭐":"☆")+'</button>';html+='</div>';
     html+='</div>';
   });
 
@@ -3091,9 +3091,7 @@ function ouvrirGPS(adresse,ville){
   var query=encodeURIComponent(adresse+" "+ville);
   window.open("https://www.google.com/maps/search/?api=1&query="+query,"_blank");
 }
-var prixVue="liste";
-var prixMap=null;
-var prixStationsData=[];
+
 
 function setPrixVue(vue){
   prixVue=vue;
@@ -3132,20 +3130,22 @@ function afficherCarte(){
     });
   }
 }
-var longPressTimer=null;
 
 
-function epinglerStation(stationId){
-  var veh=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
+function epinglerStation(btn){
+  var stationId=String(btn.dataset.sid);
+  var veh=vehicles.find(function(v){return v.id===activeVid;});
   if(!veh)return;
-  var s=null;for(var j=0;j<prixStationsData.length;j++){if(String(prixStationsData[j].id)===String(stationId)){s=prixStationsData[j];break;}}
+  var s=prixStationsData.find(function(x){return String(x.id)===stationId;});
   if(!s)return;
-  veh.stationPref=s;
+  veh.stationPref=Object.assign({},s,{id:stationId});
   saveAll();
   showToast("⭐ "+T("stationPrefEnregistree"));
-  chargerPrix();
+  document.querySelectorAll("[id^='star-']").forEach(function(b){
+    if(String(b.dataset.sid)===stationId){b.classList.add("sel");b.textContent="⭐";}
+    else{b.classList.remove("sel");b.textContent="☆";}
+  });
 }
-
 </script>
 <div id="mhelp" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.4);align-items:center;justify-content:center;padding:24px">
   <div class="card" style="width:100%;max-width:340px;padding:24px;max-height:80vh;overflow-y:auto">
