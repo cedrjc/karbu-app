@@ -2287,8 +2287,13 @@ h+='<div class="card-sm" style="text-align:center"><div style="font-size:10px;co
 var f=getFiltered();var allDates=f.map(function(e){return e.date;}).sort();var duree="--";
 if(allDates.length>=2){var d1=new Date(allDates[0]),d2=new Date(allDates[allDates.length-1]);var days=Math.round((d2-d1)/(1000*60*60*24));if(days<30)duree=days+" "+T("jour");else if(days<365)duree=Math.round(days/30)+" "+T("mois");else{var ans=(days/365).toFixed(1);duree=ans+" "+(parseFloat(ans)>=2?T("ans"):T("an"));}}
 if(true){
-var iconePrix=s.isElec?"⚡":"⛽";
-h+='<div class="card-sm" onclick="ouvrirPrix()" style="text-align:center;cursor:pointer"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">'+iconePrix+' '+T(s.isElec?"prixBorne":"prixStation")+'</div><div style="font-size:18px;font-weight:900;color:var(--text)" id="prix-station-val">--</div><div style="font-size:10px;color:var(--text3);margin-top:4px" id="prix-station-maj">'+T("voirPrix")+'</div></div>';
+var vehActif=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){vehActif=vehicles[i];break;}}
+var isElecActif=vehActif&&vehActif.type==="elec";
+var iconePrix=isElecActif?"⚡":"⛽";
+var savedPrix=ls("KarBu_prix_station","--");
+var savedMaj=ls("KarBu_prix_station_maj","");
+var majTxt=savedMaj?("MAJ: "+new Date(savedMaj).toLocaleDateString([],{day:"2-digit",month:"2-digit"})+" "+new Date(savedMaj).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})):T("voirPrix");
+h+='<div class="card-sm" onclick="ouvrirPrix()" style="text-align:center;cursor:pointer"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">'+iconePrix+' '+T(isElecActif?"prixBorne":"prixStation")+'</div><div style="font-size:18px;font-weight:900;color:var(--text)" id="prix-station-val">'+savedPrix+'</div><div style="font-size:10px;color:var(--text3);margin-top:4px" id="prix-station-maj">'+majTxt+'</div></div>';
 }
 h+='</div>';
   if(s.last){
@@ -2961,15 +2966,15 @@ if(stations.length===0){
     });
 }
 function fetchBornes(lat,lng){
-  document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">⏳ '+T("chargement")+'...</div>';
-  var url="https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/bornes-irve/records?where=within_distance("+lng+" "+lat+")%27,10km)&limit=20";
+  document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">⏳ Chargement...</div>';
+  var url="https://data.gouv.fr/api/explore/v2.1/catalog/datasets/consolidation-etalab-schema-irve-statique-v-2-3-0-20230222/records?where=distance(geo_point_borne,geom'POINT("+lng+" "+lat+")',10km)&limit=20";
   fetch(url)
     .then(function(r){return r.json();})
     .then(function(data){
-      afficherBornes(data.results,lat,lng);
+      afficherBornes(data.results||[],lat,lng);
     })
     .catch(function(){
-      document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ '+T("erreurChargement")+'</div>';
+      document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ Erreur réseau</div>';
     });
 }
 
@@ -3005,7 +3010,7 @@ prixStationsData=bornes;
 function afficherPrix(stations,lat,lng){
   var veh=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
   var isElec=veh&&veh.type==="elec";
-  var fuelType=veh&&veh.fuel?veh.fuel:"sp95";
+  var fuelType=veh&&veh.fuel?veh.fuel:"b7";
 
   var fuelMap={
     "sp95":"sp95_prix",
@@ -3058,7 +3063,7 @@ var statut=ouvert?"🟢":automate?"🟠":"🔴";
     html+='<div style="display:flex;gap:8px;margin-top:8px">';
 html+='<button onclick="ouvrirGPS(\''+s.adresse+'\',\''+s.cp+' '+s.ville+'\')" style="flex:1;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:10px;padding:6px;font-size:12px;font-weight:700;color:var(--blue)">🧭 '+T("yAller")+'</button>';
 var isPref=veh&&veh.stationPref&&String(veh.stationPref.id)===String(s.id);
-html+='<button id="star-'+s.id+'" onclick="epinglerStation(prixStationsData['+filtered.indexOf(s)+'])" style="background:var(--card2);border:1.5px solid var(--border3);border-radius:10px;padding:6px;font-size:16px">'+(isPref?"⭐":"☆")+'</button>';
+html+='<button id="star-'+s.id+'" onclick="epinglerStation(prixStationsData.find(function(x){return String(x.id)===\''+s.id+'\'}))" style="background:var(--card2);border:1.5px solid var(--border3);border-radius:10px;padding:6px;font-size:16px">'+(isPref?"⭐":"☆")+'</button>';
 html+='</div>';
     html+='</div>';
   });
@@ -3071,13 +3076,17 @@ html+='</div>';
     var bestPrix=best[fuelKey]?best[fuelKey].toFixed(3):"--";
     var bestAutomate=best.horaires_automate_24_24==="Oui";
 var bestOuvert=!bestAutomate&&best[majKey]&&new Date(best[majKey])>new Date(Date.now()-24*60*60*1000);
+ls("KarBu_prix_station",bestPrix+'|'+(bestOuvert?"🟢":bestAutomate?"🟠":"🔴"));
+ls("KarBu_prix_station_maj",best[majKey]||"");
 var el=document.getElementById("prix-station-val");
 if(el)el.innerHTML=bestPrix+' € '+(bestOuvert?"🟢":bestAutomate?"🟠":"🔴");
     var elMaj=document.getElementById("prix-station-maj");
-    if(elMaj&&best[majKey])elMaj.textContent="MAJ: "+new Date(best[majKey]).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  }
+    if(elMaj&&best[majKey]){
+  var majDate=new Date(best[majKey]);
+  elMaj.textContent="MAJ: "+majDate.toLocaleDateString([],{day:'2-digit',month:'2-digit'})+" "+majDate.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 }
-
+}
+}
 function ouvrirGPS(adresse,ville){
   var query=encodeURIComponent(adresse+" "+ville);
   window.open("https://www.google.com/maps/search/?api=1&query="+query,"_blank");
@@ -3103,21 +3112,21 @@ function setPrixVue(vue){
 function afficherCarte(){
   if(!prixMap){
     prixMap=L.map("mprix-map").setView([46.5,2.3],6);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
-      attribution:"© OpenStreetMap"
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",{
+      attribution:"© OpenStreetMap © CARTO"
     }).addTo(prixMap);
   }
   prixMap.eachLayer(function(l){if(l instanceof L.Marker)prixMap.removeLayer(l);});
   if(prixStationsData.length){
-    prixMap.setView([prixStationsData[0].latitude,prixStationsData[0].longitude],13);
+    prixMap.setView([prixStationsData[0].geom.lat,prixStationsData[0].geom.lon],13);
     prixStationsData.forEach(function(s){
-      if(!s.latitude||!s.longitude)return;
+      if(!s.geom||!s.geom.lat||!s.geom.lon)return;
       var veh=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
-      var fuelMap={"sp95":"prix_sp95","sp98":"prix_sp98","e10":"prix_e10","e85":"prix_e85","b7":"prix_gazole","gpl":"prix_gplc"};
-      var fuelKey=fuelMap[veh&&veh.fuel?veh.fuel:"sp95"]||"prix_sp95";
+      var fuelMap={"sp95":"sp95_prix","sp98":"sp98_prix","e10":"e10_prix","e85":"e85_prix","b7":"gazole_prix","gpl":"gplc_prix"};
+      var fuelKey=fuelMap[veh&&veh.fuel?veh.fuel:"b7"]||"gazole_prix";
       var prix=s[fuelKey]?s[fuelKey].toFixed(3):"--";
-      var nom=s.marque||s.adresse||"Station";
-      L.marker([s.latitude,s.longitude])
+      var nom=s.adresse||"Station";
+      L.marker([s.geom.lat,s.geom.lon])
         .addTo(prixMap)
         .bindPopup("<b>"+nom+"</b><br>"+prix+" €/L<br><a href='https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(s.adresse+" "+s.ville)+"' target='_blank'>🧭 Y aller</a>");
     });
