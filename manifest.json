@@ -2,7 +2,7 @@
   "name": "KarBu - Carnet de bord Auto",
   "short_name": "KarBu",
   "description": "Suivi consommation carburant et électrique",
-  "start_url": "/",
+  "start_url": "/karbu-app/",
   "display": "standalone",
   "background_color": "#0c65ac",
   "theme_color": "#0c65ac",
