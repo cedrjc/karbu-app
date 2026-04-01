@@ -3010,50 +3010,25 @@ prixStationsData=bornes;
 }
 function afficherPrix(stations,lat,lng){
   var veh=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
-  var isElec=veh&&veh.type==="elec";
   var fuelType=veh&&veh.fuel?veh.fuel:"b7";
-
-  var fuelMap={
-    "sp95":"sp95_prix",
-    "sp98":"sp98_prix",
-    "e10":"e10_prix",
-    "e85":"e85_prix",
-    "b7":"gazole_prix",
-    "gpl":"gplc_prix"
-  };
-  var fuelMajMap={
-    "sp95":"sp95_maj",
-    "sp98":"sp98_maj",
-    "e10":"e10_maj",
-    "e85":"e85_maj",
-    "b7":"gazole_maj",
-    "gpl":"gplc_maj"
-  };
+  var fuelMap={"sp95":"sp95_prix","sp98":"sp98_prix","e10":"e10_prix","e85":"e85_prix","b7":"gazole_prix","gpl":"gplc_prix"};
+  var fuelMajMap={"sp95":"sp95_maj","sp98":"sp98_maj","e10":"e10_maj","e85":"e85_maj","b7":"gazole_maj","gpl":"gplc_maj"};
   var fuelKey=fuelMap[fuelType]||"gazole_prix";
   var majKey=fuelMajMap[fuelType]||"gazole_maj";
-
-  if(!stations||!stations.length){
-    document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">😔 '+T("aucuneStation")+'</div>';
-    return;
-  }
-
+  if(!stations||!stations.length){document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">😔 '+T("aucuneStation")+'</div>';return;}
   var filtered=stations.slice();
   filtered.sort(function(a,b){return (a[fuelKey]||999)-(b[fuelKey]||999);});
-
   var html="";
   filtered.slice(0,10).forEach(function(s){
     var prix=s[fuelKey]?s[fuelKey].toFixed(3):"--";
     var automate=s.horaires_automate_24_24==="Oui";
-var ouvert=!automate&&s[majKey]&&new Date(s[majKey])>new Date(Date.now()-24*60*60*1000);
-var statut=ouvert?"🟢":automate?"🟠":"🔴";
-    var maj=s[majKey]?new Date(s[majKey]).toLocaleString():"--";
+    var ouvert=!automate&&s[majKey]&&new Date(s[majKey])>new Date(Date.now()-24*60*60*1000);
+    var statut=ouvert?"🟢":automate?"🟠":"🔴";
+    var maj=s[majKey]?new Date(s[majKey]).toLocaleString("fr-FR",{timeZone:"Europe/Paris"}):"--";
     var dist=s.geom?Math.round(calcDist({lat:lat,lng:lng},{lat:s.geom.lat,lng:s.geom.lon})/100)/10+" km":"--";
-    var enseignes=["Total Access","Total","BP","Shell","Esso Express","Esso","Intermarché","Carrefour Market","Carrefour","Leclerc","Avia","Système U","Casino","Géant","Lidl","Netto"];
-var nomEns=null;
-if(s.adresse){for(var e=0;e<enseignes.length;e++){if(s.adresse.toLowerCase().indexOf(enseignes[e].toLowerCase())>=0){nomEns=enseignes[e];break;}}}
-var nom=nomEns||"Station inconnue";
-var adresse=(s.adresse||"")+(s.ville?", "+s.ville:"");
-
+    var nom=s.ville||"Station";
+    var adresse=s.adresse||"";
+    var isPref=veh&&veh.stationPref&&String(veh.stationPref.id)===String(s.id);
     html+='<div class="card" style="padding:12px;margin-bottom:8px">';
     html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
     html+='<div style="font-size:14px;font-weight:800">'+statut+' '+nom+'</div>';
@@ -3065,30 +3040,28 @@ var adresse=(s.adresse||"")+(s.ville?", "+s.ville:"");
     html+='<div style="font-size:10px;color:var(--text3)">MAJ: '+maj+'</div>';
     html+='</div>';
     html+='<div style="display:flex;gap:8px;margin-top:8px">';
-html+='<button onclick="ouvrirGPS(\''+s.adresse+'\',\''+s.cp+' '+s.ville+'\')" style="flex:1;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:10px;padding:6px;font-size:12px;font-weight:700;color:var(--blue)">🧭 '+T("yAller")+'</button>';
-var isPref=veh&&veh.stationPref&&String(veh.stationPref.id)===String(s.id);
-html+='<button id="star-'+s.id+'" onclick="epinglerStation(document.getElementById(\'star-'+s.id+'\'))" data-sid="'+s.id+'" class="star-btn'+(isPref?" sel":"")+'">'+(isPref?"⭐":"☆")+'</button>';html+='</div>';
+    html+='<button onclick="ouvrirGPS(\''+s.adresse+'\',\''+s.cp+' '+s.ville+'\')" style="flex:1;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:10px;padding:6px;font-size:12px;font-weight:700;color:var(--blue)">🧭 '+T("yAller")+'</button>';
+    html+='<button data-sid="'+s.id+'" onclick="var sid=this.dataset.sid;var vv=null;for(var ii=0;ii<vehicles.length;ii++){if(vehicles[ii].id===activeVid){vv=vehicles[ii];break;}}if(!vv)return;var ss=prixStationsData.filter(function(x){return String(x.id)===sid;})[0];if(!ss)return;vv.stationPref=ss;saveAll();showToast(\'⭐ Station préférée !\');chargerPrix();" style="flex:1;background:'+(isPref?"gold":"var(--card2)")+';border:1.5px solid var(--border3);border-radius:10px;padding:6px;font-size:11px;font-weight:700;color:'+(isPref?"#000":"var(--text3)")+'>'+(isPref?"⭐ Préférée":"☆ Préférée")+'</button>';
+    html+='</div>';
     html+='</div>';
   });
-
   prixStationsData=filtered;
   document.getElementById("mprix-content").innerHTML=html;
-
   if(filtered.length){
     var best=filtered[0];
     var bestPrix=best[fuelKey]?best[fuelKey].toFixed(3):"--";
     var bestAutomate=best.horaires_automate_24_24==="Oui";
-var bestOuvert=!bestAutomate&&best[majKey]&&new Date(best[majKey])>new Date(Date.now()-24*60*60*1000);
-ls("KarBu_prix_station",bestPrix+'|'+(bestOuvert?"🟢":bestAutomate?"🟠":"🔴"));
-ls("KarBu_prix_station_maj",best[majKey]||"");
-var el=document.getElementById("prix-station-val");
-if(el)el.innerHTML=bestPrix+' € '+(bestOuvert?"🟢":bestAutomate?"🟠":"🔴");
+    var bestOuvert=!bestAutomate&&best[majKey]&&new Date(best[majKey])>new Date(Date.now()-24*60*60*1000);
+    ls("KarBu_prix_station",bestPrix+'|'+(bestOuvert?"🟢":bestAutomate?"🟠":"🔴"));
+    ls("KarBu_prix_station_maj",best[majKey]||"");
+    var el=document.getElementById("prix-station-val");
+    if(el)el.innerHTML=bestPrix+' € '+(bestOuvert?"🟢":bestAutomate?"🟠":"🔴");
     var elMaj=document.getElementById("prix-station-maj");
     if(elMaj&&best[majKey]){
-  var majDate=new Date(best[majKey]);
-  elMaj.textContent="MAJ: "+majDate.toLocaleDateString([],{day:'2-digit',month:'2-digit'})+" "+majDate.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-}
-}
+      var majDate=new Date(best[majKey]);
+      elMaj.textContent="MAJ: "+majDate.toLocaleDateString("fr-FR",{timeZone:"Europe/Paris",day:'2-digit',month:'2-digit'})+" "+majDate.toLocaleTimeString("fr-FR",{timeZone:"Europe/Paris",hour:'2-digit',minute:'2-digit'});
+    }
+  }
 }
 function ouvrirGPS(adresse,ville){
   var query=encodeURIComponent(adresse+" "+ville);
