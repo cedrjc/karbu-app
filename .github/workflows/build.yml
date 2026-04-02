@@ -1,0 +1,12 @@
+name: Build AAB
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build TWA
+        uses: chromeos/pwa-play-billing@v1
+        with:
+          packageId: com.appdrive.karbu
+          manifestUrl: https://cedrjc.github.io/karbu-app/manifest.json
