@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#1e1e2e" media="(prefers-color-scheme: dark)"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-title" content="KarBu"/>
-<link rel="manifest" href="/karbu-app/manifest.json"/>
+<link rel="manifest" href="manifest.json">
 <title>KarBu - Carnet de bord Auto</title>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-T5QZGRWSXF"></script>
@@ -2269,14 +2269,39 @@ function renderAccueil(){
   var h="";
 h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">';
 h+='<div class="card-sm" style="text-align:center"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">'+T("consoMoy")+'</div><div style="font-size:26px;font-weight:900;letter-spacing:-1.5px;line-height:1;color:var(--text)">'+(s.avgConso||"--")+'</div><div style="font-size:11px;color:var(--text3);margin-top:5px">'+uC+' km</div></div>';
-
 h+='<div class="card-sm" style="text-align:center"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">'+T("prixMoy")+'</div><div style="font-size:26px;font-weight:900;letter-spacing:-1.5px;line-height:1;color:var(--text)">'+(s.avgPrixActuel||"--")+'</div><div style="font-size:11px;color:var(--text3);margin-top:5px">'+userCurrency+' / km</div></div>';
 h+='<div class="card-sm" style="text-align:center"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">'+T("autonomie")+'</div><div style="font-size:26px;font-weight:900;letter-spacing:-1.5px;line-height:1;color:var(--text)">'+(s.autonomie||"--")+'<span style="font-size:12px;font-weight:600;margin-left:3px">km</span></div><div style="font-size:11px;color:var(--text3);margin-top:4px">~'+(s.avgKm||"--")+' km ('+T("trajetMoy")+')</div></div>';
 
 var f=getFiltered();var allDates=f.map(function(e){return e.date;}).sort();var duree="--";
 if(allDates.length>=2){var d1=new Date(allDates[0]),d2=new Date(allDates[allDates.length-1]);var days=Math.round((d2-d1)/(1000*60*60*24));if(days<30)duree=days+" "+T("jour");else if(days<365)duree=Math.round(days/30)+" "+T("mois");else{var ans=(days/365).toFixed(1);duree=ans+" "+(parseFloat(ans)>=2?T("ans"):T("an"));}}
-if(s.autonomie){
-h+='<div class="card-sm" style="text-align:center;opacity:.5"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">⛽ '+T("prixStation")+'</div><div style="font-size:20px;font-weight:900;color:var(--text3)">--</div><div style="font-size:10px;color:var(--text3);margin-top:5px">'+T("comingSoon")+'</div></div>';
+
+var isFrance=savedCountries&&savedCountries[0]&&savedCountries[0].toLowerCase().trim()==="france";
+if(isFrance){
+  var vehActif=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){vehActif=vehicles[i];break;}}
+  var isElecActif=vehActif&&vehActif.type==="elec";
+  var iconePrix=isElecActif?"⚡":"⛽";
+  var savedPrix=ls("KarBu_prix_station","--");
+  var savedMaj=ls("KarBu_prix_station_maj","");
+  var majTxt=savedMaj?("MAJ: "+new Date(savedMaj).toLocaleDateString("fr-FR",{timeZone:"Europe/Paris",day:"2-digit",month:"2-digit"})+" "+new Date(savedMaj).toLocaleTimeString("fr-FR",{timeZone:"Europe/Paris",hour:"2-digit",minute:"2-digit"})):T("Prochainement");
+  h+='<div class="card-sm" onclick="ouvrirPrix()" style="text-align:center;cursor:pointer"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">'+iconePrix+' '+T(isElecActif?"prixBorne":"prixStation")+'</div><div style="font-size:18px;font-weight:900;color:var(--text)" id="prix-station-val">'+savedPrix+'</div><div style="font-size:10px;color:var(--text3);margin-top:4px" id="prix-station-maj">'+majTxt+'</div></div>';
+}else{
+  var veh2=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh2=vehicles[i];break;}}
+  var entretienTxt="--";
+  var entretienSub="";
+  if(veh2&&veh2.vidKm&&veh2.vidIntervalKm){
+    var kmActuel=s.last&&s.last.tkm?parseInt(s.last.tkm):0;
+    var kmProchain=parseInt(veh2.vidKm)+parseInt(veh2.vidIntervalKm);
+    var restKm=kmProchain-kmActuel;
+    if(restKm>0){entretienTxt="Dans "+restKm.toLocaleString()+" km";entretienSub=T("vidange");}
+  }
+  if(veh2&&veh2.vidDate&&entretienTxt==="--"){
+    var vidProchaine=new Date(veh2.vidDate);
+    vidProchaine.setFullYear(vidProchaine.getFullYear()+1);
+    if(entretienTxt!="--"){entretienTxt+=" ou "+vidProchaine.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"});}
+    else{entretienTxt="Avant le "+vidProchaine.toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"});}
+    entretienSub=T("vidange");
+  }
+  h+='<div class="card-sm" style="text-align:center"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">🔔 '+T("prochain Entretien")+'</div><div style="font-size:14px;font-weight:900;color:var(--text)">'+entretienTxt+'</div><div style="font-size:10px;color:var(--text3);margin-top:4px">'+entretienSub+'</div></div>';
 }
 h+='</div>';
   if(s.last){
@@ -2286,7 +2311,7 @@ h+='</div>';
 var cTxt=cD!=null?(cD>0?"+ ":"- ")+Math.abs(cD)+(cPct?' <span style="font-weight:400">('+cPct+'%)</span>':""):null;
     var pCol=pD>0?"var(--red)":pD<0?"var(--green)":"var(--text3)";
     var pPct=s.prev&&s.prev.ppl?Math.round(Math.abs(pD)/s.prev.ppl*100):null;
-var pTxt=pD!=null?(pD>0?"+ ":"- ")+Math.abs(pD).toFixed(3)+" "+userCurrency+(pPct?' <span style="font-weight:400">('+pPct+'%)</span>':""):"=";
+var pTxt=pD!=null?(pD>0?"+ ":"- ")+Math.abs(pD).toFixed(3)+" "+userCurrency+(pPct?' <span style="font-weight:400">('+cPct+'%)</span>':""):"=";
     var staSuffix=s.last.ftype==="premium"?" - "+T("premium"):s.last.ftype==="normal"?" - "+T("normal"):"";
     h+='<div class="card-hero">';
 h+='<div style="margin-bottom:14px"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px">'+T("dernierPlein")+'</div>';
@@ -2314,7 +2339,6 @@ h+='</div>';
 h+='</div></div>';
   }
   h+=renderInsights();
-  
   return h;
 }
 
@@ -2581,10 +2605,20 @@ function renderActivite(){
   }
 
   var h="";
-  h+=accordion("indic","",T("actIndic"),[
+  var kmActuelAct=last&&last.tkm?parseInt(last.tkm):0;
+var entretienVAct="--";
+if(veh&&veh.vidKm&&veh.vidIntervalKm){
+  var restKmAct=parseInt(veh.vidKm)+parseInt(veh.vidIntervalKm)-kmActuelAct;
+  entretienVAct=restKmAct>0?"Dans "+restKmAct.toLocaleString()+" km":"Dépassée !";
+}else if(veh&&veh.vidDate){
+  var vPAct=new Date(veh.vidDate);
+  vPAct.setFullYear(vPAct.getFullYear()+1);
+  entretienVAct="Avant le "+vPAct.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"});
+}
+h+=accordion("indic","",T("actIndic"),[
     {l:T("distTotale"),v:totalKms.toLocaleString(),u:"km"},
     {l:T("coutTotal"),v:totalSpend,u:userCurrency},
-    {l:T("consoMoy"),v:avgConso||"--",u:uC+" km"},
+    {l:"🔔 "+T("prochain Entretien"),v:entretienVAct},
     {l:T("duree"),v:duree}
   ]);
   h+=accordion("carbu","",T("actCarbu"),[
