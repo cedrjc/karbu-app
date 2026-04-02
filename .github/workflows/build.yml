@@ -1,12 +1,36 @@
-name: Build AAB
-on: [push]
+name: Build TWA AAB
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Build TWA
-        uses: chromeos/pwa-play-billing@v1
+      
+      - name: Setup Java
+        uses: actions/setup-java@v3
         with:
-          packageId: com.appdrive.karbu
-          manifestUrl: https://cedrjc.github.io/karbu-app/manifest.json
+          java-version: '17'
+          distribution: 'temurin'
+          
+      - name: Install Bubblewrap
+        run: npm install -g @bubblewrap/cli
+        
+      - name: Init TWA
+        run: |
+          bubblewrap init --manifest=https://cedrjc.github.io/karbu-app/manifest.json \
+            --packageId=com.appdrive.karbu \
+            --name="KarBu - Carnet de Bord Auto" \
+            --shortName="KarBu"
+            
+      - name: Build AAB
+        run: bubblewrap build
+        
+      - name: Upload AAB
+        uses: actions/upload-artifact@v3
+        with:
+          name: karbu-aab
+          path: '*.aab'
