@@ -8,10 +8,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - name: Setup Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -20,17 +20,13 @@ jobs:
         run: npm install -g @bubblewrap/cli
         
       - name: Init TWA
-        run: |
-          bubblewrap init --manifest=https://cedrjc.github.io/karbu-app/manifest.json \
-            --packageId=com.appdrive.karbu \
-            --name="KarBu - Carnet de Bord Auto" \
-            --shortName="KarBu"
-            
+        run: bubblewrap init --manifest=https://cedrjc.github.io/karbu-app/manifest.json
+        
       - name: Build AAB
-        run: bubblewrap build
+        run: bubblewrap build --skipPwaValidation
         
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
           name: karbu-aab
-          path: '*.aab'
+          path: '*/.aab'
