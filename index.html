@@ -3190,18 +3190,17 @@ function setStationPref(sid) {
   if (!stFound) return;
   vv.stationPref = stFound;
   saveAll();
-
-  var fuelMap = { "sp95": "sp95_prix", "sp98": "sp98_prix", "e10": "e10_prix", "e85": "e85_prix", "b7": "gazole_prix", "gpl": "gplc_prix" };
-  var fuelMajMap = { "sp95": "sp95_maj", "sp98": "sp98_maj", "e10": "e10_maj", "e85": "e85_maj", "b7": "gazole_maj", "gpl": "gplc_maj" };
+  // Sauvegarder le prix de la station préférée dans le localStorage
+  var fuelMap = {"sp95":"sp95_prix","sp98":"sp98_prix","e10":"e10_prix","e85":"e85_prix","b7":"gazole_prix","gpl":"gplc_prix"};
+  var fuelMajMap = {"sp95":"sp95_maj","sp98":"sp98_maj","e10":"e10_maj","e85":"e85_maj","b7":"gazole_maj","gpl":"gplc_maj"};
   var fuelKey = fuelMap[vv.fuel] || "gazole_prix";
   var majKey = fuelMajMap[vv.fuel] || "gazole_maj";
-
+  var prix = stFound[fuelKey] ? stFound[fuelKey].toFixed(3) : "--";
   var prixVal = stFound[fuelKey] ? stFound[fuelKey].toFixed(3) : null;
-  var prix = prixVal !== null ? prixVal : "--";
-  var ferme = stFound.horaires_automate_24_24 !== "Oui"
-    && (!stFound[majKey] || new Date(stFound[majKey]) <= new Date(Date.now() - 24 * 60 * 60 * 1000));
-  var statut = prixVal === null ? "" : ferme ? "🔴" : "";
-
+var prix = prixVal !== null ? prixVal : "--";
+var ferme = stFound.horaires_automate_24_24 !== "Oui"
+  && (!stFound[majKey] || new Date(stFound[majKey]) <= new Date(Date.now() - 24 * 60 * 60 * 1000));
+var statut = prixVal === null ? "" : ferme ? "🔴" : "";
   ss("KarBu_prix_station", prix + "|" + statut);
   ss("KarBu_prix_station_maj", stFound[majKey] || "");
   ss("KarBu_prix_station_ville", stFound.ville || "");
@@ -3269,10 +3268,10 @@ function afficherPrix(stations, lat, lng) {
 
   filtered.slice(0, 10).forEach(function (s) {
     var prixVal = s[fuelKey] ? s[fuelKey].toFixed(3) : null;
-    var prix = prixVal !== null ? prixVal : "--";
-    var ferme = s.horaires_automate_24_24 !== "Oui"
-      && (!s[majKey] || new Date(s[majKey]) <= new Date(Date.now() - 24 * 60 * 60 * 1000));
-    var statut = prixVal === null ? "" : ferme ? "🔴 " : "";
+var prix = prixVal !== null ? prixVal : "--";
+var ferme = s.horaires_automate_24_24 !== "Oui"
+  && (!s[majKey] || new Date(s[majKey]) <= new Date(Date.now() - 24 * 60 * 60 * 1000));
+var statut = prixVal === null ? "" : ferme ? "🔴 " : "";
     var maj = s[majKey] ? s[majKey].replace("T", " ").substring(0, 16) : "--";
     var distKm = s._dist < 999999 ? (Math.round(s._dist / 100) / 10) + " km" : "--";
     var nom = s.ville || "Station";
@@ -3281,8 +3280,8 @@ function afficherPrix(stations, lat, lng) {
 
     html += '<div class="card" style="padding:12px;margin-bottom:8px' + (isPref ? ';border:2px solid gold' : '') + '">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
-    html += '<div style="font-size:14px;font-weight:800">' + statut + nom + (isPref ? ' ⭐' : '') + '</div>';
-    html += '<div style="font-size:18px;font-weight:900;color:var(--blue)">' + prix + (prixVal !== null ? ' ' + userCurrency + '/L' : '') + '</div>';
+    html += '<div style="font-size:14px;font-weight:800">' + statut + ' ' + nom + (isPref ? ' ⭐' : '') + '</div>';
+    html += '<div style="font-size:18px;font-weight:900;color:var(--blue)">' + prix + ' ' + userCurrency + '/L</div>';
     html += '</div>';
     html += '<div style="font-size:11px;color:var(--text3)">' + adresse + '</div>';
     html += '<div style="display:flex;justify-content:space-between;margin-top:4px">';
@@ -3296,15 +3295,15 @@ function afficherPrix(stations, lat, lng) {
       + 'style="flex:1;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:10px;padding:8px 4px;font-size:12px;font-weight:700;color:var(--blue);text-align:center">'
       + '🧭 ' + T("yAller") + '</button>';
     html += '<button data-sid="' + sid + '" onclick="'
-  + 'var sid=this.dataset.sid;'
-  + 'var vv=null;for(var ii=0;ii<vehicles.length;ii++){if(vehicles[ii].id===activeVid){vv=vehicles[ii];break;}}'
-  + 'if(!vv)return;'
-  + 'var stFound=prixStationsData_raw.filter(function(x){return String(x.id)===sid;})[0];'
-  + 'if(!stFound)return;'
-  + 'vv.stationPref=stFound;'
-  + 'saveAll();'
-  + 'showToast(\'⭐ Station préférée !\');'
-  + 'chargerPrix();" '
+      + 'var sid=this.dataset.sid;'
+      + 'var vv=null;for(var ii=0;ii<vehicles.length;ii++){if(vehicles[ii].id===activeVid){vv=vehicles[ii];break;}}'
+      + 'if(!vv)return;'
+      + 'var ss=prixStationsData_raw.filter(function(x){return String(x.id)===sid;})[0];'
+      + 'if(!ss)return;'
+      + 'vv.stationPref=ss;'
+      + 'saveAll();'
+      + 'showToast(\'⭐ Station préférée !\');'
+      + 'chargerPrix();" '
       + 'style="flex:1;background:' + (isPref ? 'gold' : 'var(--card2)') + ';border:1.5px solid var(--border3);border-radius:10px;padding:8px 4px;font-size:12px;font-weight:700;color:' + (isPref ? '#000' : 'var(--text3)') + ';text-align:center">'
       + (isPref ? '⭐ Préférée' : '☆ Préférée') + '</button>';
     html += '</div>';
@@ -3331,16 +3330,16 @@ function afficherPrix(stations, lat, lng) {
 
   if (stationAffichee) {
     var bestPrixVal = stationAffichee[fuelKey] ? stationAffichee[fuelKey].toFixed(3) : null;
-    var bestPrix = bestPrixVal !== null ? bestPrixVal : "--";
-    var bestFerme = stationAffichee.horaires_automate_24_24 !== "Oui"
-      && (!stationAffichee[majKey] || new Date(stationAffichee[majKey]) <= new Date(Date.now() - 24 * 60 * 60 * 1000));
-    var bestStatut = bestPrixVal === null ? "" : bestFerme ? "🔴" : "";
+var bestPrix = bestPrixVal !== null ? bestPrixVal : "--";
+var bestFerme = stationAffichee.horaires_automate_24_24 !== "Oui"
+  && (!stationAffichee[majKey] || new Date(stationAffichee[majKey]) <= new Date(Date.now() - 24 * 60 * 60 * 1000));
+var bestStatut = bestPrixVal === null ? "" : bestFerme ? "🔴" : "";
 
     ss("KarBu_prix_station", bestPrix + '|' + bestStatut);
     ss("KarBu_prix_station_maj", stationAffichee[majKey] || "");
 
     var el = document.getElementById("prix-station-val");
-    if (el) el.innerHTML = bestPrix + (bestStatut ? ' ' + bestStatut : '') + (bestPrixVal ? ' €' : '');
+    if (el) el.innerHTML = bestPrix + ' € ' + bestStatut;
 
     var elMaj = document.getElementById("prix-station-maj");
     if (elMaj && stationAffichee[majKey]) {
