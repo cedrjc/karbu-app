@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#1e1e2e" media="(prefers-color-scheme: dark)"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-title" content="KarBu"/>
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="/manifest.json"/>
 <title>KarBu - Carnet de bord Auto</title>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-T5QZGRWSXF"></script>
@@ -99,20 +99,25 @@ button:active{transform:scale(.96)}
 .bs-handle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 20px;}
 .bs-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:299;display:none;}
 .bs-overlay.open{display:block;}
+.gps-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:89;display:none;}
+.star-btn{background:var(--card2);border:1.5px solid var(--border3);border-radius:10px;padding:6px;font-size:16px;color:var(--text)}
+.star-btn.sel{color:gold}
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 <div class="header">
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
     <div style="flex:1">
       <div style="display:flex;align-items:center;gap:8px">
- 
-  <div style="font-size:19px;font-weight:900;letter-spacing:-1px;font-style:italic"><span style="color:#212121">Kar</span><span style="color:#0c65ac">Bu</span></div>
-</div>
+        <div style="font-size:19px;font-weight:900;letter-spacing:-1px;font-style:italic"><span style="color:#212121">Kar</span><span style="color:#0c65ac">Bu</span></div>
+      </div>
       <div id="hdr-sub" style="font-size:11px;color:var(--text3);margin-top:1px;font-weight:500"></div>
     </div>
+    <button id="bornes-btn" onclick="ouvrirPrix()" style="background:#e8f0fe;border:1.5px solid #f59e0b;border-radius:10px;cursor:pointer;padding:4px 12px;font-size:13px;font-weight:800;color:#f59e0b;display:none">Borne</button>
     <button id="gps-btn" onclick="toggleGPS()" style="background:#e8f0fe;border:1.5px solid #2563eb;border-radius:10px;cursor:pointer;padding:4px 12px;font-size:13px;font-weight:800;color:#2563eb;display:none">GPS</button>
-	<button onclick="openConfig()" id="tbtn" style="background:none;border:none;font-size:24px;padding:4px;cursor:pointer">⚙️</button>
+    <button onclick="openConfig()" id="tbtn" style="background:none;border:none;font-size:24px;padding:4px;cursor:pointer">⚙️</button>
   </div>
   <div id="veh-tabs" style="display:flex;gap:7px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none"></div>
 </div>
@@ -886,7 +891,7 @@ stationDef:"station par défaut",borneDef:"Borne par défaut",
 toutes:"Toutes",tous:"Tous",pays:"Pays",major:"Major",autre:"Autre",maison:"Maison",maison:"Maison",plein:"plein",pleins:"pleins",  
   premium:"Premium",normal:"Normal",trajet:"Trajet",touchPoint:"Touchez un point pour le detail. Pincez pour zoomer.",consoTitle:"Consommation",prixTitle:"Prix",prixPays:"Prix moyen par pays",meilleure:"Meilleure",pire:"Pire",meilleur:"Meilleur",tableau:"Tableau",consoMoy:"Conso. moyenne",trajetMoy:"Trajet moyen",prixMoy:"Prix moyen",autonomie:"Autonomie estimée",dernierPlein:"Dernier plein",prixL:"Prix/L",vsMoy:"VS moyenne",prixAvant:"Prix vs avant",conseil:"Conseil",record:"Record personnel",conseilEco:"Conseil eco",txtConsoHaut:"au-dessus de la moyenne - Vérifiez la pression des pneus !",txtConsoBas:"en dessous de la moyenne - Continuez !",txtRecord:"Record à battre !",txtEco:"Anticipez les freinages, roulez souple - Ça change tout à la conso !",txtConsoDebut:"Votre conso est",txtLe:"le",txtMeilleureConso:"Meilleure conso",
   aucuneDonnee:"Aucune donnée",ajouterPlein:"Ajoutez votre premier plein !",
-actIndic:"🎯Indicateurs principaux",actCarbu:"⛽Carburant",actConso:"📉Consommation",actCout:"💰Coût",actUtil:"🔧Utilisation",
+actEnergie:"⚡Énergie",actIndic:"🎯Indicateurs principaux",actCarbu:"⛽Carburant",actConso:"📉Consommation",actCout:"💰Coût",actUtil:"🔧Utilisation",
 distTotale:"Distance totale",coutTotal:"Coût total",duree:"Durée d'utilisation",
 consommes:"consommés",prixMoyen:"Prix moyen",prixMin:"Prix min",prixMax:"Prix max",
 consoMin:"Conso min",consoMax:"Conso max",variation:"Variation",consoMoyenne:"Conso moyenne",
@@ -900,20 +905,28 @@ jour:"j",mois:"mois",an:"an",ans:"ans",
   nouveauPaysPrompt:"Nouveau Pays :",
   detConsoTitle:"Consommation - Détail",detPrixTitle:"Prix - Détail",detPaysTitle:"Prix par pays - Détail",colTrajet:"Trajet",colCout:"Coût",colStation:"Station",colDate:"Date",colKm:"Km",colPays:"Pays",colN:"N",colMoy:"Moy.",colMin:"Min",colMax:"Max",colTotal:"Total",
   aideInfos:"Aide & Informations",
-  vidange:"Rappel vidange",vidDerniere:"Km dernière vidange",vidDate:"Date dernière vidange",vidIntervalKm:"Intervalle km",vidIntervalMois:"Intervalle mois",
+  vidange:"Rappel révision",vidDerniere:"Km dernière révision",vidDate:"Date dernière révision",vidIntervalKm:"Intervalle km",vidIntervalMois:"Intervalle mois",
   vidPopupTitre:"⚠️ Rappel vidange",vidPopupSub:"Il est temps de faire la vidange !",vidFait:"✅ C'est fait !",vidRappeler:"🔔 Me le rappeler",
   gpsStart:"Démarrer trajet",gpsStop:"Terminer trajet",gpsIndispo:"GPS non disponible",
   coutTrajet:"Coût du trajet",enregistrement:"Enregistrement en cours",
 ct:"Contrôle technique",ctDate:"Date de mise en circulation",ctProchain:"Prochain CT",ctPopupTitre:"Rappel CT",ctPopupSub:"Votre contrôle technique approche !",ctFait:"CT effectué !",ctRappeler:"Me le rappeler",ctNonSoumis:"Non soumis",ctLastDate:"Date dernier CT",
-  prixStation:"Prix station",comingSoon:"Bientôt — 04/2026",
+  prixStation:"Prix station",comingSoon:"Prochainement",
   partager:"Partager",partagerTitre:"Résumé du trajet",copie:"Copié !",
   supprimerPlein:"Supprimer ce plein ?",supprime:"Supprimé !",
   supprimerPays:"Supprimer ce pays ?",
   cvFiscaux:"Puissance fiscale",
   coutBareme:"Coût total (barème)",
   fermer:"Fermer",
-  scanTitre:"Scan ticket",scanSub:"Fonctionnalité bientôt disponible — v3.0 en cours de préparation ! Mai 2026",
+  scanTitre:"Scan ticket",scanSub:"Fonctionnalité bientôt disponible — v3.0 en cours de préparation ! 31 Mai 2026",
   coutCarbu:"Coût carburant",coutElec:"Coût énergie",
+  rechercheStations:"Recherche des stations autour de vous",
+chargement:"Chargement",
+erreurChargement:"Erreur de chargement — vérifiez votre connexion",
+aucuneStation:"Aucune station trouvée autour de vous",
+yAller:"Y aller",
+aucuneBorne:"Aucune borne de recharge trouvée autour de vous",
+prixBorne:"Prix Borne",
+stationPrefEnregistree:"Station préférée enregistrée !",
   droits:"Tous droits réservés",
   sp95:"SP95",sp98:"SP98",e10:"E10",e85:"E85",b7:"B7",gpl:"GPL"
 },
@@ -940,7 +953,7 @@ en:{
   toutes:"All",tous:"All",pays:"Country",major:"Major",autre:"Other",maison:"Home",maison:"Home",plein:"fill",pleins:"fills",
   premium:"Premium",normal:"Regular",trajet:"Trip",touchPoint:"Touch a point for details. Pinch to zoom.",consoTitle:"Consumption",
   aucuneDonnee:"No data",ajouterPlein:"Add your first refuel!",
-  actIndic:"🎯Main indicators",actCarbu:"⛽Fuel",actConso:"📉Consumption",actCout:"💰Cost",actUtil:"🔧Usage",
+  actEnergie:"⚡Energy",actIndic:"🎯Main indicators",actCarbu:"⛽Fuel",actConso:"📉Consumption",actCout:"💰Cost",actUtil:"🔧Usage",
   distTotale:"Total distance",coutTotal:"Total cost",duree:"Usage duration",
   consommes:"consumed",prixMoyen:"Average price",prixMin:"Min price",prixMax:"Max price",
   consoMin:"Min consumption",consoMax:"Max consumption",variation:"Variation",consoMoyenne:"Avg consumption",
@@ -954,19 +967,19 @@ en:{
   nouveauPaysPrompt:"New Country:",
   detConsoTitle:"Consumption - Detail",detPrixTitle:"Price - Detail",detPaysTitle:"Price by country - Detail",colTrajet:"Trip",colCout:"Cost",colStation:"Station",colDate:"Date",colKm:"Km",colPays:"Country",colN:"N",colMoy:"Avg.",colMin:"Min",colMax:"Max",colTotal:"Total",
   aideInfos:"Help & Information",
-  vidange:"Oil change reminder",vidDerniere:"Last oil change km",vidDate:"Last oil change date",vidIntervalKm:"Km interval",vidIntervalMois:"Month interval",
+  vidange:"Service reminder",vidDerniere:"Last service km",vidDate:"Last service date",vidIntervalKm:"Km interval",vidIntervalMois:"Month interval",
   vidPopupTitre:"⚠️ Oil change reminder",vidPopupSub:"Time for an oil change!",vidFait:"✅ Done!",vidRappeler:"🔔 Remind me later",
   gpsStart:"Start trip",gpsStop:"End trip",gpsIndispo:"GPS not available",
   coutTrajet:"Trip cost",enregistrement:"Recording in progress",
     ct:"MOT / Technical control",ctDate:"Registration date",ctProchain:"Next MOT",ctPopupTitre:" MOT reminder",ctPopupSub:"Your MOT is coming up!",ctFait:" MOT done!",ctRappeler:" Remind me later",ctNonSoumis:"Not required",ctLastDate:"Last MOT date",
-  prixStation:"Station price",comingSoon:"Coming soon — 04/2026",
+  prixStation:"Station price",comingSoon:"Coming soon — ",
   partager:"Share",partagerTitre:"Trip summary",copie:"Copied!",
   supprimerPlein:"Delete this refuel?",supprime:"Deleted!",
   supprimerPays:"Delete this country?",
   cvFiscaux:"Tax horsepower",
   coutBareme:"Total cost (mileage rate)",
   fermer:"Close",
-  scanTitre:"Ticket scan",scanSub:"Feature coming soon — v3.0 in preparation! May 2026",
+  scanTitre:"Ticket scan",scanSub:"Feature coming soon — v3.0 in preparation! 31 May 2026",
   coutCarbu:"Fuel cost",coutElec:"Energy cost",
   droits:"All rights reserved",
   sp95:"Petrol 95",sp98:"Petrol 98",e10:"E10 petrol",e85:"E85 ethanol",b7:"B7 diesel",gpl:"LPG"
@@ -994,7 +1007,7 @@ es:{
   toutes:"Todas",tous:"Todos",pays:"País",major:"Major",autre:"Otro",maison:"Casa",maison:"Casa",plein:"repostaje",pleins:"repostajes",
   premium:"Premium",normal:"Normal",trajet:"Trayecto",touchPoint:"Toca un punto para el detalle. Pellizca para hacer zoom.",consoTitle:"Consumo",
   aucuneDonnee:"Sin datos",ajouterPlein:"¡Agrega tu primer repostaje!",
-actIndic:"🎯Indicadores principales",actCarbu:"⛽Combustible",actConso:"📉Consumo",actCout:"💰Coste",actUtil:"🔧Uso",
+actEnergie:"⚡Energía",actIndic:"🎯Indicadores principales",actCarbu:"⛽Combustible",actConso:"📉Consumo",actCout:"💰Coste",actUtil:"🔧Uso",
 distTotale:"Distancia total",coutTotal:"Coste total",duree:"Duración de uso",
 consommes:"consumidos",prixMoyen:"Precio medio",prixMin:"Precio mín",prixMax:"Precio máx",
 consoMin:"Consumo mín",consoMax:"Consumo máx",variation:"Variación",consoMoyenne:"Consumo medio",
@@ -1008,19 +1021,19 @@ jour:"d",mois:"meses",an:"año",ans:"años",
   nouveauPaysPrompt:"Nuevo País:",
   detConsoTitle:"Consumo - Detalle",detPrixTitle:"Precio - Detalle",detPaysTitle:"Precio por país - Detalle",colTrajet:"Trayecto",colCout:"Coste",colStation:"Estación",colDate:"Fecha",colKm:"Km",colPays:"País",colN:"N",colMoy:"Med.",colMin:"Mín",colMax:"Máx",colTotal:"Total",
   aideInfos:"Ayuda & Información",
-  vidange:"Recordatorio cambio aceite",vidDerniere:"Km último cambio",vidDate:"Fecha último cambio",vidIntervalKm:"Intervalo km",vidIntervalMois:"Intervalo meses",
+  vidange:"Recordatorio revisión",vidDerniere:"Km última revisión",vidDate:"Fecha última revisión",vidIntervalKm:"Intervalo km",vidIntervalMois:"Intervalo meses",
   vidPopupTitre:"⚠️ Recordatorio cambio aceite",vidPopupSub:"¡Es hora de cambiar el aceite!",vidFait:"✅ ¡Hecho!",vidRappeler:"🔔 Recuérdamelo",
   gpsStart:"Iniciar trayecto",gpsStop:"Finalizar trayecto",gpsIndispo:"GPS no disponible",
   coutTrajet:"Coste del trayecto",enregistrement:"Grabación en curso",
   ct:"Revisione",ctDate:"Data di immatricolazione",ctProchain:"Prossima revisione",ctPopupTitre:" Promemoria revisione",ctPopupSub:"La revisione si avvicina!",ctFait:" Revisione effettuata!",ctRappeler:" Ricordamelo",ctNonSoumis:"No requerido",ctLastDate:"Fecha última ITV",
-  prixStation:"Precio estación",comingSoon:"Próximamente — 04/2026",
+  prixStation:"Precio estación",comingSoon:"Próximamente — ",
   partager:"Compartir",partagerTitre:"Resumen del trayecto",copie:"¡Copiado!",
   supprimerPlein:"¿Eliminar este repostaje?",supprime:"¡Eliminado!",
   supprimerPays:"¿Eliminar este país?",
   cvFiscaux:"Potencia fiscal",
   coutBareme:"Coste total (baremo)",
   fermer:"Cerrar",
-  scanTitre:"Escanear ticket",scanSub:"Función próximamente — v3.0 en preparación! Mayo 2026",
+  scanTitre:"Escanear ticket",scanSub:"Función próximamente — v3.0 en preparación! 31 Mayo 2026",
   coutCarbu:"Coste combustible",coutElec:"Coste energía",
   droits:"Todos los derechos reservados",
   sp95:"Gasolina 95",sp98:"Gasolina 98",e10:"Gasolina E10",e85:"Etanol E85",b7:"Diésel B7",gpl:"GLP"
@@ -1048,7 +1061,7 @@ it:{
   toutes:"Tutte",tous:"Tutti",pays:"Paese",major:"Major",autre:"Altro",maison:"Casa",maison:"Casa",plein:"rifornimento",pleins:"rifornimenti",
   premium:"Premium",normal:"Normale",trajet:"Percorso",touchPoint:"Tocca un punto per i dettagli. Pizzica per ingrandire.",consoTitle:"Consumo",
   aucuneDonnee:"Nessun dato",ajouterPlein:"Aggiungi il tuo primo rifornimento!",
-actIndic:"🎯Indicatori principali",actCarbu:"⛽Carburante",actConso:"📉Consumo",actCout:"💰Costo",actUtil:"🔧Utilizzo",
+actEnergie:"⚡Energia",actIndic:"🎯Indicatori principali",actCarbu:"⛽Carburante",actConso:"📉Consumo",actCout:"💰Costo",actUtil:"🔧Utilizzo",
 distTotale:"Distanza totale",coutTotal:"Costo totale",duree:"Durata utilizzo",
 consommes:"consumati",prixMoyen:"Prezzo medio",prixMin:"Prezzo min",prixMax:"Prezzo max",
 consoMin:"Consumo min",consoMax:"Consumo max",variation:"Variazione",consoMoyenne:"Consumo medio",
@@ -1062,19 +1075,19 @@ jour:"g",mois:"mesi",an:"anno",ans:"anni",
   nouveauPaysPrompt:"Nuovo Paese:",
   detConsoTitle:"Consumo - Dettaglio",detPrixTitle:"Prezzo - Dettaglio",detPaysTitle:"Prezzo per paese - Dettaglio",colTrajet:"Percorso",colCout:"Costo",colStation:"Stazione",colDate:"Data",colKm:"Km",colPays:"Paese",colN:"N",colMoy:"Med.",colMin:"Min",colMax:"Max",colTotal:"Totale",
   aideInfos:"Aiuto & Informazioni",
-  vidange:"Promemoria cambio olio",vidDerniere:"Km ultimo cambio",vidDate:"Data ultimo cambio",vidIntervalKm:"Intervallo km",vidIntervalMois:"Intervallo mesi",
+  vidange:"Promemoria revisione",vidDerniere:"Km ultima revisione",vidDate:"Data ultima revisione",vidIntervalKm:"Intervallo km",vidIntervalMois:"Intervallo mesi",
   vidPopupTitre:"⚠️ Promemoria cambio olio",vidPopupSub:"È ora di fare il cambio olio!",vidFait:"✅ Fatto!",vidRappeler:"🔔 Ricordamelo",
   gpsStart:"Avvia percorso",gpsStop:"Termina percorso",gpsIndispo:"GPS non disponibile",
   coutTrajet:"Costo del percorso",enregistrement:"Registrazione in corso",
     ct:"Revisione",ctDate:"Data di immatricolazione",ctProchain:"Prossima revisione",ctPopupTitre:" Promemoria revisione",ctPopupSub:"La revisione si avvicina!",ctFait:" Revisione effettuata!",ctRappeler:" Ricordamelo",ctNonSoumis:"Non richiesto",ctLastDate:"Data ultima revisione",
-  prixStation:"Prezzo stazione",comingSoon:"Prossimamente — 04/2026",
+  prixStation:"Prezzo stazione",comingSoon:"Prossimamente — ",
   partager:"Condividi",partagerTitre:"Riepilogo percorso",copie:"Copiato!",
   supprimerPlein:"Eliminare rifornimento?",supprime:"Eliminato!",
   supprimerPays:"Eliminare questo paese?",
   cvFiscaux:"Potenza fiscale",
   coutBareme:"Costo totale (rimborso)",
   fermer:"Chiudi",
-  scanTitre:"Scansiona ticket",scanSub:"Funzione disponibile a breve — v3.0 in preparazione! Maggio 2026",
+  scanTitre:"Scansiona ticket",scanSub:"Funzione disponibile a breve — v3.0 in preparazione! 31 Maggio 2026",
   coutCarbu:"Costo carburante",coutElec:"Costo energia",
   droits:"Tutti i diritti riservati",
   sp95:"Benzina 95",sp98:"Benzina 98",e10:"Benzina E10",e85:"E85 etanolo",b7:"Diesel B7",gpl:"GPL"
@@ -1102,7 +1115,7 @@ de:{
   toutes:"Alle",tous:"Alle",pays:"Land",major:"Major",autre:"Andere",maison:"Zuhause",maison:"Zuhause",plein:"Tankung",pleins:"Tankungen",
   premium:"Premium",normal:"Normal",trajet:"Strecke",touchPoint:"Punkt antippen für Details. Zum Zoomen zusammenkneifen.",consoTitle:"Verbrauch",
   aucuneDonnee:"Keine Daten",ajouterPlein:"Fügen Sie Ihre erste Tankung hinzu!",
-actIndic:"🎯Hauptindikatoren",actCarbu:"⛽Kraftstoff",actConso:"📉Verbrauch",actCout:"💰Kosten",actUtil:"🔧Nutzung",
+actEnergie:"⚡Energie",actIndic:"🎯Hauptindikatoren",actCarbu:"⛽Kraftstoff",actConso:"📉Verbrauch",actCout:"💰Kosten",actUtil:"🔧Nutzung",
 distTotale:"Gesamtstrecke",coutTotal:"Gesamtkosten",duree:"Nutzungsdauer",
 consommes:"verbraucht",prixMoyen:"Durchschnittspreis",prixMin:"Mindestpreis",prixMax:"Höchstpreis",
 consoMin:"Min Verbrauch",consoMax:"Max Verbrauch",variation:"Schwankung",consoMoyenne:"Ø Verbrauch",
@@ -1116,19 +1129,19 @@ jour:"T",mois:"Monate",an:"Jahr",ans:"Jahre",
  nouveauPaysPrompt:"Neues Land:",
  detConsoTitle:"Verbrauch - Detail",detPrixTitle:"Preis - Detail",detPaysTitle:"Preis pro Land - Detail",colTrajet:"Strecke",colCout:"Kosten",colStation:"Tankstelle",colDate:"Datum",colKm:"Km",colPays:"Land",colN:"N",colMoy:"Ø",colMin:"Min",colMax:"Max",colTotal:"Gesamt",
  aideInfos:"Hilfe & Informationen", 
-  vidange:"Ölwechsel-Erinnerung",vidDerniere:"Km letzter Ölwechsel",vidDate:"Datum letzter Ölwechsel",vidIntervalKm:"Intervall km",vidIntervalMois:"Intervall Monate",
+  vidange:"Wartungserinnerung",vidDerniere:"Letzter Service km",vidDate:"Datum letzter Service",vidIntervalKm:"Intervall km",vidIntervalMois:"Intervall Monate",
   vidPopupTitre:"⚠️ Ölwechsel-Erinnerung",vidPopupSub:"Zeit für einen Ölwechsel!",vidFait:"✅ Erledigt!",vidRappeler:"🔔 Später erinnern",
   gpsStart:"Fahrt starten",gpsStop:"Fahrt beenden",gpsIndispo:"GPS nicht verfügbar",
   coutTrajet:"Fahrtkosten",enregistrement:"Aufzeichnung läuft",
     ct:"Hauptuntersuchung",ctDate:"Erstzulassungsdatum",ctProchain:"Nächste HU",ctPopupTitre:"️ HU-Erinnerung",ctPopupSub:"Ihre Hauptuntersuchung naht!",ctFait:" HU erledigt!",ctRappeler:" Später erinnern",ctNonSoumis:"Nicht erforderlich",ctLastDate:"Datum letzte HU",
-  prixStation:"Tankstellenpreis",comingSoon:"Demnächst — 04/2026",
+  prixStation:"Tankstellenpreis",comingSoon:"Demnächst — ",
   partager:"Teilen",partagerTitre:"Fahrtbericht",copie:"Kopiert!",
   supprimerPlein:"Tankvorgang löschen?",supprime:"Gelöscht!",
   supprimerPays:"Dieses Land löschen?",
   cvFiscaux:"Steuerliche PS",
   coutBareme:"Gesamtkosten (Pauschale)",
   fermer:"Schließen",
-  scanTitre:"Ticket scannen",scanSub:"Funktion demnächst verfügbar — v3.0 in Vorbereitung! Mai 2026",
+  scanTitre:"Ticket scannen",scanSub:"Funktion demnächst verfügbar — v3.0 in Vorbereitung! 31 Mai 2026",
   coutCarbu:"Kraftstoffkosten",coutElec:"Energiekosten",
   droits:"Alle Rechte vorbehalten",
   sp95:"Super 95",sp98:"Super Plus 98",e10:"E10",e85:"E85",b7:"Diesel B7",gpl:"LPG"
@@ -1156,7 +1169,7 @@ pt:{
   toutes:"Todas",tous:"Todos",pays:"País",major:"Major",autre:"Outro",maison:"Casa",maison:"Casa",plein:"abastecimento",pleins:"abastecimentos",
   premium:"Premium",normal:"Normal",trajet:"Percurso",touchPoint:"Toque num ponto para detalhes. Belisque para zoom.",consoTitle:"Consumo",
   aucuneDonnee:"Sem dados",ajouterPlein:"Adicione seu primeiro abastecimento!",
-actIndic:"🎯Indicadores principais",actCarbu:"⛽Combustível",actConso:"📉Consumo",actCout:"💰Custo",actUtil:"🔧Utilização",
+actEnergie:"⚡Energia",actIndic:"🎯Indicadores principais",actCarbu:"⛽Combustível",actConso:"📉Consumo",actCout:"💰Custo",actUtil:"🔧Utilização",
 distTotale:"Distância total",coutTotal:"Custo total",duree:"Duração de uso",
 consommes:"consumidos",prixMoyen:"Preço médio",prixMin:"Preço mín",prixMax:"Preço máx",
 consoMin:"Consumo mín",consoMax:"Consumo máx",variation:"Variação",consoMoyenne:"Consumo médio",
@@ -1170,19 +1183,19 @@ jour:"d",mois:"meses",an:"ano",ans:"anos",
   nouveauPaysPrompt:"Novo País:",
   detConsoTitle:"Consumo - Detalhe",detPrixTitle:"Preço - Detalhe",detPaysTitle:"Preço por país - Detalhe",colTrajet:"Percurso",colCout:"Custo",colStation:"Posto",colDate:"Data",colKm:"Km",colPays:"País",colN:"N",colMoy:"Méd.",colMin:"Mín",colMax:"Máx",colTotal:"Total",
   aideInfos:"Ajuda & Informações",
-  vidange:"Lembrete troca de óleo",vidDerniere:"Km última troca",vidDate:"Data última troca",vidIntervalKm:"Intervalo km",vidIntervalMois:"Intervalo meses",
+  vidange:"Lembrete revisão",vidDerniere:"Km última revisão",vidDate:"Data última revisão",vidIntervalKm:"Intervalo km",vidIntervalMois:"Intervalo meses",
   vidPopupTitre:"⚠️ Lembrete troca de óleo",vidPopupSub:"Está na hora de trocar o óleo!",vidFait:"✅ Feito!",vidRappeler:"🔔 Lembrar depois",
   gpsStart:"Iniciar percurso",gpsStop:"Terminar percurso",gpsIndispo:"GPS não disponível",
   coutTrajet:"Custo do percurso",enregistrement:"Gravação em curso",
   ct:"Inspeção técnica",ctDate:"Data de matrícula",ctProchain:"Próxima inspeção",ctPopupTitre:" Lembrete inspeção",ctPopupSub:"A sua inspeção está a chegar!",ctFait:" Inspeção feita!",ctRappeler:" Lembrar depois",ctNonSoumis:"Não obrigatório",ctLastDate:"Data última inspeção",
-  prixStation:"Preço posto",comingSoon:"Em breve — 04/2026",
+  prixStation:"Preço posto",comingSoon:"Em breve — ",
   partager:"Partilhar",partagerTitre:"Resumo da viagem",copie:"Copiado!",
   supprimerPlein:"Excluir abastecimento?",supprime:"Excluído!",
   supprimerPays:"Excluir este país?",
   cvFiscaux:"Potência fiscal",
   coutBareme:"Custo total (tabela)",
   fermer:"Fechar",
-  scanTitre:"Digitalizar ticket",scanSub:"Funcionalidade em breve — v3.0 em preparação! Maio 2026",
+  scanTitre:"Digitalizar ticket",scanSub:"Funcionalidade em breve — v3.0 em preparação! 31 Maio 2026",
   coutCarbu:"Custo combustível",coutElec:"Custo energia",
   droits:"Todos os direitos reservados",
   sp95:"Gasolina 95",sp98:"Gasolina 98",e10:"Gasolina E10",e85:"Etanol E85",b7:"Diesel B7",gpl:"GPL"
@@ -1281,6 +1294,7 @@ nl: {
   txtMeilleureConso: "Beste verbruik",
   aucuneDonnee: "Geen gegevens",
   ajouterPlein: "Voeg uw eerste volle tank toe!",
+  actEnergie:"⚡Energie",
   actIndic: "🎯Belangrijkste indicatoren",
   actCarbu: "⛽Brandstof",
   actConso: "📉Verbruik",
@@ -1344,9 +1358,9 @@ nl: {
   colMax: "Max",
   colTotal: "Totaal",
   aideInfos: "Hulp & Informatie",
-  vidange: "Olie verversing herinnering",
-  vidDerniere: "Km laatste olie verversing",
-  vidDate: "Datum laatste olie verversing",
+  vidange:"Onderhoudsherinnering",
+  vidDerniere:"Km laatste service",
+  vidDate:"Datum laatste service",
   vidIntervalKm: "Interval km",
   vidIntervalMois: "Interval maanden",
   vidPopupTitre: "⚠️ Olie verversing herinnering",
@@ -1365,7 +1379,7 @@ nl: {
   e85: "E85",
   b7: "B7",
   gpl: "GPL",
-  prixStation:"Stationprijs",comingSoon:"Binnenkort — 04/2026",
+  prixStation:"Stationprijs",comingSoon:"Binnenkort — ",
   ct:"APK keuring",ctDate:"Datum eerste toelating",ctProchain:"Volgende APK",ctPopupTitre:" APK herinnering",ctPopupSub:"Uw APK nadert!",ctFait:" APK gedaan!",ctRappeler:" Herinner me",ctNonSoumis:"Niet vereist",ctLastDate:"Datum laatste APK",
   partager:"Delen",partagerTitre:"Rit samenvatting",copie:"Gekopieerd!",
   supprimerPlein:"Tankbeurt verwijderen?",supprime:"Verwijderd!",
@@ -1374,7 +1388,7 @@ nl: {
   coutBareme:"Totale kosten (km-vergoeding)",
   fermer:"Sluiten",
   coutCarbu:"Brandstofkosten",coutElec:"Energiekosten",
-  scanTitre:"Ticket scannen",scanSub:"Functie binnenkort beschikbaar — v3.0 in voorbereiding! Mei 2026",
+  scanTitre:"Ticket scannen",scanSub:"Functie binnenkort beschikbaar — v3.0 in voorbereiding! 31 Mei 2026",
 },
 jp: {
   accueil: "ホーム",
@@ -1470,6 +1484,7 @@ jp: {
   txtMeilleureConso: "最高の消費",
   aucuneDonnee: "データなし",
   ajouterPlein: "最初の満タンを追加してください！",
+  actEnergie:"⚡エネルギー",
   actIndic: "🎯主要指標",
   actCarbu: "⛽燃料",
   actConso: "📉消費",
@@ -1533,9 +1548,9 @@ jp: {
   colMax: "Max",
   colTotal: "合計",
   aideInfos: "ヘルプ & 情報",
-  vidange: "オイル交換リマインダー",
-  vidDerniere: "最後のオイル交換のkm",
-  vidDate: "最後のオイル交換の日付",
+  vidange:"点検リマインダー",
+  vidDerniere:"前回点検km",
+  vidDate:"前回点検日",
   vidIntervalKm: "km間隔",
   vidIntervalMois: "月間隔",
   vidPopupTitre: "⚠️ オイル交換リマインダー",
@@ -1659,6 +1674,7 @@ ko: {
   txtMeilleureConso: "최고의 소비",
   aucuneDonnee: "데이터 없음",
   ajouterPlein: "첫 번째 주유를 추가하세요!",
+  actEnergie:"⚡에너지",
   actIndic: "🎯주요 지표",
   actCarbu: "⛽연료",
   actConso: "📉소비",
@@ -1722,9 +1738,9 @@ ko: {
   colMax: "최대",
   colTotal: "총계",
   aideInfos: "도움말 & 정보",
-  vidange: "오일 교환 리마인더",
-  vidDerniere: "마지막 오일 교환 km",
-  vidDate: "마지막 오일 교환 날짜",
+  vidange:"정비 알림",
+  vidDerniere:"마지막 정비 km",
+  vidDate:"마지막 정비 날짜",
   vidIntervalKm: "km 간격",
   vidIntervalMois: "개월 간격",
   vidPopupTitre: "⚠️ 오일 교환 리마인더",
@@ -1848,6 +1864,7 @@ tr: {
   txtMeilleureConso: "En İyi Tüketim",
   aucuneDonnee: "Veri Yok",
   ajouterPlein: "İlk dolumunuzu ekleyin!",
+  actEnergie:"⚡Enerji",
   actIndic: "🎯Ana Göstergeler",
   actCarbu: "⛽Yakıt",
   actConso: "📉Tüketim",
@@ -1911,9 +1928,9 @@ tr: {
   colMax: "Max",
   colTotal: "Toplam",
   aideInfos: "Yardım & Bilgiler",
-  vidange: "Yağ Değişim Hatırlatıcısı",
-  vidDerniere: "Son Yağ Değişim Km",
-  vidDate: "Son Yağ Değişim Tarihi",
+  vidange:"Bakım hatırlatıcı",
+  vidDerniere:"Son bakım km",
+  vidDate:"Son bakım tarihi",
   vidIntervalKm: "Km Aralığı",
   vidIntervalMois: "Aylık Aralık",
   vidPopupTitre: "⚠️ Yağ Değişim Hatırlatıcısı",
@@ -1932,7 +1949,7 @@ tr: {
   e85: "E85",
   b7: "B7",
   gpl: "GPL",
-  prixStation:"İstasyon fiyatı",comingSoon:"Yakında — 04/2026",
+  prixStation:"İstasyon fiyatı",comingSoon:"Yakında — ",
   ct:"Araç muayenesi",ctDate:"İlk tescil tarihi",ctProchain:"Sonraki muayene",ctPopupTitre:" Muayene hatırlatıcı",ctPopupSub:"Araç muayeneniz yaklaşıyor!",ctFait:" Muayene yapıldı!",ctRappeler:" Sonra hatırlat",ctNonSoumis:"Gerekli değil",ctLastDate:"Son muayene tarihi",
   partager:"Paylaş",partagerTitre:"Seyahat özeti",copie:"Kopyalandı!",
   supprimerPlein:"Bu yakımı sil?",supprime:"Silindi!",
@@ -1940,7 +1957,7 @@ tr: {
   cvFiscaux:"Mali beygir gücü",
   coutBareme:"Toplam maliyet (tarife)",
   fermer:"Kapat",
-  scanTitre:"Fiş tara",scanSub:"Yakında mevcut — v3.0 hazırlanıyor! Mayıs 2026",
+  scanTitre:"Fiş tara",scanSub:"Yakında mevcut — v3.0 hazırlanıyor! 31 Mayıs 2026",
   coutCarbu:"Yakıt maliyeti",coutElec:"Enerji maliyeti",
 }
 };
@@ -2228,7 +2245,9 @@ function render(){
   document.getElementById("hdr-sub").textContent=(veh?veh.name:"--")+" - "+f.length+" "+(f.length>1?T("pleins"):T("plein"));
   renderVehTabs();
   var gpsbtn=document.getElementById("gps-btn");
-if(gpsbtn)gpsbtn.style.display=vehicles.length?"flex":"none";
+  if(gpsbtn)gpsbtn.style.display=vehicles.length?"flex":"none";
+  var bornesbtn=document.getElementById("bornes-btn");
+  if(bornesbtn)bornesbtn.style.display=(veh&&veh.type==="elec")?"flex":"none";
   var main=document.getElementById("main");
   if(view==="Accueil")main.innerHTML=renderAccueil();
   else if(view==="graphiques")main.innerHTML=renderGraphiques();
@@ -2261,86 +2280,129 @@ function filtersHTML(){
   h+='</div>';return h;
 }
 
-function renderAccueil(){
-  var s=getStats();
-  var uC=s.isElec?"kWh/100":"L/100";
-  var uF=s.isElec?"kWh":"L";
-  var uP=s.isElec?userCurrency+"/kWh":userCurrency+"/L";
-  var h="";
-h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">';
-h+='<div class="card-sm" style="text-align:center"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">'+T("consoMoy")+'</div><div style="font-size:26px;font-weight:900;letter-spacing:-1.5px;line-height:1;color:var(--text)">'+(s.avgConso||"--")+'</div><div style="font-size:11px;color:var(--text3);margin-top:5px">'+uC+' km</div></div>';
-h+='<div class="card-sm" style="text-align:center"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">'+T("prixMoy")+'</div><div style="font-size:26px;font-weight:900;letter-spacing:-1.5px;line-height:1;color:var(--text)">'+(s.avgPrixActuel||"--")+'</div><div style="font-size:11px;color:var(--text3);margin-top:5px">'+userCurrency+' / km</div></div>';
-h+='<div class="card-sm" style="text-align:center"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">'+T("autonomie")+'</div><div style="font-size:26px;font-weight:900;letter-spacing:-1.5px;line-height:1;color:var(--text)">'+(s.autonomie||"--")+'<span style="font-size:12px;font-weight:600;margin-left:3px">km</span></div><div style="font-size:11px;color:var(--text3);margin-top:4px">~'+(s.avgKm||"--")+' km ('+T("trajetMoy")+')</div></div>';
+function renderAccueil() {
+  var s = getStats();
+  var vehCourant=null;
+for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){vehCourant=vehicles[i];break;}}
+if(vehCourant&&vehCourant.type==="elec")s.isElec=true;
+  var uC = s.isElec ? "kWh/100" : "L/100";
+  var uF = s.isElec ? "kWh" : "L";
+  var uP = s.isElec ? userCurrency + "/kWh" : userCurrency + "/L";
+  var h = "";
 
-var f=getFiltered();var allDates=f.map(function(e){return e.date;}).sort();var duree="--";
-if(allDates.length>=2){var d1=new Date(allDates[0]),d2=new Date(allDates[allDates.length-1]);var days=Math.round((d2-d1)/(1000*60*60*24));if(days<30)duree=days+" "+T("jour");else if(days<365)duree=Math.round(days/30)+" "+T("mois");else{var ans=(days/365).toFixed(1);duree=ans+" "+(parseFloat(ans)>=2?T("ans"):T("an"));}}
+  h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">';
+  h += '<div class="card-sm" style="text-align:center"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">' + T("consoMoy") + '</div><div style="font-size:26px;font-weight:900;letter-spacing:-1.5px;line-height:1;color:var(--text)">' + (s.avgConso || "--") + '</div><div style="font-size:11px;color:var(--text3);margin-top:5px">' + uC + ' km</div></div>';
+  h += '<div class="card-sm" style="text-align:center"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">' + T("prixMoy") + '</div><div style="font-size:26px;font-weight:900;letter-spacing:-1.5px;line-height:1;color:var(--text)">' + (s.avgPrixActuel || "--") + '</div><div style="font-size:11px;color:var(--text3);margin-top:5px">' + userCurrency + ' / km</div></div>';
+  h += '<div class="card-sm" style="text-align:center"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">' + T("autonomie") + '</div><div style="font-size:26px;font-weight:900;letter-spacing:-1.5px;line-height:1;color:var(--text)">' + (s.autonomie || "--") + '<span style="font-size:12px;font-weight:600;margin-left:3px">km</span></div><div style="font-size:11px;color:var(--text3);margin-top:4px">~' + (s.avgKm || "--") + ' km (' + T("trajetMoy") + ')</div></div>';
 
-var isFrance=savedCountries&&savedCountries[0]&&savedCountries[0].toLowerCase().trim()==="france";
-if(isFrance){
-  var vehActif=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){vehActif=vehicles[i];break;}}
-  var isElecActif=vehActif&&vehActif.type==="elec";
-  var iconePrix=isElecActif?"⚡":"⛽";
-  var savedPrix=ls("KarBu_prix_station","--");
-  var savedMaj=ls("KarBu_prix_station_maj","");
-  var majTxt=savedMaj?("MAJ: "+new Date(savedMaj).toLocaleDateString("fr-FR",{timeZone:"Europe/Paris",day:"2-digit",month:"2-digit"})+" "+new Date(savedMaj).toLocaleTimeString("fr-FR",{timeZone:"Europe/Paris",hour:"2-digit",minute:"2-digit"})):T("Prochainement");
-  h+='<div class="card-sm" onclick="ouvrirPrix()" style="text-align:center;cursor:pointer"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">'+iconePrix+' '+T(isElecActif?"prixBorne":"prixStation")+'</div><div style="font-size:18px;font-weight:900;color:var(--text)" id="prix-station-val">'+savedPrix+'</div><div style="font-size:10px;color:var(--text3);margin-top:4px" id="prix-station-maj">'+majTxt+'</div></div>';
-}else{
-  var veh2=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh2=vehicles[i];break;}}
-  var entretienTxt="--";
-  var entretienSub="";
-  if(veh2&&veh2.vidKm&&veh2.vidIntervalKm){
-    var kmActuel=s.last&&s.last.tkm?parseInt(s.last.tkm):0;
-    var kmProchain=parseInt(veh2.vidKm)+parseInt(veh2.vidIntervalKm);
-    var restKm=kmProchain-kmActuel;
-    if(restKm>0){entretienTxt="Dans "+restKm.toLocaleString()+" km";entretienSub=T("vidange");}
+  var f = getFiltered();
+  var allDates = f.map(function (e) { return e.date; }).sort();
+  var duree = "--";
+  if (allDates.length >= 2) {
+    var d1 = new Date(allDates[0]), d2 = new Date(allDates[allDates.length - 1]);
+    var days = Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+    if (days < 30) duree = days + " " + T("jour");
+    else if (days < 365) duree = Math.round(days / 30) + " " + T("mois");
+    else { var ans = (days / 365).toFixed(1); duree = ans + " " + (parseFloat(ans) >= 2 ? T("ans") : T("an")); }
   }
-  if(veh2&&veh2.vidDate&&entretienTxt==="--"){
-    var vidProchaine=new Date(veh2.vidDate);
-    vidProchaine.setFullYear(vidProchaine.getFullYear()+1);
-    if(entretienTxt!="--"){entretienTxt+=" ou "+vidProchaine.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"});}
-    else{entretienTxt="Avant le "+vidProchaine.toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"});}
-    entretienSub=T("vidange");
-  }
-  h+='<div class="card-sm" style="text-align:center"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">🔔 '+T("prochain Entretien")+'</div><div style="font-size:14px;font-weight:900;color:var(--text)">'+entretienTxt+'</div><div style="font-size:10px;color:var(--text3);margin-top:4px">'+entretienSub+'</div></div>';
+
+  var isFrance = savedCountries && savedCountries[0] && savedCountries[0].toLowerCase().trim() === "france";
+var vehActif = null;
+for (var i = 0; i < vehicles.length; i++) { if (vehicles[i].id === activeVid) { vehActif = vehicles[i]; break; } }
+var isElecActif = vehActif && vehActif.type === "elec";
+
+if(isFrance && !isElecActif){
+    var iconePrix = "⛽";
+
+    var prefLabel = "";
+    var savedPrixRaw = ls("KarBu_prix_station", "--");
+var savedPrixParts = savedPrixRaw.split("|");
+var savedPrix = savedPrixParts[0] + ' € ' + (savedPrixParts[1] || "");
+    var savedMaj = ls("KarBu_prix_station_maj", "");
+
+    var prefVille = ls("KarBu_prix_station_ville", "");
+if (prefVille) {
+  prefLabel = '⭐ ' + prefVille;
 }
-h+='</div>';
-  if(s.last){
-    var cD=s.consoDiff,pD=s.pplDiff;
-    var cCol=cD>0?"var(--red)":cD<0?"var(--green)":"var(--text3)";
-    var cPct=s.avgConso?Math.round(Math.abs(cD)/s.avgConso*100):null;
-var cTxt=cD!=null?(cD>0?"+ ":"- ")+Math.abs(cD)+(cPct?' <span style="font-weight:400">('+cPct+'%)</span>':""):null;
-    var pCol=pD>0?"var(--red)":pD<0?"var(--green)":"var(--text3)";
-    var pPct=s.prev&&s.prev.ppl?Math.round(Math.abs(pD)/s.prev.ppl*100):null;
-var pTxt=pD!=null?(pD>0?"+ ":"- ")+Math.abs(pD).toFixed(3)+" "+userCurrency+(pPct?' <span style="font-weight:400">('+cPct+'%)</span>':""):"=";
-    var staSuffix=s.last.ftype==="premium"?" - "+T("premium"):s.last.ftype==="normal"?" - "+T("normal"):"";
-    h+='<div class="card-hero">';
-h+='<div style="margin-bottom:14px"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px">'+T("dernierPlein")+'</div>';
-h+='<div style="display:flex;justify-content:space-between;align-items:center">';
-h+='<div style="display:flex;flex-direction:column">';
-h+='<span style="font-size:15px;font-weight:800">'+fmtDate(s.last.date)+'</span>';
-h+='<span style="font-size:12px;color:var(--text3);margin-top:2px">'+s.last.sta+staSuffix+' - <span style="color:'+(CC[s.last.ctr]||"var(--text3)")+';font-weight:600">'+s.last.ctr+'</span></span>';
-h+='</div>';
-h+='<div style="display:flex;flex-direction:column;align-items:flex-end">';
-h+='<span style="font-size:15px;font-weight:800;color:var(--text)">'+(s.last.tkm?s.last.tkm.toLocaleString():"--")+" kms"+'</span>';
-h+='<span style="font-size:13px;font-weight:700;color:var(--text);margin-top:2px">📍 '+s.last.rkm+' kms</span>';
-h+='</div>';
-h+='</div></div>';
-    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">';
-h+='<div style="display:flex;flex-direction:column;gap:7px;flex:1">';
-h+='<div class="dc" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center"><div class="dl">'+uC+' km</div><div style="font-size:26px;font-weight:900;letter-spacing:-1.5px;line-height:1;color:'+(cD>0?"var(--red)":cD<0?"var(--green)":"var(--text)")+'">'+(s.last.conso||"--")+'</div></div>';
-if(cTxt)h+='<div class="dc" style="flex:1"><div class="dl">'+T("vsMoy")+'</div><div style="font-size:17px;font-weight:900;color:'+cCol+';letter-spacing:-.5px">'+cTxt+'</div></div>';
-h+='<div class="dc" style="flex:1"><div class="dl">'+uF+'</div><div style="font-size:17px;font-weight:900;letter-spacing:-.5px;color:var(--text)">'+s.last.lit+'</div></div>';
-h+='</div>';
-h+='<div style="display:flex;flex-direction:column;gap:7px;flex:1">';
-h+='<div class="dc" style="flex:1"><div class="dl">'+T("prixL")+'</div><div style="font-size:17px;font-weight:900;letter-spacing:-.5px">'+s.last.ppl+' '+userCurrency+'</div></div>';
-h+='<div class="dc" style="flex:1"><div class="dl">'+T("prixAvant")+'</div><div style="font-size:17px;font-weight:900;color:'+pCol+';letter-spacing:-.3px">'+pTxt+'</div></div>';
-h+='<div class="dc" style="flex:1"><div class="dl">'+userCurrency+'/km</div><div style="font-size:17px;font-weight:900;letter-spacing:-.5px;color:var(--text)">'+(s.last.ppk||"--")+'</div></div>';
-h+='</div>';
-h+='</div></div>';
+
+    var majTxt = savedMaj
+      ? ("MAJ: " + new Date(savedMaj).toLocaleDateString("fr-FR", { timeZone: "Europe/Paris", day: "2-digit", month: "2-digit" })
+        + " " + new Date(savedMaj).toLocaleTimeString("fr-FR", { timeZone: "Europe/Paris", hour: "2-digit", minute: "2-digit" }))
+      : T("");
+
+    h += '<div class="card-sm" onclick="ouvrirPrix()" style="text-align:center;cursor:pointer">';
+    h += '<div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">' + iconePrix + ' ' + T(isElecActif ? "prixBorne" : "prixStation") + '</div>';
+    h += '<div style="font-size:18px;font-weight:900;color:var(--text)" id="prix-station-val">' + savedPrix + '</div>';
+    if (prefLabel) {
+      h += '<div style="font-size:10px;color:gold;font-weight:700;margin-top:2px">' + prefLabel + '</div>';
+    }
+    h += '<div style="font-size:10px;color:var(--text3);margin-top:4px" id="prix-station-maj">' + majTxt + '</div>';
+    h += '</div>';
+
+  } else {
+    var veh2 = null;
+    for (var i = 0; i < vehicles.length; i++) { if (vehicles[i].id === activeVid) { veh2 = vehicles[i]; break; } }
+    var entretienTxt = "--";
+    var entretienSub = "";
+    if (veh2 && veh2.vidKm && veh2.vidIntervalKm) {
+      var kmActuel = s.last && s.last.tkm ? parseInt(s.last.tkm) : 0;
+      var kmProchain = parseInt(veh2.vidKm) + parseInt(veh2.vidIntervalKm);
+      var restKm = kmProchain - kmActuel;
+      if (restKm > 0) { entretienTxt = "Dans " + restKm.toLocaleString() + " km"; entretienSub = T("vidange"); }
+    }
+    if (veh2 && veh2.vidDate && entretienTxt === "--") {
+      var vidProchaine = new Date(veh2.vidDate);
+      vidProchaine.setFullYear(vidProchaine.getFullYear() + 1);
+      if (entretienTxt != "--") { entretienTxt += " ou " + vidProchaine.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" }); }
+      else { entretienTxt = "Avant le " + vidProchaine.toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" }); }
+      entretienSub = T("vidange");
+    }
+    h += '<div class="card-sm" style="text-align:center"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">🔔 ' + T("prochain Entretien") + '</div><div style="font-size:14px;font-weight:900;color:var(--text)">' + entretienTxt + '</div><div style="font-size:10px;color:var(--text3);margin-top:4px">' + entretienSub + '</div></div>';
   }
-  h+=renderInsights();
+
+  h += '</div>';
+
+  if (s.last) {
+    var cD = s.consoDiff, pD = s.pplDiff;
+    var cCol = cD > 0 ? "var(--red)" : cD < 0 ? "var(--green)" : "var(--text3)";
+    var cPct = s.avgConso ? Math.round(Math.abs(cD) / s.avgConso * 100) : null;
+    var cTxt = cD != null ? (cD > 0 ? "+ " : "- ") + Math.abs(cD) + (cPct ? ' <span style="font-weight:400">(' + cPct + '%)</span>' : "") : null;
+    var pCol = pD > 0 ? "var(--red)" : pD < 0 ? "var(--green)" : "var(--text3)";
+    var pPct = s.prev && s.prev.ppl ? Math.round(Math.abs(pD) / s.prev.ppl * 100) : null;
+    var pTxt = pD != null ? (pD > 0 ? "+ " : "- ") + Math.abs(pD).toFixed(3) + " " + userCurrency + (pPct ? ' <span style="font-weight:400">(' + cPct + '%)</span>' : "") : "=";
+    var staSuffix = s.last.ftype === "premium" ? " - " + T("premium") : s.last.ftype === "normal" ? " - " + T("normal") : "";
+
+    h += '<div class="card-hero">';
+    h += '<div style="margin-bottom:14px"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px">' + T("dernierPlein") + '</div>';
+    h += '<div style="display:flex;justify-content:space-between;align-items:center">';
+    h += '<div style="display:flex;flex-direction:column">';
+    h += '<span style="font-size:15px;font-weight:800">' + fmtDate(s.last.date) + '</span>';
+    h += '<span style="font-size:12px;color:var(--text3);margin-top:2px">' + s.last.sta + staSuffix + ' - <span style="color:' + (CC[s.last.ctr] || "var(--text3)") + ';font-weight:600">' + s.last.ctr + '</span></span>';
+    h += '</div>';
+    h += '<div style="display:flex;flex-direction:column;align-items:flex-end">';
+    h += '<span style="font-size:15px;font-weight:800;color:var(--text)">' + (s.last.tkm ? s.last.tkm.toLocaleString() : "--") + " kms" + '</span>';
+    h += '<span style="font-size:13px;font-weight:700;color:var(--text);margin-top:2px">📍 ' + s.last.rkm + ' kms</span>';
+    h += '</div>';
+    h += '</div></div>';
+
+    h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">';
+    h += '<div style="display:flex;flex-direction:column;gap:7px;flex:1">';
+    h += '<div class="dc" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center"><div class="dl">' + uC + ' km</div><div style="font-size:26px;font-weight:900;letter-spacing:-1.5px;line-height:1;color:' + (cD > 0 ? "var(--red)" : cD < 0 ? "var(--green)" : "var(--text)") + '">' + (s.last.conso || "--") + '</div></div>';
+    if (cTxt) h += '<div class="dc" style="flex:1"><div class="dl">' + T("vsMoy") + '</div><div style="font-size:17px;font-weight:900;color:' + cCol + ';letter-spacing:-.5px">' + cTxt + '</div></div>';
+    h += '<div class="dc" style="flex:1"><div class="dl">' + uF + '</div><div style="font-size:17px;font-weight:900;letter-spacing:-.5px;color:var(--text)">' + s.last.lit + '</div></div>';
+    h += '</div>';
+    h += '<div style="display:flex;flex-direction:column;gap:7px;flex:1">';
+h += '<div class="dc" style="flex:1"><div class="dl">' + (s.isElec ? "€/kWh" : T("prixL")) + '</div><div style="font-size:17px;font-weight:900;letter-spacing:-.5px">' + s.last.ppl + ' ' + userCurrency + '</div></div>';
+    h += '<div class="dc" style="flex:1"><div class="dl">' + T("prixAvant") + '</div><div style="font-size:17px;font-weight:900;color:' + pCol + ';letter-spacing:-.3px">' + pTxt + '</div></div>';
+    h += '<div class="dc" style="flex:1"><div class="dl">' + userCurrency + '/km</div><div style="font-size:17px;font-weight:900;letter-spacing:-.5px;color:var(--text)">' + (s.last.ppk || "--") + '</div></div>';
+    h += '</div>';
+    h += '</div></div>';
+  }
+
+  h += renderInsights();
   return h;
 }
+
 
 function renderGraphiques(){
   var veh=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
@@ -2621,7 +2683,7 @@ h+=accordion("indic","",T("actIndic"),[
     {l:"🔔 "+T("prochain Entretien"),v:entretienVAct},
     {l:T("duree"),v:duree}
   ]);
-  h+=accordion("carbu","",T("actCarbu"),[
+  h+=accordion("carbu","",isElec?T("actEnergie"):T("actCarbu"),[
     {l:T("consommes"),v:totalLit,u:uF},
     {l:T("prixMoyen"),v:avgP||"--",u:uP},
     {l:T("prixMin"),v:minP||"--",u:uP,col:"var(--green)"},
@@ -2924,6 +2986,465 @@ function fermerGPS(){
   if(btnStop)btnStop.style.display="block";
   gpsDistance=0;
 }
+var prixFiltre="toutes";
+
+var prixVue="liste";
+var prixMap=null;
+var prixStationsData=[];
+var prixStationsData_raw = [];
+
+
+function ouvrirPrix(){
+  var veh=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
+  var isElec=veh&&veh.type==="elec";
+  document.getElementById("mprix-filtres").style.display=isElec?"none":"flex";
+  document.getElementById("mprix").style.display="block";
+  document.getElementById("mprix-overlay").style.display="block";
+  chargerPrix();
+  var titrePrix=isElec?"⚡ "+T("prixBorne"):"⛽ "+T("prixStation");
+document.getElementById("mprix-title").textContent=titrePrix;
+}
+
+function fermerPrix(){
+  document.getElementById("mprix").style.display="none";
+  document.getElementById("mprix-overlay").style.display="none";
+}
+
+function setPrixFiltre(f){
+  prixFiltre=f;
+  document.querySelectorAll("#mprix-filtres .chip").forEach(function(b){b.classList.remove("sel");});
+  document.getElementById("mprix-f-"+f).classList.add("sel");
+  chargerPrix();
+}
+
+function chargerPrix(){
+  document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">📍 '+T("rechercheStations")+'...</div>';
+  var veh=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
+  var isElec=veh&&veh.type==="elec";
+  navigator.geolocation.getCurrentPosition(function(pos){
+    if(isElec){
+      fetchBornes(pos.coords.latitude,pos.coords.longitude);
+    } else {
+      fetchPrix(pos.coords.latitude,pos.coords.longitude);
+    }
+  },function(){
+    document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ '+T("gpsIndispo")+'</div>';
+  });
+}
+
+function fetchPrix(lat,lng){
+  document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">⏳ Chargement...</div>';
+  var rayon=10;
+  var url="https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=distance(geom,geom'POINT("+lng+" "+lat+")',"+rayon+"km)&limit=20&order_by=distance(geom,geom'POINT("+lng+" "+lat+")')";
+  fetch(url)
+    .then(function(r){return r.json();})
+    .then(function(data){
+     var stations=data.results||data.records||[];
+afficherPrix(stations,lat,lng);
+    })
+    .catch(function(){
+      document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ Erreur réseau</div>';
+    });
+}
+function fetchPrixCoords(lat,lng){
+  var rayon=10;
+  var url="https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=distance(geom,geom'POINT("+lng+" "+lat+")',"+rayon+"km)&limit=20&order_by=distance(geom,geom'POINT("+lng+" "+lat+")')";
+  fetch(url)
+    .then(function(r){return r.json();})
+    .then(function(data){
+      var stations=data.results||data.records||[];
+      prixStationsData_raw=stations;
+      afficherPrix(stations,lat,lng);
+      // Mettre à jour les marqueurs sur la carte
+      prixMap.eachLayer(function(l){if(l instanceof L.Marker)prixMap.removeLayer(l);});
+      stations.forEach(function(s){
+        if(!s.geom||!s.geom.lat||!s.geom.lon)return;
+        var veh=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
+        var fuelMap={"sp95":"sp95_prix","sp98":"sp98_prix","e10":"e10_prix","e85":"e85_prix","b7":"gazole_prix","gpl":"gplc_prix"};
+        var fuelKey=fuelMap[veh&&veh.fuel?veh.fuel:"b7"]||"gazole_prix";
+        var prix=s[fuelKey]?s[fuelKey].toFixed(3):"--";
+        var nom=s.adresse||"Station";
+        L.marker([s.geom.lat,s.geom.lon])
+          .addTo(prixMap)
+          .bindPopup("<b>"+nom+"</b><br>"+prix+" €/L<br><a href='https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(s.adresse+" "+s.ville)+"' target='_blank'>🧭 Y aller</a>");
+      });
+    })
+    .catch(function(){
+      document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ Erreur réseau</div>';
+    });
+}
+function fetchBornes(lat,lng){
+  document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">⏳ Chargement...</div>';
+  var url="https://public.opendatasoft.com/api/records/1.0/search/?dataset=osm-france-charging-station&geofilter.distance="+lat+","+lng+",10000&rows=20&sort=dist";
+  fetch(url)
+    .then(function(r){return r.json();})
+    .then(function(data){
+      var bornes=(data.records||[]).map(function(r){return r.fields;});
+      bornesData_raw=bornes;
+      afficherBornes(bornes,lat,lng);
+    })
+    .catch(function(){
+      document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ Erreur réseau</div>';
+    });
+}
+
+function fetchBornesCoords(lat,lng){
+  var url="https://public.opendatasoft.com/api/records/1.0/search/?dataset=osm-france-charging-station&geofilter.distance="+lat+","+lng+",10000&rows=20&sort=dist";
+  fetch(url)
+    .then(function(r){return r.json();})
+    .then(function(data){
+      var bornes=(data.records||[]).map(function(r){return r.fields;});
+      bornesData_raw=bornes;
+      afficherBornes(bornes,lat,lng);
+      if(prixMap){
+        prixMap.eachLayer(function(l){if(l instanceof L.Marker)prixMap.removeLayer(l);});
+        bornes.forEach(function(b){
+          if(!b.meta_geo_point)return;
+          var lat2=b.meta_geo_point[0],lng2=b.meta_geo_point[1];
+          if(!lat2||!lng2)return;
+          L.marker([lat2,lng2])
+            .addTo(prixMap)
+            .bindPopup("<b>"+(b.nom_enseigne||b.nom_station||"Borne")+"</b><br>"+(b.puissance_nominale||"--")+" kW<br><a href='https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(b.adresse_station||"")+"' target='_blank'>🧭 Y aller</a>");
+        });
+      }
+    })
+    .catch(function(){
+      document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ Erreur réseau</div>';
+    });
+}
+
+function afficherBornes(bornes,lat,lng){
+  if(!bornes||!bornes.length){
+    document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">😔 '+T("aucuneBorne")+'</div>';
+    return;
+  }
+
+  // Calcul distance — nouveau champ meta_geo_point
+  bornes.forEach(function(b){
+    if(b.meta_geo_point&&b.meta_geo_point[0]){
+      b._dist=calcDist({lat:lat,lng:lng},{lat:b.meta_geo_point[0],lng:b.meta_geo_point[1]});
+    } else if(b.dist){
+      b._dist=parseFloat(b.dist);
+    } else {
+      b._dist=999999;
+    }
+  });
+
+  bornes.sort(function(a,b){return a._dist-b._dist;});
+var html='';
+  var veh=null;
+  for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
+
+  bornes.slice(0,10).forEach(function(b){
+    // Statut — OSM n'a pas de statut temps réel
+    var couleur="🟢";
+    var nom=b.nom_enseigne||b.nom_station||b.nom_operateur||"Borne";
+    var adresse=b.adresse_station||"";
+    var puissance=b.puissance_nominale?parseFloat(b.puissance_nominale)+" kW":"--";
+    var distKm=b._dist<999999?(Math.round(b._dist/100)/10)+" km":"--";
+
+    // Connecteurs
+    var connecteurs=[];
+    if(b.prise_type_ef==="true"||b.prise_type_ef===true)connecteurs.push("EF");
+    if(b.prise_type_2==="true"||b.prise_type_2===true)connecteurs.push("T2");
+    if(b.prise_type_combo_ccs==="true"||b.prise_type_combo_ccs===true)connecteurs.push("CCS");
+    if(b.prise_type_chademo==="true"||b.prise_type_chademo===true)connecteurs.push("CHAdeMO");
+    var connecteur=connecteurs.length?connecteurs.join(" · "):"--";
+
+    var acces=b.condition_acces||"";
+    var bid=b.id_pdc_itinerance||b.meta_osm_id||nom;
+    var isPref=false;
+
+    html+='<div class="card" style="padding:12px;margin-bottom:8px'+(isPref?';border:2px solid gold':'')+'">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+    html+='<div style="font-size:14px;font-weight:800">'+couleur+' '+nom+(isPref?' ⭐':'')+'</div>';
+    html+='<div style="font-size:12px;font-weight:700;color:var(--text3)">🔌 '+connecteur+'</div>';
+    html+='</div>';
+    html+='<div style="font-size:11px;color:var(--text3)">'+adresse+'</div>';
+    html+='<div style="display:flex;justify-content:space-between;margin-top:4px">';
+    html+='<div style="font-size:10px;color:var(--text3)">📍 '+distKm+'</div>';
+    html+='</div>';
+    if(acces){
+  html+='<div style="font-size:10px;color:var(--text3);margin-top:2px">'+acces+'</div>';
+}
+    html+='<div style="display:flex;gap:8px;margin-top:10px">';
+    html+='<button onclick="ouvrirGPS(\''+adresse+'\',\'\')" '
+      +'style="flex:1;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:10px;padding:8px 4px;font-size:12px;font-weight:700;color:var(--blue);text-align:center">'
+      +'🧭 '+T("yAller")+'</button>';
+    
+    html+='</div>';
+    html+='</div>';
+  });
+
+  bornesData_raw=bornes;
+  document.getElementById("mprix-content").innerHTML=html;
+
+}
+function setStationPref(sid) {
+  var vv = null;
+  for (var ii = 0; ii < vehicles.length; ii++) {
+    if (vehicles[ii].id === activeVid) { vv = vehicles[ii]; break; }
+  }
+  if (!vv) return;
+  var stFound = prixStationsData_raw.filter(function(x) { return String(x.id) === String(sid); })[0];
+  if (!stFound) return;
+  vv.stationPref = stFound;
+  saveAll();
+
+  var fuelMap = { "sp95": "sp95_prix", "sp98": "sp98_prix", "e10": "e10_prix", "e85": "e85_prix", "b7": "gazole_prix", "gpl": "gplc_prix" };
+  var fuelMajMap = { "sp95": "sp95_maj", "sp98": "sp98_maj", "e10": "e10_maj", "e85": "e85_maj", "b7": "gazole_maj", "gpl": "gplc_maj" };
+  var fuelKey = fuelMap[vv.fuel] || "gazole_prix";
+  var majKey = fuelMajMap[vv.fuel] || "gazole_maj";
+
+  var prixVal = stFound[fuelKey] ? stFound[fuelKey].toFixed(3) : null;
+  var prix = prixVal !== null ? prixVal : "--";
+  var ferme = stFound.horaires_automate_24_24 !== "Oui"
+    && (!stFound[majKey] || new Date(stFound[majKey]) <= new Date(Date.now() - 24 * 60 * 60 * 1000));
+  var statut = prixVal === null ? "" : ferme ? "🔴" : "";
+
+  ss("KarBu_prix_station", prix + "|" + statut);
+  ss("KarBu_prix_station_maj", stFound[majKey] || "");
+  ss("KarBu_prix_station_ville", stFound.ville || "");
+  showToast('⭐ Station préférée !');
+  chargerPrix();
+}
+function setBornePref(bid){
+  var vv=null;
+  for(var ii=0;ii<vehicles.length;ii++){if(vehicles[ii].id===activeVid){vv=vehicles[ii];break;}}
+  if(!vv)return;
+  var bFound=bornesData_raw.filter(function(x){return String(x.id_pdc_itinerance||x.meta_osm_id||x.nom_enseigne||x.nom_station||"")===String(bid);})[0];
+  if(!bFound)return;
+  vv.stationPref={id:bid,ville:bFound.nom_enseigne||bFound.nom_station||bFound.nom_operateur||"Borne",adresse:bFound.adresse_station||""};
+  saveAll();
+  showToast('⭐ Borne préférée !');
+  if(bFound.meta_geo_point){
+    fetchBornes(bFound.meta_geo_point[0],bFound.meta_geo_point[1]);
+  } else {
+    chargerPrix();
+  }
+}
+function afficherPrix(stations, lat, lng) {
+  var veh = null;
+  for (var i = 0; i < vehicles.length; i++) {
+    if (vehicles[i].id === activeVid) { veh = vehicles[i]; break; }
+  }
+  var fuelType = veh && veh.fuel ? veh.fuel : "b7";
+  var fuelMap = { "sp95": "sp95_prix", "sp98": "sp98_prix", "e10": "e10_prix", "e85": "e85_prix", "b7": "gazole_prix", "gpl": "gplc_prix" };
+  var fuelMajMap = { "sp95": "sp95_maj", "sp98": "sp98_maj", "e10": "e10_maj", "e85": "e85_maj", "b7": "gazole_maj", "gpl": "gplc_maj" };
+  var fuelKey = fuelMap[fuelType] || "gazole_prix";
+  var majKey = fuelMajMap[fuelType] || "gazole_maj";
+
+  if (!stations || !stations.length) {
+    document.getElementById("mprix-content").innerHTML = '<div style="text-align:center;padding:20px">😔 ' + T("aucuneStation") + '</div>';
+    return;
+  }
+
+  var container = document.getElementById("mprix-content");
+  var currentSort = (container && container.dataset.sort) ? container.dataset.sort : "distance";
+
+  var filtered = stations.slice();
+
+  filtered.forEach(function (s) {
+    if (s.geom) {
+      s._dist = calcDist({ lat: lat, lng: lng }, { lat: s.geom.lat, lng: s.geom.lon });
+    } else {
+      s._dist = 999999;
+    }
+  });
+
+  if (currentSort === "prix") {
+    filtered.sort(function (a, b) { return (a[fuelKey] || 999) - (b[fuelKey] || 999); });
+  } else {
+    filtered.sort(function (a, b) { return a._dist - b._dist; });
+  }
+
+  var html = '<div style="display:flex;gap:8px;margin-bottom:12px">';
+  html += '<button onclick="var c=document.getElementById(\'mprix-content\');c.dataset.sort=\'distance\';afficherPrix(prixStationsData_raw,' + lat + ',' + lng + ');" '
+    + 'style="flex:1;padding:7px;border-radius:10px;font-size:12px;font-weight:700;border:1.5px solid var(--blue-border);'
+    + (currentSort !== "prix" ? 'background:var(--blue);color:#fff' : 'background:var(--card2);color:var(--text3)') + '">📍 ' + T("proximite") + '</button>';
+  html += '<button onclick="var c=document.getElementById(\'mprix-content\');c.dataset.sort=\'prix\';afficherPrix(prixStationsData_raw,' + lat + ',' + lng + ');" '
+    + 'style="flex:1;padding:7px;border-radius:10px;font-size:12px;font-weight:700;border:1.5px solid var(--blue-border);'
+    + (currentSort === "prix" ? 'background:var(--blue);color:#fff' : 'background:var(--card2);color:var(--text3)') + '">💶 ' + T("prix") + '</button>';
+  html += '</div>';
+
+  filtered.slice(0, 10).forEach(function (s) {
+    var prixVal = s[fuelKey] ? s[fuelKey].toFixed(3) : null;
+    var prix = prixVal !== null ? prixVal : "--";
+    var ferme = s.horaires_automate_24_24 !== "Oui"
+      && (!s[majKey] || new Date(s[majKey]) <= new Date(Date.now() - 24 * 60 * 60 * 1000));
+    var statut = prixVal === null ? "" : ferme ? "🔴 " : "";
+    var maj = s[majKey] ? s[majKey].replace("T", " ").substring(0, 16) : "--";
+    var distKm = s._dist < 999999 ? (Math.round(s._dist / 100) / 10) + " km" : "--";
+    var nom = s.ville || "Station";
+    var adresse = s.adresse || "";
+    var isPref = veh && veh.stationPref && String(veh.stationPref.id) === String(s.id);
+
+    html += '<div class="card" style="padding:12px;margin-bottom:8px' + (isPref ? ';border:2px solid gold' : '') + '">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+    html += '<div style="font-size:14px;font-weight:800">' + statut + nom + (isPref ? ' ⭐' : '') + '</div>';
+    html += '<div style="font-size:18px;font-weight:900;color:var(--blue)">' + prix + (prixVal !== null ? ' ' + userCurrency + '/L' : '') + '</div>';
+    html += '</div>';
+    html += '<div style="font-size:11px;color:var(--text3)">' + adresse + '</div>';
+    html += '<div style="display:flex;justify-content:space-between;margin-top:4px">';
+    html += '<div style="font-size:10px;color:var(--text3)">📍 ' + distKm + '</div>';
+    html += '<div style="font-size:10px;color:var(--text3)">MAJ: ' + maj + '</div>';
+    html += '</div>';
+
+    var sid = s.id;
+    html += '<div style="display:flex;gap:8px;margin-top:10px">';
+    html += '<button onclick="ouvrirGPS(\'' + s.adresse + '\',\'' + s.cp + ' ' + s.ville + '\')" '
+      + 'style="flex:1;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:10px;padding:8px 4px;font-size:12px;font-weight:700;color:var(--blue);text-align:center">'
+      + '🧭 ' + T("yAller") + '</button>';
+    html += '<button data-sid="' + sid + '" onclick="'
+  + 'var sid=this.dataset.sid;'
+  + 'var vv=null;for(var ii=0;ii<vehicles.length;ii++){if(vehicles[ii].id===activeVid){vv=vehicles[ii];break;}}'
+  + 'if(!vv)return;'
+  + 'var stFound=prixStationsData_raw.filter(function(x){return String(x.id)===sid;})[0];'
+  + 'if(!stFound)return;'
+  + 'vv.stationPref=stFound;'
+  + 'saveAll();'
+  + 'showToast(\'⭐ Station préférée !\');'
+  + 'chargerPrix();" '
+      + 'style="flex:1;background:' + (isPref ? 'gold' : 'var(--card2)') + ';border:1.5px solid var(--border3);border-radius:10px;padding:8px 4px;font-size:12px;font-weight:700;color:' + (isPref ? '#000' : 'var(--text3)') + ';text-align:center">'
+      + (isPref ? '⭐ Préférée' : '☆ Préférée') + '</button>';
+    html += '</div>';
+    html += '</div>';
+  });
+
+  prixStationsData_raw = stations;
+  prixStationsData = filtered;
+
+  document.getElementById("mprix-content").innerHTML = html;
+  document.getElementById("mprix-content").dataset.sort = currentSort;
+
+  var stationAffichee = null;
+  if (veh && veh.stationPref) {
+    var prefId = String(veh.stationPref.id);
+    for (var j = 0; j < stations.length; j++) {
+      if (String(stations[j].id) === prefId) { stationAffichee = stations[j]; break; }
+    }
+  }
+  if (!stationAffichee) {
+    var parPrix = stations.slice().sort(function (a, b) { return (a[fuelKey] || 999) - (b[fuelKey] || 999); });
+    stationAffichee = parPrix[0];
+  }
+
+  if (stationAffichee) {
+    var bestPrixVal = stationAffichee[fuelKey] ? stationAffichee[fuelKey].toFixed(3) : null;
+    var bestPrix = bestPrixVal !== null ? bestPrixVal : "--";
+    var bestFerme = stationAffichee.horaires_automate_24_24 !== "Oui"
+      && (!stationAffichee[majKey] || new Date(stationAffichee[majKey]) <= new Date(Date.now() - 24 * 60 * 60 * 1000));
+    var bestStatut = bestPrixVal === null ? "" : bestFerme ? "🔴" : "";
+
+    ss("KarBu_prix_station", bestPrix + '|' + bestStatut);
+    ss("KarBu_prix_station_maj", stationAffichee[majKey] || "");
+
+    var el = document.getElementById("prix-station-val");
+    if (el) el.innerHTML = bestPrix + (bestStatut ? ' ' + bestStatut : '') + (bestPrixVal ? ' €' : '');
+
+    var elMaj = document.getElementById("prix-station-maj");
+    if (elMaj && stationAffichee[majKey]) {
+      var majDate = new Date(stationAffichee[majKey]);
+      elMaj.textContent = "MAJ: "
+        + majDate.toLocaleDateString("fr-FR", { timeZone: "Europe/Paris", day: '2-digit', month: '2-digit' })
+        + " "
+        + majDate.toLocaleTimeString("fr-FR", { timeZone: "Europe/Paris", hour: '2-digit', minute: '2-digit' });
+    }
+  }
+}
+function ouvrirGPS(adresse,ville){
+  var query=encodeURIComponent(adresse+" "+ville);
+  window.open("https://www.google.com/maps/search/?api=1&query="+query,"_blank");
+}
+
+
+function setPrixVue(vue){
+  prixVue=vue;
+  document.querySelectorAll("#mprix-filtres ~ div .chip").forEach(function(b){b.classList.remove("sel");});
+  document.getElementById("mprix-v-"+vue).classList.add("sel");
+  if(vue==="carte"){
+    document.getElementById("mprix-content").style.display="none";
+    document.getElementById("mprix-map").style.display="block";
+    setTimeout(function(){afficherCarte();},100);
+  } else {
+    document.getElementById("mprix-content").style.display="block";
+    document.getElementById("mprix-map").style.display="none";
+  }
+}
+function afficherCarte(){
+  if(!prixMap){
+    prixMap=L.map("mprix-map").setView([46.5,2.3],6);
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",{
+      attribution:"© OpenStreetMap © CARTO"
+    }).addTo(prixMap);
+
+    var btnCtrl=L.Control.extend({
+      onAdd:function(){
+        var btn=L.DomUtil.create("button","karbu-search-here");
+        btn.innerHTML="🔍 Rechercher ici";
+        btn.style="background:var(--blue);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.2);display:none";
+        btn.id="btn-search-here";
+        L.DomEvent.on(btn,"click",function(){
+          var center=prixMap.getCenter();
+          btn.style.display="none";
+          document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">📍 Recherche en cours...</div>';
+          var vehClk=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){vehClk=vehicles[i];break;}}
+          if(vehClk&&vehClk.type==="elec"){
+            fetchBornesCoords(center.lat,center.lng);
+          } else {
+            fetchPrixCoords(center.lat,center.lng);
+          }
+        });
+        return btn;
+      }
+    });
+    prixMap.addControl(new btnCtrl({position:"topright"}));
+
+    prixMap.on("moveend",function(){
+      var btn=document.getElementById("btn-search-here");
+      if(btn)btn.style.display="block";
+    });
+  }
+
+  prixMap.eachLayer(function(l){if(l instanceof L.Marker)prixMap.removeLayer(l);});
+
+  var veh=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
+  var isElec=veh&&veh.type==="elec";
+
+  if(isElec){
+    // Mode électrique — bornes OSM
+    if(bornesData_raw&&bornesData_raw.length){
+      var b0=bornesData_raw[0];
+      if(b0.meta_geo_point)prixMap.setView([b0.meta_geo_point[0],b0.meta_geo_point[1]],13);
+      bornesData_raw.forEach(function(b){
+        if(!b.meta_geo_point)return;
+        var lat2=b.meta_geo_point[0],lng2=b.meta_geo_point[1];
+        if(!lat2||!lng2)return;
+        L.marker([lat2,lng2])
+          .addTo(prixMap)
+          .bindPopup("<b>"+(b.nom_enseigne||b.nom_station||"Borne")+"</b><br>"+(b.puissance_nominale||"--")+" kW<br><a href='https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(b.adresse_station||"")+"' target='_blank'>🧭 Y aller</a>");
+      });
+    }
+  } else {
+    // Mode carburant — stations prix
+    if(prixStationsData.length){
+      prixMap.setView([prixStationsData[0].geom.lat,prixStationsData[0].geom.lon],13);
+      var fuelMap={"sp95":"sp95_prix","sp98":"sp98_prix","e10":"e10_prix","e85":"e85_prix","b7":"gazole_prix","gpl":"gplc_prix"};
+      var fuelKey=fuelMap[veh&&veh.fuel?veh.fuel:"b7"]||"gazole_prix";
+      prixStationsData.forEach(function(s){
+        if(!s.geom||!s.geom.lat||!s.geom.lon)return;
+        var prix=s[fuelKey]?s[fuelKey].toFixed(3):"--";
+        var nom=s.adresse||"Station";
+        L.marker([s.geom.lat,s.geom.lon])
+          .addTo(prixMap)
+          .bindPopup("<b>"+nom+"</b><br>"+prix+" €/L<br><a href='https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(s.adresse+" "+s.ville)+"' target='_blank'>🧭 Y aller</a>");
+      });
+    }
+  }
+}
+
+
+
 </script>
 <div id="mhelp" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.4);align-items:center;justify-content:center;padding:24px">
   <div class="card" style="width:100%;max-width:340px;padding:24px;max-height:80vh;overflow-y:auto">
@@ -3002,9 +3523,27 @@ function fermerGPS(){
   <div style="background:var(--card);border-radius:20px;padding:28px;max-width:320px;width:100%;text-align:center">
     <div style="font-size:48px;margin-bottom:12px">📷</div>
     <div id="mscan-titre" style="font-size:16px;font-weight:800;margin-bottom:8px">Scan ticket</div>
-<div id="mscan-sub" style="font-size:13px;color:var(--text3);margin-bottom:20px">Fonctionnalité bientôt disponible — v3.0 en cours de préparation ! MAI 2026</div>
+<div id="mscan-sub" style="font-size:13px;color:var(--text3);margin-bottom:20px">Fonctionnalité bientôt disponible — v3.0 en cours de préparation ! 31 MAI 2026</div>
     <button id="mscan-btn-fermer" onclick="document.getElementById('mscan').style.display='none'" style="width:100%;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:14px;padding:12px;font-size:14px;font-weight:700;color:var(--blue);cursor:pointer">Fermer</button>
   </div>
+</div>
+<!-- BOTTOM SHEET PRIX STATION -->
+<div id="mprix-overlay" class="gps-overlay" onclick="fermerPrix()" style="display:none"></div>
+<div id="mprix" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--card);border-radius:20px 20px 0 0;z-index:90;max-height:90vh;flex-direction:column;overflow:hidden">  <div style="padding:16px 16px 8px 16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-size:15px;font-weight:800" id="mprix-title">⛽ Prix Station</div>
+      <button onclick="fermerPrix()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3)">✕</button>
+    </div>
+    <div style="display:none" id="mprix-filtres"></div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <button class="chip sel" onclick="setPrixVue('liste')" id="mprix-v-liste">📋 Liste</button>
+      <button class="chip" onclick="setPrixVue('carte')" id="mprix-v-carte">🗺️ Carte</button>
+    </div>
+  </div>
+  <div id="mprix-content" style="height:60vh;overflow-y:scroll;-webkit-overflow-scrolling:touch;padding:0 16px 16px 16px;overscroll-behavior:contain">
+    📍 Recherche des stations autour de vous...
+  </div>
+  <div id="mprix-map" style="display:none;height:300px;width:100%"></div>
 </div>
 </body>
 </html>
