@@ -3196,11 +3196,9 @@ function setStationPref(sid) {
   var fuelKey = fuelMap[vv.fuel] || "gazole_prix";
   var majKey = fuelMajMap[vv.fuel] || "gazole_maj";
   var prix = stFound[fuelKey] ? stFound[fuelKey].toFixed(3) : "--";
-  var prixVal = stFound[fuelKey] ? stFound[fuelKey].toFixed(3) : null;
-var prix = prixVal !== null ? prixVal : "--";
-var ferme = stFound.horaires_automate_24_24 !== "Oui"
-  && (!stFound[majKey] || new Date(stFound[majKey]) <= new Date(Date.now() - 24 * 60 * 60 * 1000));
-var statut = prixVal === null ? "" : ferme ? "🔴" : "";
+  var automate = stFound.horaires_automate_24_24 === "Oui";
+  var ouvert = !automate && stFound[majKey] && new Date(stFound[majKey]) > new Date(Date.now() - 24*60*60*1000);
+  var statut = ouvert ? "🟢" : automate ? "🟠" : "🔴";
   ss("KarBu_prix_station", prix + "|" + statut);
   ss("KarBu_prix_station_maj", stFound[majKey] || "");
   ss("KarBu_prix_station_ville", stFound.ville || "");
@@ -3267,11 +3265,10 @@ function afficherPrix(stations, lat, lng) {
   html += '</div>';
 
   filtered.slice(0, 10).forEach(function (s) {
-    var prixVal = s[fuelKey] ? s[fuelKey].toFixed(3) : null;
-var prix = prixVal !== null ? prixVal : "--";
-var ferme = s.horaires_automate_24_24 !== "Oui"
-  && (!s[majKey] || new Date(s[majKey]) <= new Date(Date.now() - 24 * 60 * 60 * 1000));
-var statut = prixVal === null ? "" : ferme ? "🔴 " : "";
+    var prix = s[fuelKey] ? s[fuelKey].toFixed(3) : "--";
+    var automate = s.horaires_automate_24_24 === "Oui";
+    var ouvert = !automate && s[majKey] && new Date(s[majKey]) > new Date(Date.now() - 24 * 60 * 60 * 1000);
+    var statut = ouvert ? "🟢" : automate ? "🟠" : "🔴";
     var maj = s[majKey] ? s[majKey].replace("T", " ").substring(0, 16) : "--";
     var distKm = s._dist < 999999 ? (Math.round(s._dist / 100) / 10) + " km" : "--";
     var nom = s.ville || "Station";
@@ -3329,11 +3326,10 @@ var statut = prixVal === null ? "" : ferme ? "🔴 " : "";
   }
 
   if (stationAffichee) {
-    var bestPrixVal = stationAffichee[fuelKey] ? stationAffichee[fuelKey].toFixed(3) : null;
-var bestPrix = bestPrixVal !== null ? bestPrixVal : "--";
-var bestFerme = stationAffichee.horaires_automate_24_24 !== "Oui"
-  && (!stationAffichee[majKey] || new Date(stationAffichee[majKey]) <= new Date(Date.now() - 24 * 60 * 60 * 1000));
-var bestStatut = bestPrixVal === null ? "" : bestFerme ? "🔴" : "";
+    var bestPrix = stationAffichee[fuelKey] ? stationAffichee[fuelKey].toFixed(3) : "--";
+    var bestAutomate = stationAffichee.horaires_automate_24_24 === "Oui";
+    var bestOuvert = !bestAutomate && stationAffichee[majKey] && new Date(stationAffichee[majKey]) > new Date(Date.now() - 24 * 60 * 60 * 1000);
+    var bestStatut = bestOuvert ? "🟢" : bestAutomate ? "🟠" : "🔴";
 
     ss("KarBu_prix_station", bestPrix + '|' + bestStatut);
     ss("KarBu_prix_station_maj", stationAffichee[majKey] || "");
