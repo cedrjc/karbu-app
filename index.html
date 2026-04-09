@@ -267,13 +267,13 @@ button:active{transform:scale(.96)}
 <div id="cfg-pref-msg" style="display:none;font-size:12px;color:var(--red);background:var(--red-bg);border-radius:10px;padding:10px 12px;margin-bottom:12px"></div> 
 <div id="cfg-veh-fuel"></div>
 <div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:10px" id="cfg-lbl-donnees">Donnees</div>
-    <button class="btn-g" style="width:100%;margin-bottom:10px" onclick="exportCSV();closeConfig()" id="cfg-btn-export">Exporter des données</button>
-    <label class="btn-s" style="display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;border-radius:14px;padding:14px;width:100%"id="cfg-btn-import">Importer une sauvegarde<input type="file" accept=".csv" style="display:none;width:auto" onchange="importCSV(this);closeConfig()"/></label><button onclick="clearData();closeConfig()" style="width:100%;margin-top:10px;background:none;border:1.5px solid var(--red);border-radius:14px;padding:14px;font-size:14px;font-weight:700;color:var(--red)"id="cfg-btn-delete">Supprimer toutes les données</button>
+    <button class="btn-g" style="width:100%;margin-bottom:10px" onclick="showExportChoix()" id="cfg-btn-export">Exporter des données</button>
+    <label class="btn-s" style="display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;border-radius:14px;padding:14px;width:100%"id="cfg-btn-import">Importer une sauvegarde<input type="file" accept=".csv,.json" style="display:none;width:auto" onchange="importCSV(this);closeConfig()"/></label><button onclick="clearData();closeConfig()" style="width:100%;margin-top:10px;background:none;border:1.5px solid var(--red);border-radius:14px;padding:14px;font-size:14px;font-weight:700;color:var(--red)"id="cfg-btn-delete">Supprimer toutes les données</button>
 <div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-top:20px;margin-bottom:10px" id="cfg-lbl-aide">Aide</div>
 <div class="card" style="padding:0;margin-bottom:12px">
   <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--border2);cursor:pointer" onclick="openAbout()">
     <span style="font-size:20px">ℹ️</span>
-    <div><div style="font-size:14px;font-weight:600" id="cfg-apropos">À propos</div><div style="font-size:11px;color:var(--text3)">KarBu v1.0 — AppDrive</div></div>
+    <div><div style="font-size:14px;font-weight:600" id="cfg-apropos">À propos</div><div style="font-size:11px;color:var(--text3)">KarBu v2.5 — AppDrive</div></div>
   </div>
   <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--border2);cursor:pointer" onclick="openHelp()">
     <span style="font-size:20px">❓</span>
@@ -511,7 +511,7 @@ function openHelp(){
 function openAbout(){
   var m=document.createElement("div");
   m.style.cssText="position:fixed;inset:0;background:#00000070;display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(6px)";
-  m.innerHTML='<div style="background:var(--card);border:1px solid var(--border2);border-radius:20px;padding:24px;max-width:320px;width:90%;box-shadow:var(--shadow2);display:flex;gap:16px;align-items:center"><div style="flex:1"><div style="font-size:16px;font-weight:900;margin-bottom:4px"><span style="color:#212121;font-style:italic">Kar</span><span style="color:#0c65ac;font-style:italic">Bu</span> <span style="font-size:12px;font-weight:600;color:var(--text3)">v1.0</span></div><div style="font-size:12px;color:var(--text2);margin-bottom:2px">© 2026 AppDrive</div><div style="font-size:12px;color:var(--text2);margin-bottom:2px">appdrive.dev@proton.me</div><div style="font-size:12px;color:var(--text2);margin-bottom:16px">Tous droits réservés</div><button class="chip sel" onclick="this.closest(\'div[style*=fixed]\').remove()" style="font-size:12px">Fermer</button></div><img src="/icon-512.png" style="width:80px;height:80px;border-radius:16px;flex-shrink:0"/></div>';
+  m.innerHTML='<div style="background:var(--card);border:1px solid var(--border2);border-radius:20px;padding:24px;max-width:320px;width:90%;box-shadow:var(--shadow2);display:flex;gap:16px;align-items:center"><div style="flex:1"><div style="font-size:16px;font-weight:900;margin-bottom:4px"><span style="color:#212121;font-style:italic">Kar</span><span style="color:#0c65ac;font-style:italic">Bu</span> <span style="font-size:12px;font-weight:600;color:var(--text3)">v2.5</span></div><div style="font-size:12px;color:var(--text2);margin-bottom:2px">© 2026 AppDrive</div><div style="font-size:12px;color:var(--text2);margin-bottom:2px">appdrive.dev@proton.me</div><div style="font-size:12px;color:var(--text2);margin-bottom:16px">Tous droits réservés</div><button class="chip sel" onclick="this.closest(\'div[style*=fixed]\').remove()" style="font-size:12px">Fermer</button></div><img src="/icon-512.png" style="width:80px;height:80px;border-radius:16px;flex-shrink:0"/></div>';
   m.onclick=function(e){if(e.target===m)m.remove();};
   document.body.appendChild(m);
 }
@@ -905,8 +905,8 @@ jour:"j",mois:"mois",an:"an",ans:"ans",
   nouveauPaysPrompt:"Nouveau Pays :",
   detConsoTitle:"Consommation - Détail",detPrixTitle:"Prix - Détail",detPaysTitle:"Prix par pays - Détail",colTrajet:"Trajet",colCout:"Coût",colStation:"Station",colDate:"Date",colKm:"Km",colPays:"Pays",colN:"N",colMoy:"Moy.",colMin:"Min",colMax:"Max",colTotal:"Total",
   aideInfos:"Aide & Informations",
-  vidange:"Rappel révision",vidDerniere:"Km dernière révision",vidDate:"Date dernière révision",vidIntervalKm:"Intervalle km",vidIntervalMois:"Intervalle mois",
-  vidPopupTitre:"⚠️ Rappel vidange",vidPopupSub:"Il est temps de faire la vidange !",vidFait:"✅ C'est fait !",vidRappeler:"🔔 Me le rappeler",
+  vidange:"Rappel révision",vidDerniere:"Km dernière révision",vidDate:"Date dernière révision",vidIntervalKm:"Intervalle km",vidIntervalMois:"Intervalle mois",rupture:"⚠️ Rupture",
+  vidPopupTitre:"⚠️ Rappel révision",vidPopupSub:"Il est temps de faire la révision !",vidFait:"✅ C'est fait !",vidRappeler:"🔔 Me le rappeler",
   gpsStart:"Démarrer trajet",gpsStop:"Terminer trajet",gpsIndispo:"GPS non disponible",
   coutTrajet:"Coût du trajet",enregistrement:"Enregistrement en cours",
 ct:"Contrôle technique",ctDate:"Date de mise en circulation",ctProchain:"Prochain CT",ctPopupTitre:"Rappel CT",ctPopupSub:"Votre contrôle technique approche !",ctFait:"CT effectué !",ctRappeler:"Me le rappeler",ctNonSoumis:"Non soumis",ctLastDate:"Date dernier CT",
@@ -1021,7 +1021,7 @@ jour:"d",mois:"meses",an:"año",ans:"años",
   nouveauPaysPrompt:"Nuevo País:",
   detConsoTitle:"Consumo - Detalle",detPrixTitle:"Precio - Detalle",detPaysTitle:"Precio por país - Detalle",colTrajet:"Trayecto",colCout:"Coste",colStation:"Estación",colDate:"Fecha",colKm:"Km",colPays:"País",colN:"N",colMoy:"Med.",colMin:"Mín",colMax:"Máx",colTotal:"Total",
   aideInfos:"Ayuda & Información",
-  vidange:"Recordatorio revisión",vidDerniere:"Km última revisión",vidDate:"Fecha última revisión",vidIntervalKm:"Intervalo km",vidIntervalMois:"Intervalo meses",
+  vidange:"Recordatorio revisión",vidDerniere:"Km última revisión",vidDate:"Fecha última revisión",vidIntervalKm:"Intervalo km",vidIntervalMois:"Intervalo meses",rupture:"⚠️ Rotura",
   vidPopupTitre:"⚠️ Recordatorio cambio aceite",vidPopupSub:"¡Es hora de cambiar el aceite!",vidFait:"✅ ¡Hecho!",vidRappeler:"🔔 Recuérdamelo",
   gpsStart:"Iniciar trayecto",gpsStop:"Finalizar trayecto",gpsIndispo:"GPS no disponible",
   coutTrajet:"Coste del trayecto",enregistrement:"Grabación en curso",
@@ -2020,7 +2020,7 @@ function renderVehTabs(){
     document.getElementById("veh-tabs").innerHTML=h;
   }
 }
-function selectVeh(id){activeVid=id;saveAll();render();}
+function selectVeh(id){activeVid=id;saveAll();render();chargerPrix();}
 function deleteVeh(id){
   if(!confirm(T("supprimerVehConfirm")))return;
   vehicles=vehicles.filter(function(v){return v.id!==id;});
@@ -2317,21 +2317,20 @@ if(isFrance && !isElecActif){
     var prefLabel = "";
     var savedPrixRaw = ls("KarBu_prix_station", "--");
 var savedPrixParts = savedPrixRaw.split("|");
-var savedPrix = savedPrixParts[0] + ' € ' + (savedPrixParts[1] || "");
+var savedPrixVal = savedPrixParts[0];
+var savedPrix = savedPrixVal === T("rupture") ? savedPrixVal : savedPrixVal + ' € ' + (savedPrixParts[1] || "");
     var savedMaj = ls("KarBu_prix_station_maj", "");
 
     var prefVille = ls("KarBu_prix_station_ville", "");
-if (prefVille) {
-  prefLabel = '⭐ ' + prefVille;
-}
+
 
     var majTxt = savedMaj
-      ? ("MAJ: " + new Date(savedMaj).toLocaleDateString("fr-FR", { timeZone: "Europe/Paris", day: "2-digit", month: "2-digit" })
-        + " " + new Date(savedMaj).toLocaleTimeString("fr-FR", { timeZone: "Europe/Paris", hour: "2-digit", minute: "2-digit" }))
-      : T("");
+  ? ("MAJ: " + new Date(savedMaj).toLocaleDateString("fr-FR", { timeZone: "UTC", day: "2-digit", month: "2-digit" })
+    + " " + new Date(savedMaj).toLocaleTimeString("fr-FR", { timeZone: "UTC", hour: "2-digit", minute: "2-digit" }))
+  : T("");
 
     h += '<div class="card-sm" onclick="ouvrirPrix()" style="text-align:center;cursor:pointer">';
-    h += '<div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px">' + iconePrix + ' ' + T(isElecActif ? "prixBorne" : "prixStation") + '</div>';
+    h += '<div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px" id="prix-station-titre">' + iconePrix + ' ' + T(isElecActif ? "prixBorne" : "prixStation") + '</div>';
     h += '<div style="font-size:18px;font-weight:900;color:var(--text)" id="prix-station-val">' + savedPrix + '</div>';
     if (prefLabel) {
       h += '<div style="font-size:10px;color:gold;font-weight:700;margin-top:2px">' + prefLabel + '</div>';
@@ -2897,6 +2896,42 @@ function deleteEntry(id){
     render();
   }
 }
+function showExportChoix(){
+  var m=document.createElement("div");
+  m.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:flex;align-items:center;justify-content:center";
+  m.innerHTML='<div style="background:var(--card);border-radius:20px;padding:24px;max-width:300px;width:90%;box-shadow:var(--shadow2)">'
+    +'<div style="font-size:16px;font-weight:800;margin-bottom:16px">📤 Exporter</div>'
+    +'<button class="btn-g" style="width:100%;margin-bottom:10px" onclick="exportJSON();this.closest(\'div[style*=fixed]\').remove();closeConfig()">💾 Tout exporter (JSON)<br><span style="font-size:11px;font-weight:400;opacity:.7">Véhicules, pleins, configuration</span></button>'
+    +'<button class="btn-g" style="width:100%;margin-bottom:16px" onclick="exportCSV();this.closest(\'div[style*=fixed]\').remove();closeConfig()">📊 Pleins uniquement (CSV)<br><span style="font-size:11px;font-weight:400;opacity:.7">Compatible Excel</span></button>'
+    +'<button class="chip" style="width:100%" onclick="this.closest(\'div[style*=fixed]\').remove()">Annuler</button>'
+    +'</div>';
+  document.body.appendChild(m);
+}
+
+function exportJSON(){
+  var data={
+    version:"2.5",
+    date:new Date().toISOString(),
+    vehicles:vehicles,
+    entries:entries,
+    activeVid:activeVid,
+    config:{
+      lang:localStorage.getItem("KarBu_lang"),
+      currency:localStorage.getItem("KarBu_currency"),
+      country:localStorage.getItem("KarBu_country"),
+      countries:localStorage.getItem("KarBu_countries"),
+      defsta:localStorage.getItem("KarBu_defsta"),
+      defborne:localStorage.getItem("KarBu_defborne"),
+      kwh_price:localStorage.getItem("KarBu_kwh_price"),
+      theme:localStorage.getItem("KarBu_theme")
+    }
+  };
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));
+  a.download="KarBu_sauvegarde.json";
+  a.click();
+  showToast("💾 Sauvegarde exportée");
+}
 function exportCSV(){
   var veh=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
   var h=["Date","Vehicule","Km voiture","Km trajet","Litres","Prix/L","Station","Type","Pays","L/100km","Cout",userCurrency+"/km","Notes"];
@@ -2909,27 +2944,49 @@ function importCSV(input){
   var reader=new FileReader();
   reader.onload=function(ev){
     try{
-      var lines=ev.target.result.replace(/^\uFEFF/,"").split("\n").filter(Boolean);var count=0;
-      for(var i=1;i<lines.length;i++){
-        var c=lines[i].split(";").map(function(x){return x.replace(/^"|"$/g,"").trim();});
-        if(c.length<6||!c[0])continue;
-        var d=c[0];if(d.indexOf("/")>=0)d=d.split("/").reverse().join("-");
-        var rkm=parseFloat(c[3].replace(",","."));
-        var lit=parseFloat(c[4].replace(",","."));
-        var ppl=parseFloat(c[5].replace(",","."));
-        if(!rkm||!lit||!ppl)continue;
-        var entry={id:Date.now()+i,vid:activeVid,date:d,tkm:parseFloat((c[2]||"0").replace(",","."))||0,rkm:rkm,lit:lit,ppl:ppl,sta:c[6]||"major",ftype:(c[7]||"normal").toLowerCase(),ctr:c[8]||"France",note:c[12]||""};
-        var exists=false;
-        for(var j=0;j<entries.length;j++){if(entries[j].date===entry.date&&entries[j].rkm===entry.rkm){exists=true;break;}}
-        if(!exists){entries.push(entry);count++;}
+      var content=ev.target.result.replace(/^\uFEFF/,"");
+      // Détection JSON ou CSV
+      if(file.name.endsWith(".json")||content.trim().startsWith("{")){
+        var data=JSON.parse(content);
+        if(data.vehicles) vehicles=data.vehicles;
+        if(data.entries) entries=data.entries;
+        if(data.activeVid) activeVid=data.activeVid;
+        if(data.config){
+          var cfg=data.config;
+          if(cfg.lang){lang=JSON.parse(cfg.lang);ss("KarBu_lang",lang);}
+          if(cfg.currency){userCurrency=JSON.parse(cfg.currency);ss("KarBu_currency",userCurrency);}
+          if(cfg.country){defaultCountry=JSON.parse(cfg.country);ss("KarBu_country",defaultCountry);}
+          if(cfg.countries){savedCountries=JSON.parse(cfg.countries);ss("KarBu_countries",savedCountries);}
+          if(cfg.defsta){defaultSta=JSON.parse(cfg.defsta);ss("KarBu_defsta",defaultSta);}
+          if(cfg.defborne){defaultBorne=JSON.parse(cfg.defborne);ss("KarBu_defborne",defaultBorne);}
+          if(cfg.kwh_price){defaultKwhPrice=JSON.parse(cfg.kwh_price);ss("KarBu_kwh_price",defaultKwhPrice);}
+          if(cfg.theme){themeMode=JSON.parse(cfg.theme);ss("KarBu_theme",themeMode);applyTheme();}
+        }
+        saveAll();showToast("✅ Sauvegarde restaurée");render();
+      } else {
+        // Import CSV existant
+        var lines=content.split("\n").filter(Boolean);var count=0;
+        for(var i=1;i<lines.length;i++){
+          var c=lines[i].split(";").map(function(x){return x.replace(/^"|"$/g,"").trim();});
+          if(c.length<6||!c[0])continue;
+          var d=c[0];if(d.indexOf("/")>=0)d=d.split("/").reverse().join("-");
+          var rkm=parseFloat(c[3].replace(",","."));
+          var lit=parseFloat(c[4].replace(",","."));
+          var ppl=parseFloat(c[5].replace(",","."));
+          if(!rkm||!lit||!ppl)continue;
+          var entry={id:Date.now()+i,vid:activeVid,date:d,tkm:parseFloat((c[2]||"0").replace(",","."))||0,rkm:rkm,lit:lit,ppl:ppl,sta:c[6]||"major",ftype:(c[7]||"normal").toLowerCase(),ctr:c[8]||"France",note:c[12]||""};
+          var exists=false;
+          for(var j=0;j<entries.length;j++){if(entries[j].date===entry.date&&entries[j].rkm===entry.rkm){exists=true;break;}}
+          if(!exists){entries.push(entry);count++;}
+        }
+        saveAll();showToast(count+" entree(s) importee(s)");render();
       }
-      saveAll();showToast(count+" entree(s) importee(s)");render();
     }catch(err){showToast("Erreur import");}
   };
   reader.readAsText(file,"UTF-8");input.value="";
 }
 
-if("serviceWorker" in navigator)navigator.serviceWorker.register("/sw.js");
+
 if(!defaultCountry){
   document.getElementById("mc-title").textContent=LC.title;
   document.getElementById("mc-sub").textContent=LC.sub;
@@ -2947,6 +3004,8 @@ if(!vehicles.length){
   setView("ajouter");
 } else {
   render();
+  chargerPrixSilencieux();
+  _prixAutoRefresh = setInterval(chargerPrixSilencieux, 10 * 60 * 1000);
 setTimeout(function(){checkVidange();checkCT();},1000);}
 updateNavLang();
 function openAbout(){
@@ -2973,6 +3032,48 @@ var txt=T("partagerTitre")+"\n🚗 "+T("kmTrajet")+": "+km+" km\n"+(isElec?"⚡ 
     });
   }
 }
+function toggleCalcGPS(){
+  var panel=document.getElementById('mgps-calc-panel');
+  var input=document.getElementById('mgps-calc-input');
+  if(panel.style.display==='none'){
+    panel.style.display='block';
+    setTimeout(function(){input.focus();},100);
+  } else {
+    panel.style.display='none';
+    input.value='';
+    document.getElementById('mgps-calc-result').style.display='none';
+  }
+}
+
+function calcTrajetManuel(){
+  var km=parseFloat(document.getElementById('mgps-calc-input').value);
+  var result=document.getElementById('mgps-calc-result');
+  if(!km||km<=0){result.style.display='none';return;}
+  var s=getStats();
+  var veh=null;
+  for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
+  result.style.display='block';
+  var isElec=veh&&veh.type==='elec';
+  if(s&&s.avgPrixActuel){
+    var coutCarbu=(km*s.avgPrixActuel).toFixed(2);
+    var ppl=s.last&&s.last.ppl?s.last.ppl.toFixed(3):'--';
+    var litres=s.avgConso?((s.avgConso/100)*km).toFixed(1):'--';
+    var labelCarbu=isElec?'⚡':'⛽';
+    document.getElementById('mgps-calc-carbu').innerHTML=
+      labelCarbu+' <strong>'+coutCarbu+' '+userCurrency+'</strong> · '+litres+(isElec?' kWh':' L')+' · '+ppl+(isElec?' €/kWh':' €/L');
+  } else {
+    document.getElementById('mgps-calc-carbu').innerHTML='⛽ Données insuffisantes';
+  }
+  var baremeTable={3:0.529,4:0.606,5:0.636,6:0.665,7:0.697};
+  var taux=isElec?0.799:(veh&&veh.cv?baremeTable[veh.cv]||0.697:null);
+  if(taux){
+    var coutBareme=(km*taux).toFixed(2);
+    document.getElementById('mgps-calc-bareme').innerHTML=
+      '🚗 Barème : <strong>'+coutBareme+' '+userCurrency+'</strong> · '+taux+' €/km';
+  } else {
+    document.getElementById('mgps-calc-bareme').innerHTML='🚗 CV non renseigné';
+  }
+}
 function fermerGPS(){
   var mgps=document.getElementById("mgps");
   if(mgps)mgps.classList.remove("open");
@@ -2985,9 +3086,15 @@ function fermerGPS(){
   var btnStop=document.getElementById("mgps-btn-stop");
   if(btnStop)btnStop.style.display="block";
   gpsDistance=0;
+  var calcPanel=document.getElementById('mgps-calc-panel');
+  if(calcPanel){calcPanel.style.display='none';}
+  var calcInput=document.getElementById('mgps-calc-input');
+  if(calcInput){calcInput.value='';}
+  var calcResult=document.getElementById('mgps-calc-result');
+  if(calcResult){calcResult.style.display='none';}
 }
 var prixFiltre="toutes";
-
+var prixLat=0,prixLng=0;
 var prixVue="liste";
 var prixMap=null;
 var prixStationsData=[];
@@ -3000,9 +3107,15 @@ function ouvrirPrix(){
   document.getElementById("mprix-filtres").style.display=isElec?"none":"flex";
   document.getElementById("mprix").style.display="block";
   document.getElementById("mprix-overlay").style.display="block";
-  chargerPrix();
   var titrePrix=isElec?"⚡ "+T("prixBorne"):"⛽ "+T("prixStation");
-document.getElementById("mprix-title").textContent=titrePrix;
+  document.getElementById("mprix-title").textContent=titrePrix;
+  if(!isElec && prixStationsData_raw && prixStationsData_raw.length){
+    afficherPrix(prixStationsData_raw,prixLat,prixLng);
+  } else if(isElec && bornesData_raw && bornesData_raw.length){
+    afficherBornes(bornesData_raw,prixLat,prixLng);
+  } else {
+    chargerPrix();
+  }
 }
 
 function fermerPrix(){
@@ -3016,7 +3129,61 @@ function setPrixFiltre(f){
   document.getElementById("mprix-f-"+f).classList.add("sel");
   chargerPrix();
 }
+var _prixAutoRefresh = null;
 
+function chargerPrixSilencieux() {
+  var veh = null;
+  for (var i = 0; i < vehicles.length; i++) { if (vehicles[i].id === activeVid) { veh = vehicles[i]; break; } }
+  var isElec = veh && veh.type === "elec";
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    var lat = pos.coords.latitude, lng = pos.coords.longitude;
+    var rayon = 10;
+    var url = "https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=distance(geom,geom'POINT(" + lng + " " + lat + ")'," + rayon + "km)&limit=20&order_by=distance(geom,geom'POINT(" + lng + " " + lat + ")')";
+    fetch(url)
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var stations = data.results || data.records || [];
+        if (!stations.length) return;
+        prixStationsData_raw = stations;
+        var fuelMap = {"sp95":"sp95_prix","sp98":"sp98_prix","e10":"e10_prix","e85":"e85_prix","b7":"gazole_prix","gpl":"gplc_prix"};
+        var fuelMajMap = {"sp95":"sp95_maj","sp98":"sp98_maj","e10":"e10_maj","e85":"e85_maj","b7":"gazole_maj","gpl":"gplc_maj"};
+        var fuelKey = fuelMap[veh && veh.fuel ? veh.fuel : "b7"] || "gazole_prix";
+        var majKey = fuelMajMap[veh && veh.fuel ? veh.fuel : "b7"] || "gazole_maj";
+        var stationAffichee = null;
+        if (veh && veh.stationPref) {
+          var prefId = String(veh.stationPref.id);
+          for (var j = 0; j < stations.length; j++) {
+            if (String(stations[j].id) === prefId) { stationAffichee = stations[j]; break; }
+          }
+        }
+        if (!stationAffichee) {
+          stationAffichee = stations.slice().sort(function(a,b){ return (a[fuelKey]||999)-(b[fuelKey]||999); })[0];
+        }
+        if (stationAffichee) {
+          var prixVal = stationAffichee[fuelKey] ? stationAffichee[fuelKey].toFixed(3) : null;
+          var prix = prixVal !== null ? prixVal : T("rupture");
+          var ferme = stationAffichee.horaires_automate_24_24 !== "Oui"
+            && (!stationAffichee[majKey] || new Date(stationAffichee[majKey]) <= new Date(Date.now() - 24*60*60*1000));
+          var statut = prixVal === null ? "" : ferme ? "" : "";
+          ss("KarBu_prix_station", prix + "|" + statut);
+          ss("KarBu_prix_station_maj", stationAffichee[majKey] || "");
+          ss("KarBu_prix_station_nom", osmNomCache[stationAffichee.id] || "");
+          var el = document.getElementById("prix-station-val");
+          if (el) el.innerHTML = prix + (prixVal ? " € " + statut : "");
+          var elTitre = document.getElementById("prix-station-titre");
+          if (elTitre) { var isPrefNow=!!(veh&&veh.stationPref); elTitre.innerHTML=(isPrefNow?"⭐":"⛽")+" "+(osmNomCache[stationAffichee.id]||T("prixStation")); }
+          var elMaj = document.getElementById("prix-station-maj");
+          if (elMaj && stationAffichee[majKey]) {
+            var majDate = new Date(stationAffichee[majKey]);
+            elMaj.textContent = "MAJ: "
+              + majDate.toLocaleDateString("fr-FR", {timeZone:"UTC",day:"2-digit",month:"2-digit"})
+              + " "
+              + majDate.toLocaleTimeString("fr-FR", {timeZone:"UTC",hour:"2-digit",minute:"2-digit"});
+          }
+        }
+      }).catch(function(){});
+  }, function(){}, {maximumAge: 60000, timeout: 10000});
+}
 function chargerPrix(){
   document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px">📍 '+T("rechercheStations")+'...</div>';
   var veh=null;for(var i=0;i<vehicles.length;i++){if(vehicles[i].id===activeVid){veh=vehicles[i];break;}}
@@ -3029,7 +3196,7 @@ function chargerPrix(){
     }
   },function(){
     document.getElementById("mprix-content").innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">❌ '+T("gpsIndispo")+'</div>';
-  });
+ },{maximumAge:300000,timeout:30000,enableHighAccuracy:false});
 }
 
 function fetchPrix(lat,lng){
@@ -3063,10 +3230,10 @@ function fetchPrixCoords(lat,lng){
         var fuelMap={"sp95":"sp95_prix","sp98":"sp98_prix","e10":"e10_prix","e85":"e85_prix","b7":"gazole_prix","gpl":"gplc_prix"};
         var fuelKey=fuelMap[veh&&veh.fuel?veh.fuel:"b7"]||"gazole_prix";
         var prix=s[fuelKey]?s[fuelKey].toFixed(3):"--";
-        var nom=s.adresse||"Station";
+        var nom=osmNomCache[s.id]||s.adresse||"Station";
         L.marker([s.geom.lat,s.geom.lon])
           .addTo(prixMap)
-          .bindPopup("<b>"+nom+"</b><br>"+prix+" €/L<br><a href='https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(s.adresse+" "+s.ville)+"' target='_blank'>🧭 Y aller</a>");
+          .bindPopup("<b>"+nom+"</b><br>"+prix+" €/L<br><a href='https://www.google.com/maps/dir/?api=1&destination="+s.geom.lat+","+s.geom.lon+"' target='_blank'>🧭 Y aller</a>");
       });
     })
     .catch(function(){
@@ -3097,7 +3264,7 @@ function fetchBornesCoords(lat,lng){
       bornesData_raw=bornes;
       afficherBornes(bornes,lat,lng);
       if(prixMap){
-        prixMap.eachLayer(function(l){if(l instanceof L.Marker)prixMap.removeLayer(l);});
+        if(prixMap) prixMap.eachLayer(function(l){if(l instanceof L.Marker)prixMap.removeLayer(l);});
         bornes.forEach(function(b){
           if(!b.meta_geo_point)return;
           var lat2=b.meta_geo_point[0],lng2=b.meta_geo_point[1];
@@ -3180,6 +3347,7 @@ var html='';
   document.getElementById("mprix-content").innerHTML=html;
 
 }
+
 function setStationPref(sid) {
   var vv = null;
   for (var ii = 0; ii < vehicles.length; ii++) {
@@ -3190,18 +3358,19 @@ function setStationPref(sid) {
   if (!stFound) return;
   vv.stationPref = stFound;
   saveAll();
-  // Sauvegarder le prix de la station préférée dans le localStorage
   var fuelMap = {"sp95":"sp95_prix","sp98":"sp98_prix","e10":"e10_prix","e85":"e85_prix","b7":"gazole_prix","gpl":"gplc_prix"};
   var fuelMajMap = {"sp95":"sp95_maj","sp98":"sp98_maj","e10":"e10_maj","e85":"e85_maj","b7":"gazole_maj","gpl":"gplc_maj"};
   var fuelKey = fuelMap[vv.fuel] || "gazole_prix";
   var majKey = fuelMajMap[vv.fuel] || "gazole_maj";
-  var prix = stFound[fuelKey] ? stFound[fuelKey].toFixed(3) : "--";
-  var automate = stFound.horaires_automate_24_24 === "Oui";
-  var ouvert = !automate && stFound[majKey] && new Date(stFound[majKey]) > new Date(Date.now() - 24*60*60*1000);
-  var statut = ouvert ? "🟢" : automate ? "🟠" : "🔴";
+  var prixVal = stFound[fuelKey] ? stFound[fuelKey].toFixed(3) : null;
+  var prix = prixVal !== null ? prixVal : "--";
+  var ferme = stFound.horaires_automate_24_24 !== "Oui"
+    && (!stFound[majKey] || new Date(stFound[majKey]) <= new Date(Date.now() - 24*60*60*1000));
+  var statut = prixVal === null ? "" : ferme ? "" : "";
   ss("KarBu_prix_station", prix + "|" + statut);
   ss("KarBu_prix_station_maj", stFound[majKey] || "");
   ss("KarBu_prix_station_ville", stFound.ville || "");
+  ss("KarBu_prix_station_nom", osmNomCache[stFound.id] || "");
   showToast('⭐ Station préférée !');
   chargerPrix();
 }
@@ -3220,8 +3389,27 @@ function setBornePref(bid){
     chargerPrix();
   }
 }
+var osmNomCache = (function(){ try { return JSON.parse(localStorage.getItem("KarBu_osm_cache") || "{}"); } catch(e) { return {}; } })();
+
+async function getNomStation(lat, lon, id) {
+  if (osmNomCache[id]) return osmNomCache[id];
+  var url = "https://overpass.kumi.systems/api/interpreter?data="
+    + encodeURIComponent('[out:json][timeout:5];(node["amenity"="fuel"](around:300,'
++ lat + ',' + lon + ');way["amenity"="fuel"](around:300,'
++ lat + ',' + lon + ');node["shop"="fuel"](around:300,'
++ lat + ',' + lon + '););out tags;');
+  try {
+    var r = await fetch(url);
+    var d = await r.json();
+    var tags = d.elements[0] && d.elements[0].tags || {};
+    var nom = tags.brand || tags.name || tags.operator || null;
+  if (nom) { osmNomCache[id] = nom; localStorage.setItem("KarBu_osm_cache", JSON.stringify(osmNomCache)); }
+    return nom;
+  } catch(e) { return null; }
+}
 function afficherPrix(stations, lat, lng) {
   var veh = null;
+  prixLat=lat; prixLng=lng;
   for (var i = 0; i < vehicles.length; i++) {
     if (vehicles[i].id === activeVid) { veh = vehicles[i]; break; }
   }
@@ -3255,7 +3443,7 @@ function afficherPrix(stations, lat, lng) {
     filtered.sort(function (a, b) { return a._dist - b._dist; });
   }
 
-  var html = '<div style="display:flex;gap:8px;margin-bottom:12px">';
+  var html = '<div style="display:flex;gap:8px;margin-bottom:12px;position:sticky;top:0;background:var(--card);z-index:2;padding:8px 0">';
   html += '<button onclick="var c=document.getElementById(\'mprix-content\');c.dataset.sort=\'distance\';afficherPrix(prixStationsData_raw,' + lat + ',' + lng + ');" '
     + 'style="flex:1;padding:7px;border-radius:10px;font-size:12px;font-weight:700;border:1.5px solid var(--blue-border);'
     + (currentSort !== "prix" ? 'background:var(--blue);color:#fff' : 'background:var(--card2);color:var(--text3)') + '">📍 ' + T("proximite") + '</button>';
@@ -3264,21 +3452,92 @@ function afficherPrix(stations, lat, lng) {
     + (currentSort === "prix" ? 'background:var(--blue);color:#fff' : 'background:var(--card2);color:var(--text3)') + '">💶 ' + T("prix") + '</button>';
   html += '</div>';
 
-  filtered.slice(0, 10).forEach(function (s) {
-    var prix = s[fuelKey] ? s[fuelKey].toFixed(3) : "--";
-    var automate = s.horaires_automate_24_24 === "Oui";
-    var ouvert = !automate && s[majKey] && new Date(s[majKey]) > new Date(Date.now() - 24 * 60 * 60 * 1000);
-    var statut = ouvert ? "🟢" : automate ? "🟠" : "🔴";
+  var stats = getStats();
+var avgConso = stats.avgConso || null;
+var cap = veh && veh.cap ? veh.cap : 50;
+var reserve = veh && veh.reserve ? veh.reserve : 8;
+var litresEstimes = cap - reserve;
+
+var plusProche = filtered.filter(function(s){ return s[fuelKey] && s._dist < 999999; })[0] || null;
+var moinsChere = filtered.filter(function(s){ return s[fuelKey]; }).slice().sort(function(a,b){ return a[fuelKey]-b[fuelKey]; })[0] || null;
+var prefStation = null;
+if(veh && veh.stationPref){
+  var prefIdResume = String(veh.stationPref.id);
+  for(var pi=0; pi<filtered.length; pi++){
+    if(String(filtered[pi].id)===prefIdResume && filtered[pi]._dist<=10000){ prefStation=filtered[pi]; break; }
+  }
+}
+
+var resumeEl = document.getElementById("mprix-resume");
+if(resumeEl) resumeEl.innerHTML = "";
+if(plusProche && (moinsChere || prefStation)){
+  var refPrix = plusProche[fuelKey];
+  var resumeHtml = '<div style="background:var(--card2);border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:12px;line-height:2">';
+  var distPP = (Math.round(plusProche._dist/100)/10);
+  resumeHtml += (currentSort==='prix'?'💶':'📍') + ' ' + (osmNomCache[plusProche.id]||'Station') + ' — ' + distPP + ' km — ' + refPrix.toFixed(3) + ' ' + userCurrency + '/L <span style="color:var(--text3);font-size:10px">(référence)</span><br>';
+  if(moinsChere && moinsChere.id !== plusProche.id){
+    var distMC = (Math.round(moinsChere._dist/100)/10);
+    var prixMC = moinsChere[fuelKey];
+    var gainBrut = (refPrix - prixMC) * litresEstimes;
+    var coutDetour = (moinsChere._dist*2/1000) * (avgConso/100) * prixMC;
+    var gainNet = avgConso ? gainBrut - coutDetour : null;
+    var gainStr = gainNet !== null
+      ? (gainNet >= 0
+          ? '<span style="color:green">✅ Vous économisez ' + Math.abs(gainNet).toFixed(2) + ' €</span>'
+          : '<span style="color:orange">⚠️ Vous perdez ' + Math.abs(gainNet).toFixed(2) + ' €</span>')
+      : '';
+    resumeHtml += '💶 ' + (osmNomCache[moinsChere.id]||'Station') + ' — ' + distMC + ' km — ' + prixMC.toFixed(3) + ' ' + userCurrency + '/L — ' + gainStr + '<br>';
+  }
+  if(prefStation && prefStation.id !== plusProche.id){
+    var distPref = (Math.round(prefStation._dist/100)/10);
+    var prixPref = prefStation[fuelKey];
+    var gainBrutP = prixPref ? (refPrix - prixPref) * litresEstimes : null;
+    var coutDetourP = prixPref ? (prefStation._dist*2/1000) * (avgConso/100) * prixPref : null;
+    var gainNetP = (avgConso && gainBrutP !== null) ? gainBrutP - coutDetourP : null;
+    var gainStrP = gainNetP !== null
+      ? (gainNetP >= 0
+          ? '<span style="color:green">✅ Vous économisez ' + Math.abs(gainNetP).toFixed(2) + ' €</span>'
+          : '<span style="color:orange">⚠️ Vous perdez ' + Math.abs(gainNetP).toFixed(2) + ' €</span>')
+      : '';
+    resumeHtml += '⭐ ' + (osmNomCache[prefStation.id]||'Station') + ' — ' + distPref + ' km — ' + (prixPref ? prixPref.toFixed(3) + ' ' + userCurrency + '/L' : T("rupture")) + ' — ' + gainStrP + '<br>';
+  }
+  var litresLabel = veh && veh.cap ? litresEstimes + ' L' : '42 L (réservoir non renseigné)';
+resumeHtml += '<span style="font-size:10px;color:var(--text3);font-style:italic">Calcul indicatif pour un plein de ' + litresLabel + '</span>';
+  resumeHtml += '</div>';
+  if(resumeEl) resumeEl.innerHTML = resumeHtml;
+}
+
+var top10 = filtered.slice(0, 10);
+top10.forEach(function(s) {
+  if (!osmNomCache[s.id]) {
+    getNomStation(s.geom ? s.geom.lat : 0, s.geom ? s.geom.lon : 0, s.id).then(function(nomOSM) {
+      if (nomOSM) {
+        osmNomCache[s.id] = nomOSM;
+        var el = document.querySelector('[data-nomid="' + s.id + '"]');
+        if (el) el.textContent = nomOSM;
+      }
+    });
+  }
+});
+top10.forEach(function (s) {
+    var prixVal = s[fuelKey] ? s[fuelKey].toFixed(3) : null;
+var prix = prixVal !== null ? prixVal : T("rupture");
+var ferme = s.horaires_automate_24_24 !== "Oui"
+  && (!s[majKey] || new Date(s[majKey]) <= new Date(Date.now() - 24 * 60 * 60 * 1000));
+var statut = prixVal === null ? "" : ferme ? "" : "";
     var maj = s[majKey] ? s[majKey].replace("T", " ").substring(0, 16) : "--";
     var distKm = s._dist < 999999 ? (Math.round(s._dist / 100) / 10) + " km" : "--";
-    var nom = s.ville || "Station";
-    var adresse = s.adresse || "";
+    var nom = osmNomCache[s.id] || "";
+var sousTitre = (s.adresse && s.ville) ? s.adresse + ', ' + s.ville : (s.adresse || s.ville || "");
+    var adresse = sousTitre;
+var adresseEsc = (s.adresse || "").replace(/'/g, "\\'");
+var villeEsc = (s.ville || "").replace(/'/g, "\\'");
     var isPref = veh && veh.stationPref && String(veh.stationPref.id) === String(s.id);
 
     html += '<div class="card" style="padding:12px;margin-bottom:8px' + (isPref ? ';border:2px solid gold' : '') + '">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
-    html += '<div style="font-size:14px;font-weight:800">' + statut + ' ' + nom + (isPref ? ' ⭐' : '') + '</div>';
-    html += '<div style="font-size:18px;font-weight:900;color:var(--blue)">' + prix + ' ' + userCurrency + '/L</div>';
+    html += '<div style="font-size:14px;font-weight:800" data-nomid="' + s.id + '">' + statut + ' ' + nom + (isPref ? ' ⭐' : '') + '</div>';
+    html += '<div style="font-size:18px;font-weight:900;color:var(--blue)">' + prix + (prixVal ? ' ' + userCurrency + '/L' : '') + '</div>';
     html += '</div>';
     html += '<div style="font-size:11px;color:var(--text3)">' + adresse + '</div>';
     html += '<div style="display:flex;justify-content:space-between;margin-top:4px">';
@@ -3288,19 +3547,20 @@ function afficherPrix(stations, lat, lng) {
 
     var sid = s.id;
     html += '<div style="display:flex;gap:8px;margin-top:10px">';
-    html += '<button onclick="ouvrirGPS(\'' + s.adresse + '\',\'' + s.cp + ' ' + s.ville + '\')" '
+    html += '<button onclick="ouvrirGPS(' + (s.geom ? s.geom.lat : 0) + ',' + (s.geom ? s.geom.lon : 0) + ')" '
       + 'style="flex:1;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:10px;padding:8px 4px;font-size:12px;font-weight:700;color:var(--blue);text-align:center">'
       + '🧭 ' + T("yAller") + '</button>';
     html += '<button data-sid="' + sid + '" onclick="'
       + 'var sid=this.dataset.sid;'
       + 'var vv=null;for(var ii=0;ii<vehicles.length;ii++){if(vehicles[ii].id===activeVid){vv=vehicles[ii];break;}}'
       + 'if(!vv)return;'
-      + 'var ss=prixStationsData_raw.filter(function(x){return String(x.id)===sid;})[0];'
-      + 'if(!ss)return;'
-      + 'vv.stationPref=ss;'
-      + 'saveAll();'
-      + 'showToast(\'⭐ Station préférée !\');'
-      + 'chargerPrix();" '
+      + 'if(vv.stationPref && String(vv.stationPref.id)===sid){'
+      + 'vv.stationPref=null;saveAll();showToast(\'☆ Station retirée des préférées\');'
+      + '}else{'
+      + 'var stPref=prixStationsData_raw.filter(function(x){return String(x.id)===sid;})[0];'
+      +'if(stPref){vv.stationPref=stPref;}else{vv.stationPref={id:sid};}saveAll();showToast(\'⭐ Station préférée !\');'
+      + '}'
+      + 'afficherPrix(prixStationsData_raw,prixLat,prixLng);" '
       + 'style="flex:1;background:' + (isPref ? 'gold' : 'var(--card2)') + ';border:1.5px solid var(--border3);border-radius:10px;padding:8px 4px;font-size:12px;font-weight:700;color:' + (isPref ? '#000' : 'var(--text3)') + ';text-align:center">'
       + (isPref ? '⭐ Préférée' : '☆ Préférée') + '</button>';
     html += '</div>';
@@ -3308,7 +3568,9 @@ function afficherPrix(stations, lat, lng) {
   });
 
   prixStationsData_raw = stations;
-  prixStationsData = filtered;
+prixStationsData = filtered;
+prixLat = lat;
+prixLng = lng;
 
   document.getElementById("mprix-content").innerHTML = html;
   document.getElementById("mprix-content").dataset.sort = currentSort;
@@ -3326,30 +3588,33 @@ function afficherPrix(stations, lat, lng) {
   }
 
   if (stationAffichee) {
-    var bestPrix = stationAffichee[fuelKey] ? stationAffichee[fuelKey].toFixed(3) : "--";
-    var bestAutomate = stationAffichee.horaires_automate_24_24 === "Oui";
-    var bestOuvert = !bestAutomate && stationAffichee[majKey] && new Date(stationAffichee[majKey]) > new Date(Date.now() - 24 * 60 * 60 * 1000);
-    var bestStatut = bestOuvert ? "🟢" : bestAutomate ? "🟠" : "🔴";
+    var bestPrixVal = stationAffichee[fuelKey] ? stationAffichee[fuelKey].toFixed(3) : null;
+var bestPrix = bestPrixVal !== null ? bestPrixVal : T("rupture");
+var bestFerme = stationAffichee.horaires_automate_24_24 !== "Oui"
+  && (!stationAffichee[majKey] || new Date(stationAffichee[majKey]) <= new Date(Date.now() - 24 * 60 * 60 * 1000));
+var bestStatut = bestPrixVal === null ? "" : bestFerme ? "" : "";
 
     ss("KarBu_prix_station", bestPrix + '|' + bestStatut);
     ss("KarBu_prix_station_maj", stationAffichee[majKey] || "");
+    ss("KarBu_prix_station_nom", osmNomCache[stationAffichee.id] || "");
 
     var el = document.getElementById("prix-station-val");
-    if (el) el.innerHTML = bestPrix + ' € ' + bestStatut;
+    if (el) el.innerHTML = bestPrix + (bestPrixVal ? ' € ' + bestStatut : '');
+    var elTitre = document.getElementById("prix-station-titre");
+    if (elTitre) { var isPrefNow=!!(veh&&veh.stationPref); elTitre.innerHTML=(isPrefNow?"⭐":"⛽")+" "+(osmNomCache[stationAffichee.id]||T("prixStation")); }
 
     var elMaj = document.getElementById("prix-station-maj");
     if (elMaj && stationAffichee[majKey]) {
       var majDate = new Date(stationAffichee[majKey]);
       elMaj.textContent = "MAJ: "
-        + majDate.toLocaleDateString("fr-FR", { timeZone: "Europe/Paris", day: '2-digit', month: '2-digit' })
+        + majDate.toLocaleDateString("fr-FR", { timeZone: "UTC", day: '2-digit', month: '2-digit' })
         + " "
-        + majDate.toLocaleTimeString("fr-FR", { timeZone: "Europe/Paris", hour: '2-digit', minute: '2-digit' });
+        + majDate.toLocaleTimeString("fr-FR", { timeZone: "UTC", hour: '2-digit', minute: '2-digit' });
     }
   }
 }
-function ouvrirGPS(adresse,ville){
-  var query=encodeURIComponent(adresse+" "+ville);
-  window.open("https://www.google.com/maps/search/?api=1&query="+query,"_blank");
+function ouvrirGPS(lat,lng){
+  window.open("https://www.google.com/maps/dir/?api=1&destination="+lat+","+lng,"_blank");
 }
 
 
@@ -3429,10 +3694,10 @@ function afficherCarte(){
       prixStationsData.forEach(function(s){
         if(!s.geom||!s.geom.lat||!s.geom.lon)return;
         var prix=s[fuelKey]?s[fuelKey].toFixed(3):"--";
-        var nom=s.adresse||"Station";
+        var nom=osmNomCache[s.id]||s.adresse||"Station";
         L.marker([s.geom.lat,s.geom.lon])
           .addTo(prixMap)
-          .bindPopup("<b>"+nom+"</b><br>"+prix+" €/L<br><a href='https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(s.adresse+" "+s.ville)+"' target='_blank'>🧭 Y aller</a>");
+          .bindPopup("<b>"+nom+"</b><br>"+prix+" €/L<br><a href='https://www.google.com/maps/dir/?api=1&destination="+s.geom.lat+","+s.geom.lon+"' target='_blank'>🧭 Y aller</a>");
       });
     }
   }
@@ -3472,7 +3737,7 @@ function afficherCarte(){
 <div id="mabout" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.4);align-items:center;justify-content:center;padding:24px">
   <div class="card" style="width:100%;max-width:340px;padding:24px;display:flex;align-items:center;gap:20px">
     <div style="flex:1">
-      <div style="font-size:20px;font-weight:900"><span style="color:#212121;font-weight:900;font-style:italic">Kar</span><span style="color:#0c65ac;font-weight:900;font-style:italic">Bu</span> <span style="font-size:13px;color:var(--text3);font-weight:700">v1.0</span></div>
+      <div style="font-size:20px;font-weight:900"><span style="color:#212121;font-weight:900;font-style:italic">Kar</span><span style="color:#0c65ac;font-weight:900;font-style:italic">Bu</span> <span style="font-size:13px;color:var(--text3);font-weight:700">v2.5</span></div>
       <div style="font-size:13px;color:var(--text3);margin-top:6px">© 2026 AppDrive</div>
       <div style="font-size:13px;color:var(--text3)">appdrive.dev@proton.me</div>
       <div style="font-size:13px;color:var(--text3)">Tous droits réservés</div>
@@ -3488,8 +3753,18 @@ function afficherCarte(){
 <div class="bottom-sheet" id="mgps" style="display:none">
   <div class="bs-handle"></div>
   <div style="text-align:center">
-    <div style="font-size:13px;color:var(--text3);font-weight:700;letter-spacing:.5px;margin-bottom:20px" id="mgps-title"></div>
-    <div style="margin-bottom:16px">
+    <div id="mgps-calc-panel" style="display:none;margin-bottom:16px;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:14px;padding:14px">
+  <div style="font-size:12px;color:var(--text3);margin-bottom:8px;font-weight:600" id="mgps-calc-lbl">📏 Distance du trajet (km)</div>
+  <input id="mgps-calc-input" type="number" min="0" step="0.1" placeholder="ex: 20"
+    oninput="calcTrajetManuel()"
+    style="width:100%;box-sizing:border-box;padding:10px 12px;border-radius:10px;border:1.5px solid var(--blue-border);background:var(--bg);color:var(--text);font-size:16px;font-weight:700;outline:none">
+  <div id="mgps-calc-result" style="display:none;margin-top:12px;text-align:left">
+    <div id="mgps-calc-carbu" style="font-size:13px;color:var(--text);margin-bottom:4px"></div>
+    <div id="mgps-calc-bareme" style="font-size:13px;color:var(--text3)"></div>
+  </div>
+</div>
+<div style="font-size:13px;color:var(--text3);font-weight:700;letter-spacing:.5px;margin-bottom:20px" id="mgps-title"></div>
+<div style="margin-bottom:16px">
       <div style="font-size:12px;color:var(--text3);margin-bottom:4px" id="mgps-lbl-km"></div>
       <div style="font-size:42px;font-weight:900;color:var(--text);letter-spacing:-2px" id="mgps-km">0 km</div>
     </div>
@@ -3497,7 +3772,10 @@ function afficherCarte(){
       <div style="font-size:12px;color:var(--text3);margin-bottom:4px" id="mgps-lbl-cout"></div>
       <div style="font-size:42px;font-weight:900;color:#2563eb;letter-spacing:-2px" id="mgps-cout">0.00</div>
     </div>
-    <button onclick="stopGPS()" style="width:100%;background:#ef0000;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:700;color:#fff;cursor:pointer" id="mgps-btn-stop"></button>
+    <div style="display:flex;gap:10px;align-items:center">
+  <button onclick="stopGPS()" style="flex:1;background:#ef0000;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:700;color:#fff;cursor:pointer" id="mgps-btn-stop"></button>
+  <button onclick="toggleCalcGPS()" id="mgps-btn-calc" style="width:52px;height:52px;flex-shrink:0;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:14px;font-size:22px;cursor:pointer" title="Calculatrice trajet">🖩</button>
+</div>
 <button onclick="partagerTrajet()" id="mgps-btn-share" style="display:none;width:100%;margin-top:10px;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:14px;padding:14px;font-size:14px;font-weight:700;color:var(--blue);cursor:pointer">📤 Partager</button>
 <button onclick="fermerGPS()" id="mgps-btn-close" style="display:none;width:100%;margin-top:8px;background:none;border:none;padding:10px;font-size:13px;font-weight:600;color:var(--text3);cursor:pointer" data-t="fermer">✕ Fermer</button>
   </div>
@@ -3535,6 +3813,7 @@ function afficherCarte(){
       <button class="chip" onclick="setPrixVue('carte')" id="mprix-v-carte">🗺️ Carte</button>
     </div>
   </div>
+  <div id="mprix-resume" style="padding:0 16px;"></div>
   <div id="mprix-content" style="height:60vh;overflow-y:scroll;-webkit-overflow-scrolling:touch;padding:0 16px 16px 16px;overscroll-behavior:contain">
     📍 Recherche des stations autour de vous...
   </div>
