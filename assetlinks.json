@@ -1,8 +1,8 @@
 [{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "app.netlify.sage_kulfi_f33735.twa",
-        "sha256_cert_fingerprints": ["1A:B6:E1:2A:0A:88:44:EE:FA:8C:1B:C3:37:94:35:CF:F1:11:C8:9F:59:A3:1D:E5:78:F5:C0:93:EC:C9:9D:30"]
-      }
-    }]
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.appdrive.karbu",
+    "sha256_cert_fingerprints": ["1A:B6:E1:2A:0A:88:44:EE:FA:8C:1B:C3:37:94:35:CF:F1:11:C8:9F:59:A3:1D:E5:78:F5:C0:93:EC:C9:9D:30"]
+  }
+}]
