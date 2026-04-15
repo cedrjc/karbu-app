@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script>
+      var path = window.location.pathname.replace("/karbu-app", "");
+      var newUrl = "/karbu-app/#" + path + window.location.search + window.location.hash;
+      window.location.replace(newUrl);
+    </script>
+  </head>
+  <body></body>
+</html>
