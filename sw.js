@@ -1,4 +1,4 @@
-const CACHE = "KarBu-v5";
+const CACHE = "KarBu-v6";
 const FILES = [
   "/",
   "/index.html",
