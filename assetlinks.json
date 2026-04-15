@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.appdrive.karbu",
+        "sha256_cert_fingerprints": ["DB:89:D1:35:57:BB:DB:F9:15:23:D4:0A:1C:1E:F1:14:50:F3:CE:60:92:3B:0E:BB:73:8E:47:01:C9:FA:65:AA"]
+      }
+    }]
